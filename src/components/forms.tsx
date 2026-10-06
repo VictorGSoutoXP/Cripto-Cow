@@ -7,10 +7,89 @@ import {
   CheckCircle2,
   ArrowRight,
   LockKeyhole,
+  LoaderCircle,
 } from 'lucide-react';
-import { api, cents, money } from '../lib/api';
+import { api, ApiError, cents, date, money } from '../lib/api';
+import { useLegalManifest } from '../lib/legal';
+import type { LegalRole } from '../lib/legal';
 import { Modal, Button } from './ui';
 import type { Campaign, Expense } from '../types';
+
+function LegalAcceptance({
+  legal,
+  role,
+  accepted,
+  onAccepted,
+  busy,
+}: {
+  legal: ReturnType<typeof useLegalManifest>;
+  role: LegalRole;
+  accepted: boolean;
+  onAccepted: (value: boolean) => void;
+  busy: boolean;
+}) {
+  const consent = legal.manifest?.acceptance[role];
+  const documents = legal.manifest?.documents.filter((document) =>
+    consent?.documents.includes(document.id),
+  );
+
+  if (legal.loading)
+    return (
+      <p className="legal-consent-loading" role="status">
+        <LoaderCircle className="spin" size={16} /> Carregando as condições da demonstração...
+      </p>
+    );
+
+  if (legal.error || !consent)
+    return (
+      <div className="legal-consent-error">
+        <p role="alert">{legal.error || 'Não foi possível carregar as condições de uso.'}</p>
+        <Button
+          type="button"
+          className="button outline"
+          onClick={() => {
+            onAccepted(false);
+            legal.reload();
+          }}
+        >
+          Carregar termos novamente
+        </Button>
+      </div>
+    );
+
+  return (
+    <div className="legal-consent">
+      <nav aria-label="Documentos do aceite" className="legal-consent-links">
+        {documents?.map((document) => (
+          <a
+            href={`#/politicas/${document.id}`}
+            key={document.id}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {document.title}
+            <span className="sr-only"> (abre em nova aba)</span>
+          </a>
+        ))}
+      </nav>
+      <label className="checkbox">
+        <input
+          name="accepted"
+          type="checkbox"
+          checked={accepted}
+          disabled={busy}
+          onChange={(event) => onAccepted(event.target.checked)}
+          required
+        />
+        <span>{consent.text}</span>
+      </label>
+      <p className="legal-consent-version">
+        Versão {consent.version}
+        {documents?.[0] && ` · Atualização de ${date(documents[0].updatedAt)}`}
+      </p>
+    </div>
+  );
+}
 
 export function DonationForm({
   campaign,
@@ -25,22 +104,45 @@ export function DonationForm({
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [receipt, setReceipt] = useState<{ id: string; acceptedAt: string } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    id: string;
+    amount: number;
+    acceptedAt: string;
+  } | null>(null);
   const [requestKey] = useState(() => crypto.randomUUID());
+  const legal = useLegalManifest();
+  const consent = legal.manifest?.acceptance.donor;
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
+    if (!consent || legal.loading || !accepted) {
+      setError('Leia e aceite as condições vigentes para registrar a doação demonstrativa.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
-      const result = await api<{ id: string; acceptedAt: string }>(
+      const result = await api<{ id: string; amount: number; acceptedAt: string }>(
         `/campaigns/${campaign.id}/donations`,
-        { method: 'POST', body: JSON.stringify({ amount: cents(amount), requestKey, accepted }) },
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            amount: cents(amount),
+            requestKey,
+            accepted,
+            termsVersion: consent.version,
+            termsHash: consent.hash,
+          }),
+        },
       );
       setReceipt(result);
       onSaved();
     } catch (err) {
-      setError((err as Error).message);
+      if (err instanceof ApiError && err.code === 'TERMS_CHANGED') {
+        setAccepted(false);
+        legal.reload();
+        setError('As condições foram atualizadas. Leia os documentos e confirme o novo aceite.');
+      } else setError((err as Error).message);
     } finally {
       setBusy(false);
     }
@@ -57,7 +159,7 @@ export function DonationForm({
           <span className="success-icon">
             <CheckCircle2 size={36} />
           </span>
-          <h3>{money(cents(amount))} registrados</h3>
+          <h3>{money(receipt.amount)} registrados</h3>
           <p>
             A entrada foi adicionada ao histórico da campanha. O valor só será liberado após a
             análise de uma evidência.
@@ -114,18 +216,13 @@ export function DonationForm({
               <span>Taxa da plataforma: R$ 0 nesta demonstração.</span>
             </div>
           </div>
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={accepted}
-              onChange={(event) => setAccepted(event.target.checked)}
-              required
-            />
-            <span>
-              Tenho 18 anos ou mais e aceito a regra de liberação e de devolução da sobra. Não
-              espero retorno financeiro.
-            </span>
-          </label>
+          <LegalAcceptance
+            legal={legal}
+            role="donor"
+            accepted={accepted}
+            onAccepted={setAccepted}
+            busy={busy}
+          />
           <p className="privacy-note">
             <LockKeyhole size={14} /> Sua doação aparece sem nome. Não coletamos dados de pagamento
             nesta demonstração.
@@ -135,7 +232,11 @@ export function DonationForm({
               {error}
             </p>
           )}
-          <Button busy={busy} className="button primary full" disabled={!accepted}>
+          <Button
+            busy={busy}
+            className="button primary full"
+            disabled={!accepted || !consent || legal.loading}
+          >
             <Heart size={18} /> Registrar doação demonstrativa
           </Button>
         </form>
@@ -148,10 +249,17 @@ export function CampaignForm({ onClose, onSaved }: { onClose: () => void; onSave
   const [budget, setBudget] = useState([{ name: '', value: '' }]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [accepted, setAccepted] = useState(false);
+  const legal = useLegalManifest();
+  const consent = legal.manifest?.acceptance.organizer;
   const total = budget.reduce((sum, item) => sum + (Number(item.value.replace(',', '.')) || 0), 0);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!consent || legal.loading || !accepted) {
+      setError('Leia e aceite as condições vigentes para criar a campanha demonstrativa.');
+      return;
+    }
     const form = new FormData(event.currentTarget);
     setBusy(true);
     setError('');
@@ -166,13 +274,19 @@ export function CampaignForm({ onClose, onSaved }: { onClose: () => void; onSave
           category: form.get('category'),
           deadline: form.get('deadline'),
           budget: budget.map((item) => ({ name: item.name, planned: cents(item.value) })),
-          accepted: form.get('accepted') === 'on',
+          accepted,
+          termsVersion: consent.version,
+          termsHash: consent.hash,
         }),
       });
       onSaved();
       onClose();
     } catch (err) {
-      setError((err as Error).message);
+      if (err instanceof ApiError && err.code === 'TERMS_CHANGED') {
+        setAccepted(false);
+        legal.reload();
+        setError('As condições foram atualizadas. Leia os documentos e confirme o novo aceite.');
+      } else setError((err as Error).message);
     } finally {
       setBusy(false);
     }
@@ -311,19 +425,23 @@ export function CampaignForm({ onClose, onSaved }: { onClose: () => void; onSave
             doadores. Este protótipo não verifica identidade nem processa pagamentos.
           </p>
         </div>
-        <label className="checkbox">
-          <input name="accepted" type="checkbox" required />
-          <span>
-            Tenho 18 anos ou mais. Usarei dados fictícios e aceito a prestação de contas por etapa e
-            a devolução proporcional da sobra.
-          </span>
-        </label>
+        <LegalAcceptance
+          legal={legal}
+          role="organizer"
+          accepted={accepted}
+          onAccepted={setAccepted}
+          busy={busy}
+        />
         {error && (
           <p className="form-error" role="alert">
             {error}
           </p>
         )}
-        <Button busy={busy} className="button primary full">
+        <Button
+          busy={busy}
+          className="button primary full"
+          disabled={!accepted || !consent || legal.loading}
+        >
           Enviar campanha para revisão <ArrowRight size={17} />
         </Button>
       </form>

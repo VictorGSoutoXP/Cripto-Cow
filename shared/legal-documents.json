@@ -1,0 +1,528 @@
+{
+  "source": {
+    "title": "Doações Transparentes — Estudo de viabilidade jurídica e compliance",
+    "date": "2026-10-02",
+    "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas preservam as seções 7, 8 e 9; as políticas atuais descrevem o MVP publicado."
+  },
+  "acceptance": {
+    "version": "mvp-1.1",
+    "documents": ["uso-demonstrativo", "privacidade", "transparencia"],
+    "donorText": "Tenho 18 anos ou mais, li os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP e aceito as regras de liberação e sobra desta campanha na demonstração. Usarei apenas dados fictícios. Entendo que não há pagamento real nem retorno financeiro.",
+    "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro."
+  },
+  "documents": [
+    {
+      "id": "uso-demonstrativo",
+      "title": "Termos de uso do MVP",
+      "summary": "Regras válidas para participar da demonstração da Cripto Cow.",
+      "status": "current",
+      "version": "mvp-1.1",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "A Cripto Cow é um protótipo de doações transparentes criado para o hackathon. Campanhas, valores, comprovantes e decisões da demonstração devem usar dados fictícios. Uma doação no site é uma simulação e não movimenta dinheiro.",
+        "Estes termos, a Política de Privacidade do MVP e a Política de Transparência do MVP compõem o aceite atual. As minutas para operação futura estão disponíveis para consulta e não fazem parte desse aceite."
+      ],
+      "sections": [
+        {
+          "id": "participacao",
+          "title": "1. Participação na demonstração",
+          "paragraphs": [
+            "O uso é destinado a pessoas com 18 anos ou mais. O aceite é uma declaração do participante; o MVP não realiza verificação de idade ou identidade.",
+            "Utilize apenas nomes, organizações, localidades, histórias, fornecedores e evidências fictícios. Não envie CPF, RG, endereço pessoal, chave Pix, dados bancários, laudos, informações de saúde, biometria ou dados de crianças e adolescentes."
+          ]
+        },
+        {
+          "id": "simulacao",
+          "title": "2. Doações, regras e saldos simulados",
+          "paragraphs": [
+            "Os valores são registrados como simulações no banco de dados. Não existe cobrança por Pix ou cartão, custódia de dinheiro, conta de pagamento parceira, taxa, gorjeta, rendimento ou retorno financeiro.",
+            "A página de cada campanha exibe orçamento, regra de liberação e destino da sobra. O participante aceita essas regras para a demonstração. A análise de uma despesa pode gerar uma saída simulada; a regra da sobra é informativa e não executa uma devolução real.",
+            "O painel permite publicar campanhas, analisar solicitações de despesa, congelar liberações e revisar denúncias manualmente. Essas ações alteram o estado da demonstração e não constituem verificação profissional de uma causa."
+          ]
+        },
+        {
+          "id": "conteudo",
+          "title": "3. Conteúdo permitido",
+          "paragraphs": [
+            "Publique apenas conteúdo próprio ou que você tenha autorização para usar, incluindo imagens e textos. O conteúdo fica visível na campanha para que a demonstração possa ser acompanhada.",
+            "Campanhas e conteúdos contrários a estas regras podem ser recusados ou interrompidos pelo time, com motivo registrado no painel. O protótipo não verifica automaticamente todas as restrições abaixo."
+          ],
+          "items": [
+            "Não crie campanhas eleitorais ou partidárias, rifas, sorteios, apostas ou promessas de investimento e retorno financeiro.",
+            "Não publique atividades ilícitas, armas, discurso de ódio, violência, exposição vexatória ou imagem de terceiros sem autorização.",
+            "Não apresente pessoas reais, doentes, falecidas ou menores como beneficiárias da demonstração."
+          ]
+        },
+        {
+          "id": "blockchain",
+          "title": "4. Registro na Solana devnet",
+          "paragraphs": [
+            "A integração com a Phantom permite ao administrador assinar uma transação de testes para registrar um hash do histórico na Solana devnet. Ela não envia os valores das doações nem transfere recursos a um beneficiário.",
+            "O endereço da carteira e a transação assinada são públicos na blockchain. A Cripto Cow não solicita a frase de recuperação ou a chave privada da carteira. Utilize uma carteira de testes com SOL de devnet, sem valor real.",
+            "Um registro só é apresentado como confirmado após a consulta da transação. Um hash pode demonstrar a correspondência de um histórico com o registro, mas não comprova que uma história ou evidência seja verdadeira."
+          ]
+        },
+        {
+          "id": "aceite",
+          "title": "5. Aceite e versões",
+          "paragraphs": [
+            "Antes de simular uma doação ou criar uma campanha, o participante deve marcar o aceite das regras atuais. O registro associa a operação à data, hora e versão dos documentos aceitos e às regras da campanha aplicáveis.",
+            "O registro não inclui consentimento para tratamento de saúde, biometria, documentos pessoais ou futura operação financeira. Mudanças relevantes das regras atuais exigem uma nova versão; os registros anteriores conservam a versão aceita."
+          ]
+        },
+        {
+          "id": "limites",
+          "title": "6. Limites da demonstração",
+          "paragraphs": [
+            "O MVP pode ficar indisponível, ser reiniciado ou ter seu ambiente de demonstração ajustado pelo time. Não o utilize para arrecadar, comprovar despesas reais ou tomar decisões financeiras.",
+            "As minutas jurídicas são material de trabalho. A operação com dinheiro e dados reais depende de revisão, parceiro, canais de atendimento, prazos e demais decisões ainda pendentes."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "privacidade",
+      "title": "Política de Privacidade do MVP",
+      "summary": "Quais informações o protótipo utiliza, publica e mantém restritas.",
+      "status": "current",
+      "version": "mvp-1.1",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "Esta política descreve o funcionamento atual da Cripto Cow. A demonstração deve receber somente dados fictícios e não possui cadastro de identidade, KYC, biometria ou envio de documentos originais.",
+        "Campos de texto podem identificar pessoas se forem preenchidos com dados reais. Por isso, não inclua informações pessoais ou sensíveis nas campanhas, justificativas, evidências ou denúncias."
+      ],
+      "sections": [
+        {
+          "id": "dados",
+          "title": "1. Informações registradas",
+          "paragraphs": [
+            "O banco Turso armazena os dados enviados aos formulários e os registros da demonstração, incluindo nome da organização, localização, título e descrição da campanha, orçamento, prazo e regras; título, fornecedor, valor e resumo de evidência de despesas; justificativas de decisões; motivo e estado das denúncias; valores simulados, identificadores e aceites versionados.",
+            "A doação demonstrativa não solicita nome, CPF, cartão, conta bancária ou chave Pix do doador. O acesso ao painel usa uma senha administrativa e não um cadastro individual de participante.",
+            "A preparação e confirmação de ancoragens também registram o endereço público da carteira, assinatura e dados técnicos da transação. Uma assinatura de transação não dá ao site acesso à chave privada."
+          ]
+        },
+        {
+          "id": "publicacao",
+          "title": "2. Informações públicas e restritas",
+          "paragraphs": [
+            "Campanhas publicadas, organização, localização, descrição, orçamento, movimentações, resumos de evidência, fornecedor e decisões sobre despesas ou estado da campanha podem ser consultados publicamente. O histórico e seus hashes também podem ser exportados.",
+            "Denúncias, seus motivos e a decisão de revisão ficam restritos ao painel administrativo. Organização e revisão compartilham esse mesmo painel no MVP; a separação de acesso por função ainda não foi implementada. O formulário não solicita a identidade do denunciante, mas qualquer pessoa com acesso administrativo pode consultar o texto enviado. Não inclua dados que identifiquem quem denuncia.",
+            "Não existe, neste MVP, mecanismo para ocultar automaticamente dados pessoais, tarjar documentos ou remover metadados. Os formulários recebem textos demonstrativos, não documentos originais. Não copie informações reais para esses textos."
+          ]
+        },
+        {
+          "id": "sessao",
+          "title": "3. Cookie administrativo e armazenamento no navegador",
+          "paragraphs": [
+            "O cookie essencial elo_session mantém a autenticação do painel por até oito horas. Ele usa HttpOnly e SameSite=Strict, além de Secure no ambiente publicado. As sessões ficam na memória do servidor e terminam também quando o servidor reinicia ou o usuário sai do painel.",
+            "O navegador pode guardar temporariamente, em sessionStorage, o identificador e a assinatura de uma ancoragem pendente para permitir sua confirmação após uma falha de conexão. Isso não armazena a chave privada da carteira.",
+            "O MVP não utiliza ferramentas de analytics, publicidade ou cookies de rastreamento. O aceite das regras da demonstração não é uma autorização geral para novos usos de dados."
+          ]
+        },
+        {
+          "id": "infraestrutura",
+          "title": "4. Infraestrutura e dados técnicos",
+          "paragraphs": [
+            "O Render hospeda o site e a API, o Turso armazena o banco, e o navegador solicita as fontes ao Google Fonts. Esses serviços recebem dados técnicos necessários às conexões, como endereço IP. A carteira Phantom e o serviço RPC da Solana participam das requisições de ancoragem quando essa função é utilizada.",
+            "A API usa o IP em memória para limitar requisições de alteração em uma janela de um minuto. Um registro pode permanecer até ser substituído, limpo ou até o servidor reiniciar; o sistema não garante exclusão automática após sessenta segundos.",
+            "Não há registro de IP no aceite da doação ou da campanha. A operação futura poderá exigir regras próprias de retenção e registro, ainda não aprovadas."
+          ]
+        },
+        {
+          "id": "blockchain",
+          "title": "5. Dados na blockchain",
+          "paragraphs": [
+            "O Memo enviado à Solana devnet contém identificador da campanha, quantidade de registros e hash do histórico. O endereço assinante e os metadados da transação são públicos na rede. Não insira dados pessoais no conteúdo da campanha ou das evidências.",
+            "A blockchain não oferece uma função de apagar uma transação já publicada. O MVP foi desenhado para demonstrar integridade sem enviar documentos, dados de saúde ou identificação pessoal deliberada ao Memo."
+          ]
+        },
+        {
+          "id": "retencao",
+          "title": "6. Retenção, atendimento e operação futura",
+          "paragraphs": [
+            "O banco preserva os registros da demonstração entre reinícios. Ainda não há prazo formal de retenção para dados pessoais, canal de atendimento definido ou interface para solicitar acesso, correção, eliminação e retirada de consentimento.",
+            "Esses pontos precisam ser definidos e implementados antes de receber dados reais. Esta política não promete um procedimento ainda inexistente nem declara conformidade jurídica. Durante o MVP, mantenha todas as entradas fictícias."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "transparencia",
+      "title": "Política de Transparência do MVP",
+      "summary": "Como consultar o histórico, entender evidências e acompanhar decisões simuladas.",
+      "status": "current",
+      "version": "mvp-1.1",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "A Cripto Cow demonstra prestação de contas por campanha: entradas, saídas, orçamento, evidências e decisões ficam disponíveis para consulta pública, com os limites descritos nesta política.",
+        "A demonstração não substitui auditoria, verificação documental, comprovação de identidade ou análise jurídica. Os dados e valores são simulados."
+      ],
+      "sections": [
+        {
+          "id": "regras",
+          "title": "1. Regras da campanha",
+          "paragraphs": [
+            "A página da campanha apresenta finalidade, orçamento por categoria, prazo, regra de liberação e destino da sobra antes de uma doação demonstrativa. O aceite é registrado com a versão dos documentos atuais.",
+            "Saldos e limites são calculados a partir dos registros do sistema. Solicitações de despesa reservam saldo da demonstração, e aprovações registram saídas simuladas. Não existe conciliação com conta de pagamento real.",
+            "A campanha pode ser congelada manualmente. O encerramento exige saldo zerado e ausência de solicitações pendentes; o MVP não executa devolução de sobras."
+          ]
+        },
+        {
+          "id": "evidencias",
+          "title": "2. Evidências e decisões",
+          "paragraphs": [
+            "O painel recebe um resumo textual de evidência fictícia e registra seu hash, categoria, valor e nível de evidência. A análise de despesas é manual e conserva uma justificativa de aprovação ou recusa.",
+            "O nível apresentado informa a classificação do registro na demonstração. Um selo, nível ou aprovação não representa autenticação de um documento, análise automática de fraude ou garantia sobre a causa.",
+            "As evidências e decisões publicadas podem ser consultadas no histórico. Documentos pessoais, originais e dados de saúde não devem ser enviados."
+          ]
+        },
+        {
+          "id": "denuncias",
+          "title": "3. Denúncias e revisão humana",
+          "paragraphs": [
+            "Qualquer visitante pode enviar uma denúncia demonstrativa sobre uma campanha ou despesa. O motivo fica restrito ao painel; a confirmação devolve um identificador de registro.",
+            "A equipe analisa e registra manualmente o motivo da revisão. O congelamento de liberações é uma ação manual distinta da denúncia. Não há julgamento automático de fraude.",
+            "Prazos formais de resposta, contraditório, reconsideração por outra pessoa e atendimento ainda dependem de definição e implementação para a operação futura. Não se presume fraude porque uma campanha está congelada ou em análise."
+          ]
+        },
+        {
+          "id": "integridade",
+          "title": "4. Integridade do histórico",
+          "paragraphs": [
+            "Cada evento recebe um hash SHA-256 encadeado ao evento anterior. A conferência no navegador e a exportação permitem recalcular a sequência e comparar o resultado com o histórico apresentado.",
+            "Sem uma ancoragem confirmada externa, essa conferência verifica a consistência dos dados fornecidos pelo próprio sistema. Ela, por si só, não prova que o operador nunca tenha substituído um histórico inteiro.",
+            "Quando uma transação de ancoragem é confirmada na Solana devnet, o registro público permite comparar o hash e a quantidade de eventos daquela versão do histórico. Eventos posteriores precisam de nova ancoragem para receber o mesmo tipo de referência externa.",
+            "A correspondência de hashes demonstra integridade em relação ao registro consultado; ela não confirma a veracidade de descrições, documentos, pessoas ou despesas."
+          ]
+        },
+        {
+          "id": "minutas",
+          "title": "5. Minutas jurídicas e decisões pendentes",
+          "paragraphs": [
+            "Os termos do organizador, termos do doador e textos de declarações publicados como minutas reproduzem o documento de trabalho do time de 02/10/2026. Eles descrevem uma operação futura e não compõem o aceite da demonstração.",
+            "Parceiro de pagamento, taxas, prazos, regras de devolução, canal de atendimento, retenção, autorização de dados e revisão jurídica continuam pendentes. O time deve resolver essas decisões antes de operar com recursos ou dados reais."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "doador",
+      "title": "Termos do doador — minuta",
+      "summary": "Texto do documento jurídico para uma futura operação com doações reais.",
+      "status": "draft",
+      "version": "juridico-2026-10-02",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
+        "Orientação da fonte: o doador deve ver os pontos essenciais antes de pagar, em destaque, e aceitar com uma caixa de seleção própria."
+      ],
+      "sections": [
+        {
+          "id": "clausula-1",
+          "title": "Cláusula 1. Quem pode doar",
+          "paragraphs": [
+            "Podem doar pessoas maiores de 18 anos. O doador declara que o meio de pagamento é de sua titularidade."
+          ]
+        },
+        {
+          "id": "clausula-2",
+          "title": "Cláusula 2. O que significa doar aqui",
+          "paragraphs": [
+            "Ao doar, o doador contribui para a finalidade da campanha. O valor fica em conta segregada no parceiro de pagamento e é liberado ao organizador ou a fornecedores conforme as regras da campanha. O doador não recebe retorno financeiro, participação em lucros ou promessa de rendimento."
+          ]
+        },
+        {
+          "id": "clausula-3",
+          "title": "Cláusula 3. Regra da sobra",
+          "paragraphs": [
+            "A regra de destino do saldo não utilizado está indicada na página da campanha e é aceita expressamente pelo doador antes da doação."
+          ]
+        },
+        {
+          "id": "clausula-4",
+          "title": "Cláusula 4. Acompanhamento e transparência",
+          "paragraphs": [
+            "O doador pode acompanhar entradas e saídas, níveis de verificação e documentos (com dados pessoais ocultados). Pode ativar notificações de saídas."
+          ]
+        },
+        {
+          "id": "clausula-5",
+          "title": "Cláusula 5. Denúncia",
+          "paragraphs": [
+            "O doador pode denunciar gastos ou campanhas suspeitas. A identidade de quem denuncia não é revelada ao organizador. A plataforma analisa a denúncia, ouve o organizador e pode congelar novas liberações enquanto analisa."
+          ]
+        },
+        {
+          "id": "clausula-6",
+          "title": "Cláusula 6. Mandato para fiscalizar e devolver",
+          "paragraphs": [
+            "O doador autoriza a plataforma a fiscalizar o cumprimento das regras da campanha e a executar, em seu nome, congelamentos e devoluções previstos nestes Termos."
+          ]
+        },
+        {
+          "id": "clausula-7",
+          "title": "Cláusula 7. Devolução",
+          "paragraphs": [
+            "O doador tem direito à devolução nas seguintes hipóteses: sobra, quando a regra da campanha for de devolução; campanha cancelada ou reprovada na verificação; fraude ou desvio confirmados (quanto aos valores ainda não liberados); erro operacional ou cobrança em duplicidade; e, se aplicável, arrependimento. A devolução é feita ao meio de pagamento de origem, quando possível, em até [A definir pelo time] dias."
+          ]
+        },
+        {
+          "id": "clausula-8",
+          "title": "Cláusula 8. Taxas e gorjeta",
+          "paragraphs": [
+            "Tarifas e eventual gorjeta à plataforma são exibidas antes da confirmação. A gorjeta é opcional."
+          ]
+        },
+        {
+          "id": "clausula-9",
+          "title": "Cláusula 9. Doação anônima e dados",
+          "paragraphs": [
+            "O doador pode escolher aparecer com nome ou apelido, ou permanecer anônimo. Os dados de pagamento ficam com o parceiro de pagamento, e a plataforma não os armazena. A plataforma trata os dados do doador conforme a LGPD, para processar a doação, emitir o recibo e prevenir fraude."
+          ]
+        },
+        {
+          "id": "clausula-10",
+          "title": "Cláusula 10. Tributos",
+          "paragraphs": [
+            "A plataforma não presta aconselhamento tributário. O doador e o organizador devem verificar eventuais obrigações, como o imposto estadual sobre doações, conforme a lei aplicável."
+          ]
+        },
+        {
+          "id": "clausula-11",
+          "title": "Cláusula 11. Limites da responsabilidade da plataforma",
+          "paragraphs": [
+            "A plataforma não garante o sucesso da campanha nem o resultado do projeto ou do tratamento financiado. A plataforma responde pela execução das regras de liberação e pela segurança da operação sob sua responsabilidade.",
+            "Nota da minuta original: esta cláusula limita a responsabilidade da plataforma e deve ser revisada por advogado à luz do CDC, art. 51, I (cláusulas que reduzem ou afastam a responsabilidade do fornecedor podem ser nulas). Em contrato de adesão, deve aparecer em destaque."
+          ]
+        },
+        {
+          "id": "clausula-12",
+          "title": "Cláusula 12. Atendimento e foro",
+          "paragraphs": [
+            "O doador pode contatar o atendimento (SAC) pelo canal [A definir pelo time], com resposta em até [A definir pelo time] dias. Aplica-se o foro do domicílio do consumidor."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "organizador",
+      "title": "Termos do organizador — minuta",
+      "summary": "As vinte cláusulas de trabalho para a futura criação e administração de campanhas reais.",
+      "status": "draft",
+      "version": "juridico-2026-10-02",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real."
+      ],
+      "sections": [
+        {
+          "id": "clausula-1",
+          "title": "Cláusula 1. Definições",
+          "paragraphs": [
+            "Plataforma: Cripto Cow. Organizador: quem cria a campanha. Beneficiário: quem recebe o benefício final. Doador: quem contribui. Parceiro de pagamento: instituição de pagamento autorizada (A definir pelo time). Evidência: documento ou registro que comprova um gasto. Encargo: conjunto de obrigações do organizador descritas nestes Termos."
+          ]
+        },
+        {
+          "id": "clausula-2",
+          "title": "Cláusula 2. Elegibilidade",
+          "paragraphs": [
+            "Podem criar campanhas pessoas maiores de 18 anos, com capacidade civil, e pessoas jurídicas regularmente constituídas. O organizador autoriza a verificação de identidade, inclusive por biometria facial, para prevenção à fraude."
+          ]
+        },
+        {
+          "id": "clausula-3",
+          "title": "Cláusula 3. Papel da plataforma",
+          "paragraphs": [
+            "A plataforma é intermediadora tecnológica. Os recursos arrecadados são mantidos em conta segregada junto ao parceiro de pagamento e não integram o patrimônio da plataforma nem do organizador até a liberação conforme estes Termos."
+          ]
+        },
+        {
+          "id": "clausula-4",
+          "title": "Cláusula 4. Natureza da doação e encargo",
+          "paragraphs": [
+            "O doador destina o valor à finalidade descrita na campanha. Ao criar a campanha, o organizador aceita que a liberação dos recursos fica condicionada às regras destes Termos, que constituem encargo da doação. O doador autoriza a plataforma a fiscalizar o cumprimento do encargo e a executar, em seu nome, o congelamento de liberações e as devoluções previstas."
+          ]
+        },
+        {
+          "id": "clausula-5",
+          "title": "Cláusula 5. Veracidade e declarações",
+          "paragraphs": [
+            "O organizador declara que as informações e documentos são verdadeiros, que tem poderes para arrecadar em favor do beneficiário, e que obteve a autorização do beneficiário ou do responsável legal. O organizador responde civil e criminalmente por falsidade."
+          ]
+        },
+        {
+          "id": "clausula-6",
+          "title": "Cláusula 6. Orçamento e remanejamento",
+          "paragraphs": [
+            "O organizador define o orçamento por categorias. O remanejamento entre categorias até [A definir pelo time]% do total pode ser feito mediante justificativa. Acima disso, depende de aprovação da plataforma e de aviso aos doadores, com prazo de [A definir pelo time] dias para manifestação."
+          ]
+        },
+        {
+          "id": "clausula-7",
+          "title": "Cláusula 7. Formas de liberação",
+          "paragraphs": [
+            "Os recursos serão liberados por uma das rotas abaixo, conforme definido na campanha:"
+          ],
+          "items": [
+            "pagamento direto ao fornecedor identificado;",
+            "liberação por etapa, mediante comprovação;",
+            "reembolso de despesa já paga pelo organizador, com comprovante;",
+            "adiantamento de até [A definir pelo time]% do valor orçado, com prova retroativa em até [A definir pelo time] dias."
+          ]
+        },
+        {
+          "id": "clausula-8",
+          "title": "Cláusula 8. Níveis de comprovação",
+          "paragraphs": [
+            "Quanto maior o valor da saída, maior o nível de evidência exigido. A plataforma pode recusar comprovante insuficiente, inconsistente, adulterado ou já utilizado em outra campanha, com justificativa e possibilidade de complementação."
+          ]
+        },
+        {
+          "id": "clausula-9",
+          "title": "Cláusula 9. Prazo e consequências da falta de prestação de contas",
+          "paragraphs": [
+            "O organizador deve comprovar cada gasto em até [A definir pelo time] dias da liberação. O descumprimento autoriza a suspensão de novas liberações, a sinalização pública da campanha, restrições a campanhas futuras e as medidas de devolução previstas, sem prejuízo de outras providências cabíveis."
+          ]
+        },
+        {
+          "id": "clausula-10",
+          "title": "Cláusula 10. Saldo não utilizado",
+          "paragraphs": [
+            "Ao criar a campanha, o organizador define o destino da sobra: devolução proporcional aos doadores, causa correlata identificada ou reserva para a mesma causa até [A definir pelo time]. A regra é exibida ao doador antes da doação e exige aceite expresso. Valores de devolução inferiores a R$ [A definir pelo time] ou não reclamados em [A definir pelo time] dias terão o destino de [A definir pelo time]."
+          ]
+        },
+        {
+          "id": "clausula-11",
+          "title": "Cláusula 11. Conteúdo vedado",
+          "paragraphs": [
+            "É proibido criar campanhas eleitorais ou partidárias; rifas, sorteios e apostas; campanhas que prometam retorno financeiro ou investimento ao doador; atividades ilícitas; armas; conteúdo que incite ódio ou violência; uso de imagem de terceiros sem autorização; campanhas em nome de pessoa falecida ou doente sem anuência de familiar ou responsável; e exposição vexatória de crianças. A plataforma pode recusar o cadastro ou encerrar a campanha que descumprir esta cláusula, sempre com motivo registrado e possibilidade de recurso."
+          ]
+        },
+        {
+          "id": "clausula-12",
+          "title": "Cláusula 12. Imagem, textos e licença",
+          "paragraphs": [
+            "O organizador garante ter direitos sobre imagens e textos publicados e concede à plataforma licença não exclusiva, gratuita e limitada para exibi-los na campanha. Imagens de crianças dependem de autorização do responsável."
+          ]
+        },
+        {
+          "id": "clausula-13",
+          "title": "Cláusula 13. Taxas, tarifas do parceiro de pagamento e eventual gorjeta",
+          "paragraphs": [
+            "Percentual: [A definir pelo time]. Tributos incidentes sobre a doação recebida são de responsabilidade do organizador, e a plataforma presta apenas informação geral, não aconselhamento tributário."
+          ]
+        },
+        {
+          "id": "clausula-14",
+          "title": "Cláusula 14. Encerramento da campanha",
+          "paragraphs": [
+            "A campanha encerra ao atingir a meta, ao fim do prazo, por decisão do organizador mediante cumprimento das regras de sobra, ou por decisão da plataforma nos casos previstos. Após o encerramento, o organizador deve concluir a prestação de contas em [A definir pelo time] dias."
+          ]
+        },
+        {
+          "id": "clausula-15",
+          "title": "Cláusula 15. Denúncia, congelamento e devolução",
+          "paragraphs": [
+            "Qualquer pessoa pode denunciar uma campanha ou um gasto. Em caso de indícios graves, a plataforma poderá congelar cautelarmente novas liberações e sinalizar a campanha como \"em análise\", sem acusar fraude. O organizador será avisado dos motivos e terá [A definir pelo time] dias úteis para apresentar documentos. A plataforma decidirá de forma fundamentada em até [A definir pelo time] dias, podendo liberar, manter o congelamento, exigir complementação ou encerrar a campanha e devolver os valores aos doadores. O organizador poderá pedir reconsideração em até [A definir pelo time] dias, e o pedido será analisado por pessoa diferente da que decidiu. A identidade de quem denuncia não é revelada ao organizador."
+          ]
+        },
+        {
+          "id": "clausula-16",
+          "title": "Cláusula 16. Responsabilidades",
+          "paragraphs": [],
+          "items": [
+            "Organizador: responde pela veracidade das informações e dos documentos e pelo uso dos valores liberados conforme a finalidade da campanha.",
+            "Plataforma: responde pela execução das regras de liberação, pela segurança da operação sob sua responsabilidade e pelo tratamento de dados. Não garante o sucesso da campanha nem o resultado do tratamento ou projeto financiado."
+          ]
+        },
+        {
+          "id": "clausula-17",
+          "title": "Cláusula 17. Dados pessoais",
+          "paragraphs": [
+            "O tratamento de dados segue a LGPD. Os dados são usados para executar a campanha, verificar identidade, prevenir fraude, cumprir obrigações legais e exibir a transparência pública. Documentos, biometria e dados de saúde ficam em área restrita e nunca no painel público. Dados sensíveis, como saúde, só são exibidos publicamente com consentimento específico do titular e de forma minimizada. Nenhum dado pessoal é gravado no registro imutável. O titular pode exercer seus direitos (acesso, correção, eliminação e retirada de consentimento) pelo canal de atendimento da plataforma."
+          ]
+        },
+        {
+          "id": "clausula-18",
+          "title": "Cláusula 18. Cooperação com autoridades",
+          "paragraphs": [
+            "A plataforma poderá comunicar fatos e fornecer dados às autoridades competentes mediante ordem judicial ou requisição legal, e para cumprimento de obrigação legal ou regulatória."
+          ]
+        },
+        {
+          "id": "clausula-19",
+          "title": "Cláusula 19. Aceite e registro",
+          "paragraphs": [
+            "O aceite é eletrônico. A plataforma registra data, hora, endereço IP e versão dos Termos aceitos, e mantém o registro pelo prazo de [A definir pelo time]."
+          ]
+        },
+        {
+          "id": "clausula-20",
+          "title": "Cláusula 20. Alterações e foro",
+          "paragraphs": [
+            "Alterações relevantes serão comunicadas com antecedência de [A definir pelo time] dias. Aplica-se a lei brasileira. Para consumidores, o foro é o do domicílio do consumidor; eventual arbitragem só poderá ocorrer por iniciativa ou com concordância expressa do consumidor (CDC, art. 51, VII)."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "declaracoes",
+      "title": "Aceites, consentimentos e declarações — minutas",
+      "summary": "Textos de referência para a operação futura; não são solicitados no MVP.",
+      "status": "draft",
+      "version": "juridico-2026-10-02",
+      "updatedAt": "2026-10-06",
+      "intro": [
+        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
+        "Os campos entre colchetes referentes à campanha, ao beneficiário e às informações a exibir são preenchidos caso a caso. Os parceiros, canais e prazos sem decisão continuam pendentes. A demonstração não solicita consentimento de beneficiário, responsável legal ou tratamento de saúde."
+      ],
+      "sections": [
+        {
+          "id": "aceite-doador",
+          "title": "Aceite do doador (caixa de seleção no checkout)",
+          "paragraphs": [
+            "“Li e aceito que o valor doado ficará em conta segregada e será liberado conforme as regras desta campanha (pagamento a fornecedores e liberação contra comprovação). Estou ciente de que, caso haja sobra, ela terá o seguinte destino: [regra da sobra da campanha]. Não espero retorno financeiro.”"
+          ]
+        },
+        {
+          "id": "declaracao-organizador",
+          "title": "Declaração do organizador",
+          "paragraphs": [
+            "“Declaro, sob as penas da lei, que as informações e documentos que apresentei são verdadeiros, que tenho autorização do beneficiário (ou de seu responsável legal) para arrecadar em seu favor e que usarei os recursos exclusivamente para a finalidade da campanha, comprovando cada gasto conforme as regras da plataforma.”"
+          ]
+        },
+        {
+          "id": "consentimento-beneficiario",
+          "title": "Consentimento do beneficiário para exibição pública",
+          "paragraphs": [
+            "“Autorizo a exibição pública, na campanha [nome da campanha], do meu nome [ou apelido], de minha foto [opcional] e de um resumo da minha situação de saúde aprovado por mim. Sei que documentos completos (laudos, exames, documentos pessoais) não serão publicados. Posso retirar este consentimento a qualquer momento pelo canal [A definir pelo time], sabendo que o registro financeiro da campanha será mantido sem identificar-me.”"
+          ]
+        },
+        {
+          "id": "consentimento-responsavel",
+          "title": "Consentimento do responsável legal (beneficiário menor)",
+          "paragraphs": [
+            "“Na condição de [mãe/pai/responsável legal] de [iniciais ou apelido], autorizo a exibição pública apenas das informações [descrever] e declaro que isso atende ao melhor interesse da criança ou adolescente. Estou ciente de que o rosto e o nome completo não serão exibidos por padrão e de que posso retirar esta autorização a qualquer momento.”"
+          ]
+        },
+        {
+          "id": "consentimento-saude",
+          "title": "Consentimento para tratamento de dados de saúde",
+          "paragraphs": [
+            "“Autorizo o tratamento de dados de saúde, como laudos e orçamentos médicos, para verificar a campanha e comprovar gastos. Esses documentos ficarão em área restrita, acessíveis apenas à equipe autorizada e a parceiros [A definir pelo time], e serão eliminados ou arquivados com restrição após prazo [A definir pelo time].”"
+          ]
+        },
+        {
+          "id": "aviso-tributario",
+          "title": "Aviso tributário (informativo)",
+          "paragraphs": [
+            "“Doações podem estar sujeitas a imposto estadual (ITCMD) e a obrigações de declaração, conforme o estado e o valor. Esta informação é geral e não substitui orientação de contador ou advogado.”"
+          ]
+        }
+      ]
+    }
+  ]
+}

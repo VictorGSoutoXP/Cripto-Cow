@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { Store } from '../server/store.js';
 import { evidenceDigest } from '../server/ledger.js';
+import { getAcceptance } from '../server/legal.js';
 
 async function fixture(t) {
   const store = await Store.open({ path: ':memory:', seed: false });
@@ -13,6 +14,7 @@ async function fixture(t) {
     status: 'active',
     deadline: '2099-01-01',
     surplusRule: 'Devolução proporcional',
+    releaseRule: 'Liberação por etapa após análise',
     budget: [
       { id: 'one', name: 'Categoria', planned: 10000 },
       { id: 'two', name: 'Outra', planned: 10000 },
@@ -38,8 +40,21 @@ test('doação é idempotente e preserva o aceite da regra da sobra', async (t) 
   const second = await store.donate('cause', 1000, key, true);
   assert.equal(first.id, second.id);
   assert.equal((await store.campaign('cause')).raised, 16000);
-  assert.equal(first.termsVersion, 'demo-1.0');
+  const acceptance = getAcceptance('donor');
+  assert.equal(first.termsVersion, acceptance.version);
+  assert.equal(first.termsHash, acceptance.hash);
+  assert.deepEqual(first.termsDocumentIds, acceptance.documents);
+  assert.equal(first.termsText, acceptance.text);
   assert.equal(first.surplusRule, 'Devolução proporcional');
+  assert.equal(first.releaseRule, 'Liberação por etapa após análise');
+  assert.equal(first.simulated, true);
+  assert.deepEqual(await store.get('donations', first.id), first);
+  await store.save('campaigns', {
+    ...(await store.get('campaigns', 'cause')),
+    surplusRule: 'Outra regra de sobra',
+    releaseRule: 'Outra regra de liberação',
+  });
+  assert.deepEqual(await store.donate('cause', 1000, key, true), first);
   await assert.rejects(() => store.donate('cause', 2000, key, true));
   await assert.rejects(() => store.donate('cause', 1000, randomUUID(), false));
   await assert.rejects(() => store.donate('cause', 100.5, randomUUID(), true));

@@ -7,14 +7,18 @@ import { Proof, Decision, About } from './components/overlays';
 import Home from './pages/Home';
 import CampaignPage from './pages/CampaignPage';
 import Admin from './pages/Admin';
+import Policies from './pages/Policies';
 import type { Campaign, Overlay } from './types';
 
-type View = 'home' | 'transparency' | 'admin' | 'campaign';
+type View = 'home' | 'transparency' | 'admin' | 'campaign' | 'policies';
 
 function useRoute() {
   const read = () => {
     const parts = window.location.hash.replace(/^#\/?/, '').split('/');
-    if (parts[0] === 'campanha' && parts[1]) return { view: 'campaign' as View, id: parts[1] };
+    if (parts[0] === 'campanha' && parts[1])
+      return { view: 'campaign' as View, id: parts[1], sectionId: '' };
+    if (parts[0] === 'politicas')
+      return { view: 'policies' as View, id: parts[1] || '', sectionId: parts[2] || '' };
     return {
       view:
         parts[0] === 'transparencia'
@@ -23,6 +27,7 @@ function useRoute() {
             ? ('admin' as View)
             : ('home' as View),
       id: '',
+      sectionId: '',
     };
   };
   const [route, setRoute] = useState(read);
@@ -130,7 +135,9 @@ export default function App() {
         </div>
       </div>
       <main>
-        {loading ? (
+        {route.view === 'policies' ? (
+          <Policies documentId={route.id} sectionId={route.sectionId} />
+        ) : loading ? (
           <div className="loading-state">
             <LoaderCircle className="spin" /> Carregando as causas...
           </div>
@@ -178,6 +185,7 @@ export default function App() {
           <div className="footer-links">
             <a href="#/">Explorar causas</a>
             <a href="#/transparencia">Registro público</a>
+            <a href="#/politicas">Termos e políticas</a>
             <button onClick={() => setOverlay({ type: 'info' })}>Sobre o protótipo</button>
           </div>
           <div className="footer-note">

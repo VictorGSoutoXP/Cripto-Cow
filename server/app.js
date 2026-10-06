@@ -3,6 +3,7 @@ import { randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { resolve } from 'node:path';
 import { z } from 'zod';
 import { digest, verifyEntries } from './ledger.js';
+import { getAcceptance, getLegalManifest } from './legal.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -14,6 +15,11 @@ import {
 
 const text = (min, max) => z.string().trim().min(min).max(max);
 const money = z.number().int().min(100).max(100000000);
+const acceptanceFields = {
+  accepted: z.literal(true),
+  termsVersion: z.string().max(100).optional(),
+  termsHash: z.string().max(128).optional(),
+};
 const campaignSchema = z.object({
   title: text(8, 100),
   description: text(30, 1200),
@@ -25,7 +31,7 @@ const campaignSchema = z.object({
     .array(z.object({ name: text(3, 60), planned: money }))
     .min(1)
     .max(8),
-  accepted: z.literal(true),
+  ...acceptanceFields,
 });
 const expenseSchema = z.object({
   title: text(5, 100),
@@ -100,7 +106,17 @@ export function createApp(store, options = {}) {
     if (!campaign) throw Object.assign(new Error('Campanha não encontrada.'), { status: 404 });
     return campaign;
   };
+  const requireAcceptance = (input, role) => {
+    const acceptance = getAcceptance(role);
+    if (input.termsVersion !== acceptance.version || input.termsHash !== acceptance.hash)
+      throw Object.assign(
+        new Error('As políticas foram atualizadas. Recarregue a página, leia e aceite novamente.'),
+        { status: 409, code: 'TERMS_CHANGED' },
+      );
+    return acceptance;
+  };
 
+  app.get('/api/legal', (req, res) => res.json(getLegalManifest()));
   app.get('/api/health', async (req, res) => {
     try {
       await store.db.execute('SELECT 1');
@@ -151,8 +167,9 @@ export function createApp(store, options = {}) {
   });
   app.post('/api/campaigns/:id/donations', demoOnly, async (req, res) => {
     const input = z
-      .object({ amount: money.max(1000000), requestKey: z.uuid(), accepted: z.literal(true) })
+      .object({ amount: money.max(1000000), requestKey: z.uuid(), ...acceptanceFields })
       .parse(req.body);
+    requireAcceptance(input, 'donor');
     res
       .status(201)
       .json(await store.donate(req.params.id, input.amount, input.requestKey, input.accepted));
@@ -215,9 +232,10 @@ export function createApp(store, options = {}) {
   });
   app.post('/api/campaigns', admin, demoOnly, async (req, res) => {
     const input = campaignSchema.parse(req.body);
+    const acceptance = requireAcceptance(input, 'organizer');
     if (new Date(`${input.deadline}T23:59:59-03:00`) <= new Date())
       throw new Error('Escolha uma data de encerramento no futuro.');
-    const { accepted, ...fields } = input;
+    const { accepted, termsVersion, termsHash, ...fields } = input;
     const campaign = await store.transaction(async () => {
       const id = randomUUID();
       const record = await store.save('campaigns', {
@@ -233,7 +251,10 @@ export function createApp(store, options = {}) {
         releaseRule: 'Liberação por etapa após análise do comprovante',
         createdAt: new Date().toISOString(),
         acceptedAt: new Date().toISOString(),
-        termsVersion: 'demo-1.0',
+        termsVersion: acceptance.version,
+        termsHash: acceptance.hash,
+        termsDocumentIds: acceptance.documents,
+        termsText: acceptance.text,
         simulated: true,
       });
       await store.append(id, { type: 'campaign_created' });
