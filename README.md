@@ -1,6 +1,6 @@
 # Cripto Cow
 
-[Abrir o site](https://cripto-cow.onrender.com) · [Painel](https://cripto-cow.onrender.com/#/painel)
+[Abrir o site](https://cripto-cow.onrender.com) · [Painel](https://cripto-cow.onrender.com/#/painel) · [Termos e políticas](https://cripto-cow.onrender.com/#/politicas)
 
 MVP de doações com orçamento aberto, prestação de contas e ancoragem de hashes na Solana devnet. Campanhas, doações e liberações são demonstrativas; nenhum dinheiro real é movimentado.
 
@@ -32,6 +32,7 @@ O build é servido em `http://127.0.0.1:3001`.
 - `server/`: API Express, SQLite local ou Turso/libSQL e ledger com SHA-256.
 - `tests/`: integridade, saldo, revisão, acesso e ancoragem.
 - `scripts/`: verificação independente do histórico exportado.
+- `shared/`: textos publicados de termos, privacidade e transparência.
 
 O banco local fica em `data/`, fora do Git. Valores são armazenados em centavos. Pedidos reservam saldo; a aprovação registra a saída numa transação atômica. O ledger aceita apenas novos registros.
 
@@ -42,6 +43,10 @@ Site e API estão publicados no Render Free, com dados persistentes no Turso. `/
 ## Contribuir
 
 Crie uma branch a partir de `main`, mantenha `.env` e `data/` fora do Git e abra um pull request com o que mudou e como foi conferido. Antes de enviar, rode `npm run check` e `npm run format:check`. Mudanças aprovadas em `main` são publicadas depois que o CI passa.
+
+## Termos e políticas
+
+Os textos ficam em `shared/legal-documents.json` e são exibidos no site, sem PDF. O aceite das regras atuais guarda data, versão, hash e regras da campanha. As minutas do documento do time ficam identificadas como textos para a operação futura. Atualizações e pontos pendentes estão em [docs/politicas.md](docs/politicas.md).
 
 ## Solana
 

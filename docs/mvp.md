@@ -4,7 +4,7 @@ A Cripto Cow demonstra o fluxo do documento de Doações Transparentes: criar um
 
 ## Fluxo
 
-1. O painel cria a campanha como rascunho e registra o aceite das regras demonstrativas.
+1. O painel cria a campanha como rascunho e registra o aceite das regras demonstrativas com data, versão, hash e textos associados.
 2. A publicação libera a página pública, sem atribuir um selo de identidade.
 3. O doador aceita a regra de liberação e a devolução proporcional da sobra. A entrada simulada recebe um identificador idempotente e um recibo.
 4. O organizador informa uma evidência fictícia em versão pública. O pedido reserva saldo e orçamento, mas ainda não registra uma saída.
@@ -19,6 +19,10 @@ Cada evento contém ID opaco, sequência, tipo, valor em centavos, categoria, re
 SQLite impede atualização e exclusão da tabela de ledger por triggers. Alterações financeiras e de status ocorrem em transações. Isso protege a aplicação, mas um operador com acesso ao arquivo do banco ainda pode substituí-lo. A ancoragem externa permite comparar um prefixo do histórico com um hash já publicado.
 
 A verificação no navegador recalcula os hashes com Web Crypto. A evidência tem um nonce público para permitir a conferência de seu conteúdo contra o hash registrado no ledger. O script de exportação confere a cadeia sem consultar a API. A compatibilidade com o hash ancorado não substitui a consulta da transação no Explorer nem prova que uma evidência é verdadeira.
+
+## Termos e políticas
+
+O site publica os termos da demonstração, a política de privacidade e as regras de transparência em texto. As minutas para doadores, organizadores e consentimentos preservam o conteúdo do documento jurídico do time e ficam identificadas como textos da operação futura. O aceite do MVP se refere aos textos atuais; mudanças de versão ou conteúdo exigem nova leitura e confirmação. Aceites antigos e o ledger existente são preservados. Veja [políticas e versionamento](politicas.md).
 
 ## Privacidade
 

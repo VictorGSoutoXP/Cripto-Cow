@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { campaigns } from './seed.js';
 import { digest, evidenceDigest, makeEntry, verifyEntries } from './ledger.js';
 import { openDatabase } from './database.js';
+import { getAcceptance } from './legal.js';
 
 const tables = ['campaigns', 'expenses', 'reports', 'donations', 'anchors'];
 const locks = new Map();
@@ -262,13 +263,18 @@ export class Store {
       if (!Number.isSafeInteger(amount) || amount < 100 || amount > 1000000)
         throw new Error('A doação deve ser entre R$ 1 e R$ 10.000.');
       const id = randomUUID();
+      const acceptance = getAcceptance('donor');
       const entry = await this.append(campaignId, { type: 'donation', amount, referenceId: id });
       return this.save('donations', {
         id,
         campaignId,
         amount,
         requestKey,
-        termsVersion: 'demo-1.0',
+        termsVersion: acceptance.version,
+        termsHash: acceptance.hash,
+        termsDocumentIds: acceptance.documents,
+        termsText: acceptance.text,
+        releaseRule: campaign.releaseRule,
         surplusRule: campaign.surplusRule,
         acceptedAt: entry.createdAt,
         ledgerId: entry.id,

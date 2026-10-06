@@ -6,6 +6,7 @@ import { createServer } from 'node:http';
 import { Keypair } from '@solana/web3.js';
 import { Store } from '../server/store.js';
 import { createApp } from '../server/app.js';
+import { getAcceptance } from '../server/legal.js';
 
 async function fixture(t, options = {}) {
   const store = await Store.open({ path: ':memory:' });
@@ -127,6 +128,7 @@ test('validação recusa centavos fracionários e ausência de aceite', async (t
 
 test('campanha criada fica privada até publicação sem selo de identidade', async (t) => {
   const { request } = await fixture(t);
+  const acceptance = getAcceptance('organizer');
   await request('/admin/session', 'POST', {});
   const result = await request('/campaigns', 'POST', {
     title: 'Campanha de teste',
@@ -137,6 +139,8 @@ test('campanha criada fica privada até publicação sem selo de identidade', as
     deadline: '2099-01-01',
     budget: [{ name: 'Materiais', planned: 100000 }],
     accepted: true,
+    termsVersion: acceptance.version,
+    termsHash: acceptance.hash,
   });
   assert.equal(result.status, 201);
   assert.equal(result.body.status, 'draft');
