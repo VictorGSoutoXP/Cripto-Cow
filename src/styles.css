@@ -1066,6 +1066,8 @@ p {
 }
 .timeline-copy {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .timeline-copy > strong {
   display: block;
@@ -1763,6 +1765,56 @@ p {
 .form-stack > label,
 .form-row > label {
   font-size: 14px;
+}
+.donor-identity {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.donor-identity legend {
+  font-size: 14px;
+  font-weight: 500;
+  color: #697b5a;
+}
+.donor-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.donor-options label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 9px;
+  border: 1px solid #dfe6d6;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.donor-options label.selected {
+  background: #edf2df;
+  border-color: #8fa864;
+}
+.donor-options input[type='radio'] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+  accent-color: #718e45;
+}
+.donor-name {
+  margin-top: 13px;
+}
+.donor-identity > p {
+  color: #879078;
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 9px;
+}
+.donor-receipt {
+  overflow-wrap: anywhere;
 }
 label {
   font-size: 12px;
@@ -2682,6 +2734,28 @@ select {
 }
 
 @media (max-width: 380px) {
+  .donor-options label {
+    padding-inline: 6px;
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .campaign-stat-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .campaign-stat-grid > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .campaign-stat-grid strong {
+    margin-top: 0;
+  }
+
   .header-inner {
     padding-inline: 16px;
     gap: 8px;

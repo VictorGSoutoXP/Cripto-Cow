@@ -6,7 +6,7 @@ A Cripto Cow demonstra o fluxo do documento de Doações Transparentes: criar um
 
 1. O painel cria a campanha como rascunho e registra o aceite das regras demonstrativas com data, versão, hash e textos associados.
 2. A publicação libera a página pública, sem atribuir um selo de identidade.
-3. O doador aceita a regra de liberação e a devolução proporcional da sobra. A entrada simulada recebe um identificador idempotente e um recibo.
+3. O doador aceita a regra de liberação e a devolução proporcional da sobra. A doação aparece como anônima por padrão ou, se escolher pessoa ou empresa, com um nome fictício de 2 a 60 caracteres, o tipo, o valor e a data em público. Não há verificação de identidade. A entrada simulada recebe um identificador idempotente e um recibo.
 4. O organizador informa uma evidência fictícia em versão pública. O pedido reserva saldo e orçamento, mas ainda não registra uma saída.
 5. A revisão aprova ou recusa com justificativa. A aprovação verifica o saldo novamente e registra a saída; a recusa libera a reserva.
 6. Uma denúncia gera protocolo privado para o painel. A suspensão depende da revisão e bloqueia novas doações e liberações.
@@ -20,13 +20,19 @@ SQLite impede atualização e exclusão da tabela de ledger por triggers. Altera
 
 A verificação no navegador recalcula os hashes com Web Crypto. A evidência tem um nonce público para permitir a conferência de seu conteúdo contra o hash registrado no ledger. O script de exportação confere a cadeia sem consultar a API. A compatibilidade com o hash ancorado não substitui a consulta da transação no Explorer nem prova que uma evidência é verdadeira.
 
+O nome fictício e o tipo escolhido pelo doador ficam no banco fora do ledger financeiro imutável. Esses campos não integram os hashes financeiros e não são cobertos pela conferência do histórico ou pela ancoragem.
+
+## Dados da demonstração
+
+Os exemplos usam valores variados, doações anônimas e nomes fictícios de pessoas e empresas. Bancos novos recebem essa variedade na carga inicial. No ambiente existente, a atualização acrescenta oito doações demonstrativas por campanha original de forma idempotente: os 380 eventos anteriores permanecem como prefixo, com seus hashes e referências preservados. Não há remoção ou reescrita do histórico anterior. O saldo e o hash final passam a refletir as novas entradas.
+
 ## Termos e políticas
 
 O site publica os termos da demonstração, a política de privacidade e as regras de transparência em texto. As minutas para doadores, organizadores e consentimentos preservam o conteúdo do documento jurídico do time e ficam identificadas como textos da operação futura. O aceite do MVP se refere aos textos atuais; mudanças de versão ou conteúdo exigem nova leitura e confirmação. Aceites antigos e o ledger existente são preservados. Veja [políticas e versionamento](politicas.md).
 
 ## Privacidade
 
-O protótipo usa dados fictícios e não aceita arquivos originais, documentos de identidade, cartões ou dados bancários. Doações são públicas sem nome. Somente a versão pública da evidência aparece na campanha; o relato de denúncia fica restrito ao painel. A ancoragem contém apenas identificador de campanha, quantidade de eventos e hash.
+O protótipo usa dados fictícios e não aceita arquivos originais, documentos de identidade, CPF, CNPJ, cartões ou dados bancários. A identificação pública da doação é opcional; nomes de pessoas e empresas devem ser fictícios e são autodeclarados. O modo anônimo se refere à exibição pública e não elimina os dados técnicos tratados pela infraestrutura. Somente a versão pública da evidência aparece na campanha; o relato de denúncia fica restrito ao painel administrativo compartilhado. O Memo de ancoragem contém identificador de campanha, quantidade de eventos e hash; a carteira assinante e a transação são públicas na rede.
 
 ## Limites
 

@@ -38,6 +38,13 @@ export type Anchor = {
   explorerUrl: string;
   confirmedAt: string;
 };
+export type Donor = { type: 'anonymous' } | { type: 'person' | 'company'; name: string };
+export type PublicDonation = {
+  id: string;
+  ledgerId: string;
+  donor: Donor;
+  simulated: true;
+};
 export type Campaign = {
   id: string;
   title: string;
@@ -62,6 +69,7 @@ export type Campaign = {
   budget: Category[];
   expenses: Expense[];
   ledger: LedgerEntry[];
+  donations?: PublicDonation[];
   integrity: { valid: boolean; count: number; root: string };
   anchors: Anchor[];
 };

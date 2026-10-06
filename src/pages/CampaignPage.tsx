@@ -22,6 +22,8 @@ import {
   Pause,
   FileText,
   CheckCircle2,
+  Building2,
+  UserRound,
 } from 'lucide-react';
 import { verifyInBrowser } from '../lib/verify';
 
@@ -524,8 +526,13 @@ function TimelineItem({
   const expense = campaign.expenses.find((item) => item.id === entry.referenceId);
   const incoming = entry.type === 'donation';
   const outgoing = entry.type === 'release';
+  const donor = incoming
+    ? campaign.donations?.find((donation) => donation.id === entry.referenceId)?.donor
+    : undefined;
   const title = incoming
-    ? 'Uma nova doação chegou'
+    ? donor && donor.type !== 'anonymous'
+      ? donor.name
+      : 'Uma nova doação chegou'
     : (expense?.title ??
       (entry.type === 'campaign_created'
         ? 'A campanha começou'
@@ -535,7 +542,9 @@ function TimelineItem({
             ? 'Campanha ativa'
             : 'Atualização do histórico'));
   const subtitle = incoming
-    ? 'Apoio anônimo · demonstração'
+    ? donor && donor.type !== 'anonymous'
+      ? `${donor.type === 'company' ? 'Empresa' : 'Pessoa'} · nome fictício · demonstração`
+      : 'Apoio anônimo · demonstração'
     : outgoing
       ? `${expense?.supplier ?? 'Fornecedor demonstrativo'} · evidência nível ${entry.evidenceLevel}`
       : entry.type === 'expense_requested'
@@ -547,7 +556,13 @@ function TimelineItem({
     <div className="timeline-item">
       <span className={`timeline-icon ${incoming ? 'incoming' : outgoing ? 'outgoing' : ''}`}>
         {incoming ? (
-          <Heart size={17} />
+          donor?.type === 'company' ? (
+            <Building2 size={18} />
+          ) : donor?.type === 'person' ? (
+            <UserRound size={18} />
+          ) : (
+            <Heart size={17} />
+          )
         ) : outgoing ? (
           <CircleArrowOutUpRight size={18} />
         ) : (
