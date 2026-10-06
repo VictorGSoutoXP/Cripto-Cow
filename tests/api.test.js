@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { once } from 'node:events';
+import { createServer } from 'node:http';
+import { Keypair } from '@solana/web3.js';
 import { Store } from '../server/store.js';
 import { createApp } from '../server/app.js';
 
@@ -33,6 +35,35 @@ async function fixture(t, options = {}) {
     },
   };
 }
+
+test('erro numérico do RPC mantém resposta JSON recuperável sem expor detalhes', async (t) => {
+  const rpc = createServer(async (req, res) => {
+    let raw = '';
+    for await (const chunk of req) raw += chunk;
+    const { id } = JSON.parse(raw);
+    res.setHeader('Content-Type', 'application/json');
+    res.end(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id,
+        error: { code: -32005, message: 'private-rpc-detail' },
+      }),
+    );
+  }).listen(0, '127.0.0.1');
+  await once(rpc, 'listening');
+  t.after(() => new Promise((resolve) => rpc.close(resolve)));
+  const { request } = await fixture(t, {
+    password: 'test-password',
+    rpcUrl: `http://127.0.0.1:${rpc.address().port}`,
+  });
+  await request('/admin/session', 'POST', { password: 'test-password' });
+  const result = await request('/campaigns/horta-do-amanha/anchors/prepare', 'POST', {
+    wallet: Keypair.generate().publicKey.toBase58(),
+  });
+  assert.equal(result.status, 503);
+  assert.equal(result.body.code, 'RPC_UNAVAILABLE');
+  assert.equal(JSON.stringify(result.body).includes('private-rpc-detail'), false);
+});
 
 test('painel exige sessão, senha é verificada e origem externa é recusada', async (t) => {
   const { request } = await fixture(t, { password: 'test-password' });
@@ -173,4 +204,24 @@ test('encerramento não descarta saldo sem executar a regra da sobra', async (t)
     ).status,
     400,
   );
+});
+
+test('confirmar ancoragem informa código estável para pedido ausente ou histórico incompatível', async (t) => {
+  const { request, store } = await fixture(t);
+  await request('/admin/session', 'POST', {});
+  const signature = '1'.repeat(88);
+  const missing = await request(`/anchors/${randomUUID()}/confirm`, 'POST', { signature });
+  assert.equal(missing.status, 404);
+  assert.equal(missing.body.code, 'ANCHOR_NOT_FOUND');
+  const anchor = await store.save('anchors', {
+    id: randomUUID(),
+    campaignId: 'horta-do-amanha',
+    root: '0'.repeat(64),
+    count: 1,
+    status: 'pending',
+  });
+  const mismatch = await request(`/anchors/${anchor.id}/confirm`, 'POST', { signature });
+  assert.equal(mismatch.status, 400);
+  assert.equal(mismatch.body.code, 'ANCHOR_HISTORY_MISMATCH');
+  assert.equal((await store.get('anchors', anchor.id)).status, 'pending');
 });

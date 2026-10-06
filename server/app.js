@@ -314,22 +314,35 @@ export function createApp(store, options = {}) {
       .object({ signature: z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{80,90}$/) })
       .parse(req.body);
     const anchor = await store.get('anchors', req.params.id);
-    if (!anchor) throw new Error('Solicitação de registro não encontrada.');
+    if (!anchor)
+      throw Object.assign(new Error('Solicitação de registro não encontrada.'), {
+        status: 404,
+        code: 'ANCHOR_NOT_FOUND',
+      });
     if (anchor.status === 'confirmed') {
       if (anchor.signature !== signature)
-        throw new Error('Este registro já possui outra transação.');
+        throw Object.assign(new Error('Este registro já possui outra transação.'), {
+          status: 409,
+          code: 'ANCHOR_ALREADY_CONFIRMED',
+        });
       return res.json(anchor);
     }
     const prefix = verifyEntries((await store.entries(anchor.campaignId)).slice(0, anchor.count));
     if (!prefix.valid || prefix.root !== anchor.root)
-      throw new Error('O histórico não corresponde ao hash solicitado.');
+      throw Object.assign(new Error('O histórico não corresponde ao hash solicitado.'), {
+        status: 400,
+        code: 'ANCHOR_HISTORY_MISMATCH',
+      });
     const confirmed = await confirmAnchor(anchor, signature, rpcUrl);
     res.json(
       await store.transaction(async () => {
         const current = await store.get('anchors', anchor.id);
         if (current.status === 'confirmed') {
           if (current.signature !== signature)
-            throw new Error('Este registro já possui outra transação.');
+            throw Object.assign(new Error('Este registro já possui outra transação.'), {
+              status: 409,
+              code: 'ANCHOR_ALREADY_CONFIRMED',
+            });
           return current;
         }
         return store.save('anchors', { ...current, ...confirmed, status: 'confirmed' });
@@ -357,19 +370,26 @@ export function createApp(store, options = {}) {
       return res.status(400).json({ error: 'JSON inválido.' });
     if (error.type === 'entity.too.large')
       return res.status(413).json({ error: 'O conteúdo ultrapassa o limite permitido.' });
+    const errorCode = typeof error.code === 'string' ? error.code : undefined;
     if (
       error.name === 'LibsqlError' ||
-      error.code?.startsWith('SERVER_') ||
-      error.code?.startsWith('SQLITE_') ||
-      error.code?.startsWith('ERR_SQLITE')
+      errorCode?.startsWith('SERVER_') ||
+      errorCode?.startsWith('SQLITE_') ||
+      errorCode?.startsWith('ERR_SQLITE')
     ) {
       return res
         .status(503)
         .json({ error: 'Não foi possível acessar o banco. Tente novamente em instantes.' });
     }
-    res
-      .status(error.status ?? 400)
-      .json({ error: error.message ?? 'Não foi possível concluir a operação.' });
+    if (error.name === 'SolanaJSONRPCError' || typeof error.code === 'number')
+      return res.status(503).json({
+        error: 'A Solana devnet está indisponível. Tente novamente em instantes.',
+        code: 'RPC_UNAVAILABLE',
+      });
+    res.status(error.status ?? 400).json({
+      error: error.message ?? 'Não foi possível concluir a operação.',
+      ...(errorCode ? { code: errorCode } : {}),
+    });
   });
   return app;
 }

@@ -2,6 +2,8 @@
 
 O Render serve o site e a API no mesmo endereço HTTPS. O Turso guarda campanhas e movimentações em um banco libSQL, preservando os dados quando o servidor reinicia.
 
+O ambiente atual já está publicado em [cripto-cow.onrender.com](https://cripto-cow.onrender.com). A configuração fica no [serviço do Render](https://dashboard.render.com/web/srv-db252pbbc2fs73f95thg) e no [Blueprint Cripto Cow](https://dashboard.render.com/blueprint/exs-db2511p7lnhs73dkoo3g). Os passos abaixo servem para reproduzir o ambiente; para atualizar o existente, use a seção de manutenção.
+
 ## 1. Criar o banco
 
 Entre no [Turso](https://turso.tech/) e escolha o plano gratuito. Crie um banco chamado `cripto-cow` com o motor **libSQL**, pelo painel ou pela CLI.
@@ -23,7 +25,7 @@ Guarde a URL em `TURSO_DATABASE_URL` e o token com permissão de leitura e escri
 
 1. Envie o código e o arquivo `render.yaml` para o GitHub.
 2. Entre no [Render](https://dashboard.render.com/), abra **New → Blueprint** e conecte o repositório.
-3. Escolha a branch que contém este MVP e confirme o plano **Free**.
+3. Escolha `main` e confirme o plano **Free**.
 4. Preencha `TURSO_DATABASE_URL` e `TURSO_AUTH_TOKEN` quando o Render solicitar e aplique o Blueprint.
 
 O [Blueprint](https://render.com/docs/blueprint-spec) configura Node.js 24, instala as dependências, gera o site e inicia a API. O Render fornece a porta e o endereço público. As próximas publicações automáticas aguardam os testes do GitHub passarem.
@@ -44,6 +46,14 @@ Acesse o endereço HTTPS exibido pelo Render. Para entrar no painel da Cripto Co
 Abra `/api/health` no endereço publicado e confirme que o serviço está disponível. Faça uma doação demonstrativa, atualize a página e confira a movimentação no histórico. Após reiniciar o serviço pelo Render, o histórico deve continuar no Turso.
 
 O SQLite em `data/` continua disponível para desenvolvimento local. No Render, o banco remoto é obrigatório. O servidor não inicia sem URL, token e senha do painel. Para usar Turso localmente, copie `.env.example` para `.env` e preencha as duas variáveis do banco.
+
+## Manutenção
+
+- Envie alterações por pull request para `main`. O CI verifica build e testes; o Render acompanha essa branch e publica quando as verificações passam.
+- A senha do painel e as credenciais do banco ficam em **Environment** no Render. Atualize o token nesse painel caso ele seja revogado ou substituído no Turso.
+- `SEED_DEMO=true` preenche somente um banco vazio. Reinícios e novas publicações preservam o histórico existente.
+- Sessões administrativas ficam em memória. Após reiniciar ou publicar, entre novamente no painel.
+- Para investigar falhas, confira **Events**, **Logs** e `/api/health`. Um health check indisponível pode indicar problema na conexão com o Turso.
 
 ## Plano gratuito
 

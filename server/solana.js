@@ -6,7 +6,13 @@ export function anchorMemo(campaignId, count, root) {
   return `elo:v1:${campaignId}:${count}:${root}`;
 }
 
-export async function confirmAnchor(anchor, signature, rpcUrl, fetchTransaction) {
+export async function confirmAnchor(
+  anchor,
+  signature,
+  rpcUrl,
+  fetchTransaction,
+  fetchPendingState,
+) {
   const connection = new Connection(rpcUrl, 'confirmed');
   const transaction = fetchTransaction
     ? await fetchTransaction(signature)
@@ -14,9 +20,35 @@ export async function confirmAnchor(anchor, signature, rpcUrl, fetchTransaction)
         commitment: 'confirmed',
         maxSupportedTransactionVersion: 0,
       });
-  if (!transaction)
-    throw new Error('A transação ainda não foi confirmada na devnet. Aguarde e tente novamente.');
-  if (transaction.meta?.err || !transaction.meta) throw new Error('A transação falhou na Solana.');
+  if (!transaction) {
+    if (Number.isSafeInteger(anchor.lastValidBlockHeight)) {
+      const state = fetchPendingState
+        ? await fetchPendingState(signature)
+        : await Promise.all([
+            connection.getBlockHeight('confirmed'),
+            connection.getSignatureStatuses([signature], { searchTransactionHistory: true }),
+          ]).then(([blockHeight, statuses]) => ({ blockHeight, status: statuses.value[0] }));
+      if (state.status?.err)
+        throw Object.assign(new Error('A transação falhou na Solana.'), {
+          status: 400,
+          code: 'TRANSACTION_FAILED',
+        });
+      if (state.blockHeight > anchor.lastValidBlockHeight && state.status === null)
+        throw Object.assign(new Error('A transação expirou antes de ser confirmada.'), {
+          status: 410,
+          code: 'TRANSACTION_EXPIRED',
+        });
+    }
+    throw Object.assign(
+      new Error('A transação ainda não foi confirmada na devnet. Aguarde e tente novamente.'),
+      { status: 409, code: 'CONFIRMATION_PENDING' },
+    );
+  }
+  if (transaction.meta?.err || !transaction.meta)
+    throw Object.assign(new Error('A transação falhou na Solana.'), {
+      status: 400,
+      code: 'TRANSACTION_FAILED',
+    });
   const signer = transaction.transaction.message.accountKeys.find(
     (key) => key.signer && key.pubkey.toString() === anchor.wallet,
   );
@@ -27,7 +59,10 @@ export async function confirmAnchor(anchor, signature, rpcUrl, fetchTransaction)
       instruction.parsed === anchor.memo,
   );
   if (!signer || !memo)
-    throw new Error('A transação não corresponde ao registro e à carteira desta solicitação.');
+    throw Object.assign(
+      new Error('A transação não corresponde ao registro e à carteira desta solicitação.'),
+      { status: 400, code: 'TRANSACTION_MISMATCH' },
+    );
   return {
     signature,
     slot: transaction.slot,

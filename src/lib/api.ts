@@ -1,11 +1,35 @@
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = code;
+  }
+}
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`/api${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
     credentials: 'same-origin',
   });
-  const body = await response.json();
-  if (!response.ok) throw new Error(body.error ?? 'Não foi possível carregar os dados.');
+  const body = await response.json().catch(() => null);
+  if (!response.ok)
+    throw new ApiError(
+      typeof body?.error === 'string'
+        ? body.error
+        : 'Não foi possível carregar os dados. Tente novamente em instantes.',
+      response.status,
+      typeof body?.code === 'string' ? body.code : undefined,
+    );
+  if (body === null)
+    throw new ApiError(
+      'O servidor retornou uma resposta inválida. Tente novamente.',
+      response.status,
+    );
   return body as T;
 }
 

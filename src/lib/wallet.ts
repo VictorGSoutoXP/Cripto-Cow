@@ -1,5 +1,12 @@
 import { Buffer } from 'buffer';
-import { api } from './api';
+import { api, ApiError } from './api';
+import {
+  confirmPendingAnchor,
+  recoverPendingAnchor,
+  signedAnchorSignature,
+  submitPendingAnchor,
+} from './anchor-pending';
+import type { PendingAnchor } from './anchor-pending';
 import type { Anchor } from '../types';
 
 type Wallet = {
@@ -14,21 +21,14 @@ type Prepared = {
   blockhash: string;
   lastValidBlockHeight: number;
 };
-type PendingAnchor = { id: string; campaignId: string; signature: string };
-
 export async function anchorHistory(campaignId: string): Promise<Anchor> {
-  const saved = sessionStorage.getItem('elo-pending-anchor');
-  if (saved) {
-    const pending = JSON.parse(saved) as PendingAnchor;
-    if (pending.campaignId === campaignId) {
-      const result = await api<Anchor>(`/anchors/${pending.id}/confirm`, {
-        method: 'POST',
-        body: JSON.stringify({ signature: pending.signature }),
-      });
-      sessionStorage.removeItem('elo-pending-anchor');
-      return result;
-    }
-  }
+  const confirm = (pending: PendingAnchor) =>
+    api<Anchor>(`/anchors/${pending.id}/confirm`, {
+      method: 'POST',
+      body: JSON.stringify({ signature: pending.signature }),
+    });
+  const recovered = await recoverPendingAnchor(sessionStorage, campaignId, confirm);
+  if (recovered) return recovered;
   const scope = window as unknown as { phantom?: { solana?: Wallet }; solana?: Wallet };
   const provider = scope.phantom?.solana ?? scope.solana;
   if (!provider)
@@ -52,26 +52,21 @@ export async function anchorHistory(campaignId: string): Promise<Anchor> {
     }),
   );
   const signed = await provider.signTransaction(transaction);
-  const { signature } = await api<{ signature: string }>(`/anchors/${prepared.id}/submit`, {
-    method: 'POST',
-    body: JSON.stringify({ transaction: Buffer.from(signed.serialize()).toString('base64') }),
-  });
-  sessionStorage.setItem(
-    'elo-pending-anchor',
-    JSON.stringify({ id: prepared.id, campaignId, signature }),
+  const serialized = signed.serialize();
+  const signature = await signedAnchorSignature(serialized);
+  const pending = { id: prepared.id, campaignId, signature };
+  await submitPendingAnchor(sessionStorage, pending, () =>
+    api<{ signature: string }>(`/anchors/${prepared.id}/submit`, {
+      method: 'POST',
+      body: JSON.stringify({ transaction: Buffer.from(serialized).toString('base64') }),
+    }),
   );
   for (let attempt = 0; attempt < 8; attempt += 1) {
     await new Promise((resolve) => setTimeout(resolve, 1800));
     try {
-      const result = await api<Anchor>(`/anchors/${prepared.id}/confirm`, {
-        method: 'POST',
-        body: JSON.stringify({ signature }),
-      });
-      sessionStorage.removeItem('elo-pending-anchor');
-      return result;
+      return await confirmPendingAnchor(sessionStorage, pending, confirm);
     } catch (error) {
-      if (!(error instanceof Error) || !error.message.includes('ainda não foi confirmada'))
-        throw error;
+      if (!(error instanceof ApiError) || error.code !== 'CONFIRMATION_PENDING') throw error;
     }
   }
   throw new Error(

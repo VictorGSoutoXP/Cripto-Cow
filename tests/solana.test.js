@@ -27,6 +27,34 @@ const fixture = () => ({
   },
 });
 
+test('pendência só expira sem assinatura encontrada após a última altura válida', async () => {
+  const pending = { ...anchor, lastValidBlockHeight: 100 };
+  const check = (state) =>
+    confirmAnchor(
+      pending,
+      'signature',
+      'https://api.devnet.solana.com',
+      async () => null,
+      async () => state,
+    );
+  await assert.rejects(
+    check({ blockHeight: 101, status: null }),
+    (error) => error.code === 'TRANSACTION_EXPIRED' && error.status === 410,
+  );
+  for (const state of [
+    { blockHeight: 100, status: null },
+    { blockHeight: 101, status: { err: null, confirmationStatus: 'confirmed' } },
+  ])
+    await assert.rejects(
+      check(state),
+      (error) => error.code === 'CONFIRMATION_PENDING' && error.status === 409,
+    );
+  await assert.rejects(
+    check({ blockHeight: 101, status: { err: { InstructionError: [0, 'failure'] } } }),
+    (error) => error.code === 'TRANSACTION_FAILED' && error.status === 400,
+  );
+});
+
 test('envio aceita somente memo assinado e recusa transferência de valores', () => {
   const wallet = Keypair.generate();
   const blockhash = Keypair.generate().publicKey.toBase58();
@@ -75,19 +103,19 @@ test('ancoragem exige transação confirmada, assinante esperado e memo exato', 
   assert.match(result.explorerUrl, /cluster=devnet/);
   await assert.rejects(
     confirmAnchor(anchor, 'signature', 'https://api.devnet.solana.com', async () => null),
-    /ainda não/,
+    (error) => error.code === 'CONFIRMATION_PENDING' && error.status === 409,
   );
   const failed = fixture();
   failed.meta.err = 'failure';
   await assert.rejects(
     confirmAnchor(anchor, 'signature', 'https://api.devnet.solana.com', async () => failed),
-    /falhou/,
+    (error) => error.code === 'TRANSACTION_FAILED' && error.status === 400,
   );
   const wrongMemo = fixture();
   wrongMemo.transaction.message.instructions[0].parsed = 'outro hash';
   await assert.rejects(
     confirmAnchor(anchor, 'signature', 'https://api.devnet.solana.com', async () => wrongMemo),
-    /não corresponde/,
+    (error) => error.code === 'TRANSACTION_MISMATCH' && error.status === 400,
   );
   const wrongWallet = fixture();
   wrongWallet.transaction.message.accountKeys[0].pubkey.toString = () => 'outra carteira';
