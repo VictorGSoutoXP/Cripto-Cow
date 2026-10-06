@@ -1,3 +1,49 @@
+export function seedAmounts(total, count) {
+  const pattern = [2, 1, 4, 1, 7, 3, 1, 2, 5, 1, 8, 2];
+  const weights = Array.from({ length: count }, (_, index) => pattern[index % pattern.length]);
+  const weightTotal = weights.reduce((sum, weight) => sum + weight, 0);
+  const amounts = weights.map((weight) => Math.floor((total * weight) / weightTotal));
+  const remaining = total - amounts.reduce((sum, amount) => sum + amount, 0);
+  const order = weights
+    .map((weight, index) => ({ index, remainder: (total * weight) % weightTotal }))
+    .sort((a, b) => b.remainder - a.remainder || a.index - b.index);
+  for (let index = 0; index < remaining; index += 1) amounts[order[index].index] += 1;
+  return amounts;
+}
+
+export const demoDonations = {
+  'horta-do-amanha': [
+    { amount: 3500, donor: { type: 'person', name: 'Lia Moreira' } },
+    { amount: 125000, donor: { type: 'company', name: 'Semente do Bairro' } },
+    { amount: 7490, donor: { type: 'anonymous' } },
+    { amount: 18000, donor: { type: 'person', name: 'Caio Nunes' } },
+    { amount: 5000, donor: { type: 'anonymous' } },
+    { amount: 95000, donor: { type: 'company', name: 'Oficina Horizonte' } },
+    { amount: 12500, donor: { type: 'person', name: 'Maya Ferreira' } },
+    { amount: 4200, donor: { type: 'person', name: 'Davi Azevedo' } },
+  ],
+  'patas-em-casa': [
+    { amount: 2550, donor: { type: 'person', name: 'Nina Duarte' } },
+    { amount: 80000, donor: { type: 'company', name: 'Casa Patinha' } },
+    { amount: 5990, donor: { type: 'anonymous' } },
+    { amount: 12000, donor: { type: 'person', name: 'Teo Martins' } },
+    { amount: 4000, donor: { type: 'anonymous' } },
+    { amount: 155000, donor: { type: 'company', name: 'Vila do Cuidado' } },
+    { amount: 9500, donor: { type: 'person', name: 'Iara Campos' } },
+    { amount: 6500, donor: { type: 'person', name: 'Noah Almeida' } },
+  ],
+  recomecar: [
+    { amount: 5000, donor: { type: 'person', name: 'Bia Tavares' } },
+    { amount: 250000, donor: { type: 'company', name: 'Ponte Solidária' } },
+    { amount: 8990, donor: { type: 'anonymous' } },
+    { amount: 25000, donor: { type: 'person', name: 'Yuri Melo' } },
+    { amount: 10000, donor: { type: 'anonymous' } },
+    { amount: 175000, donor: { type: 'company', name: 'Ateliê Recomeço' } },
+    { amount: 22500, donor: { type: 'person', name: 'Luna Reis' } },
+    { amount: 9900, donor: { type: 'person', name: 'Ravi Bastos' } },
+  ],
+};
+
 export const campaigns = [
   {
     id: 'horta-do-amanha',

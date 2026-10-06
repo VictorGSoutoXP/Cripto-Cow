@@ -180,7 +180,7 @@ test('cliente libSQL HTTP registra, consulta e reabre o banco sem conexão à nu
   assert.equal((await store.list('campaigns')).length, 3);
   const seeded = await store.campaign('horta-do-amanha');
   assert.equal(seeded.integrity.valid, true);
-  assert.equal(seeded.raised, 2845000);
+  assert.equal(seeded.raised, 3115690);
   assert.ok(remote.stats.sql.includes('BEGIN TRANSACTION READONLY'));
   const id = await createCampaign(store);
   const key = randomUUID();

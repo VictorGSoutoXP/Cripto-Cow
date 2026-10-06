@@ -13,7 +13,7 @@ import { api, ApiError, cents, date, money } from '../lib/api';
 import { useLegalManifest } from '../lib/legal';
 import type { LegalRole } from '../lib/legal';
 import { Modal, Button } from './ui';
-import type { Campaign, Expense } from '../types';
+import type { Campaign, Donor, Expense } from '../types';
 
 function LegalAcceptance({
   legal,
@@ -101,6 +101,8 @@ export function DonationForm({
   onSaved: () => void;
 }) {
   const [amount, setAmount] = useState('50');
+  const [donorType, setDonorType] = useState<Donor['type']>('anonymous');
+  const [donorName, setDonorName] = useState('');
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -108,6 +110,7 @@ export function DonationForm({
     id: string;
     amount: number;
     acceptedAt: string;
+    donor?: Donor;
   } | null>(null);
   const [requestKey] = useState(() => crypto.randomUUID());
   const legal = useLegalManifest();
@@ -119,22 +122,30 @@ export function DonationForm({
       setError('Leia e aceite as condições vigentes para registrar a doação demonstrativa.');
       return;
     }
+    const name = donorName.trim();
+    if (donorType !== 'anonymous' && (name.length < 2 || name.length > 60)) {
+      setError('Use um nome fictício com 2 a 60 caracteres.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
-      const result = await api<{ id: string; amount: number; acceptedAt: string }>(
-        `/campaigns/${campaign.id}/donations`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            amount: cents(amount),
-            requestKey,
-            accepted,
-            termsVersion: consent.version,
-            termsHash: consent.hash,
-          }),
-        },
-      );
+      const result = await api<{
+        id: string;
+        amount: number;
+        acceptedAt: string;
+        donor?: Donor;
+      }>(`/campaigns/${campaign.id}/donations`, {
+        method: 'POST',
+        body: JSON.stringify({
+          amount: cents(amount),
+          requestKey,
+          accepted,
+          termsVersion: consent.version,
+          termsHash: consent.hash,
+          donor: donorType === 'anonymous' ? { type: 'anonymous' } : { type: donorType, name },
+        }),
+      });
       setReceipt(result);
       onSaved();
     } catch (err) {
@@ -160,6 +171,11 @@ export function DonationForm({
             <CheckCircle2 size={36} />
           </span>
           <h3>{money(receipt.amount)} registrados</h3>
+          <p className="donor-receipt">
+            {receipt.donor && receipt.donor.type !== 'anonymous'
+              ? `${receipt.donor.name} · ${receipt.donor.type === 'company' ? 'Empresa' : 'Pessoa'} fictícia`
+              : 'Apoio anônimo'}
+          </p>
           <p>
             A entrada foi adicionada ao histórico da campanha. O valor só será liberado após a
             análise de uma evidência.
@@ -206,6 +222,47 @@ export function DonationForm({
               </button>
             ))}
           </div>
+          <fieldset className="donor-identity">
+            <legend>Como quer aparecer no histórico?</legend>
+            <div className="donor-options">
+              {[
+                { type: 'anonymous', label: 'Anônimo' },
+                { type: 'person', label: 'Pessoa' },
+                { type: 'company', label: 'Empresa' },
+              ].map(({ type, label }) => (
+                <label key={type} className={donorType === type ? 'selected' : ''}>
+                  <input
+                    type="radio"
+                    name="donorType"
+                    value={type}
+                    checked={donorType === type}
+                    disabled={busy}
+                    onChange={() => setDonorType(type as Donor['type'])}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            {donorType !== 'anonymous' && (
+              <label className="donor-name">
+                Nome fictício {donorType === 'company' ? 'da empresa' : 'da pessoa'}
+                <input
+                  name="donorName"
+                  value={donorName}
+                  onChange={(event) => setDonorName(event.target.value)}
+                  minLength={2}
+                  maxLength={60}
+                  required
+                  disabled={busy}
+                  autoComplete="off"
+                  placeholder={
+                    donorType === 'company' ? 'Ex.: Aurora Papelaria' : 'Ex.: Lia Mendes'
+                  }
+                />
+              </label>
+            )}
+            <p>Use apenas nomes fictícios. A identificação desta demonstração não é verificada.</p>
+          </fieldset>
           <div className="rule-box">
             <ShieldCheck size={20} />
             <div>
@@ -224,8 +281,11 @@ export function DonationForm({
             busy={busy}
           />
           <p className="privacy-note">
-            <LockKeyhole size={14} /> Sua doação aparece sem nome. Não coletamos dados de pagamento
-            nesta demonstração.
+            <LockKeyhole size={14} />
+            {donorType === 'anonymous'
+              ? 'Sua doação aparece sem nome no histórico público.'
+              : 'O nome fictício escolhido aparecerá no histórico público.'}{' '}
+            Não coletamos dados de pagamento nesta demonstração.
           </p>
           {error && (
             <p className="form-error" role="alert">

@@ -6,7 +6,9 @@ Os textos publicados vêm de `shared/legal-documents.json`. A página de políti
 
 Os Termos de uso, a Política de Privacidade e a Política de Transparência descrevem o protótipo publicado: valores simulados, entradas fictícias, análise manual, denúncias restritas, Turso, sessão administrativa e ancoragem de hashes na Solana devnet. O endereço assinante fica público na blockchain. Não há pagamentos, custódia, KYC, biometria, originais de documentos ou devoluções reais.
 
-Somente esses três documentos integram o aceite `mvp-1.1`, junto às regras da campanha. O aceite não autoriza dados sensíveis nem serviços financeiros futuros. Registros anteriores conservam suas versões, incluindo `demo-1.0`.
+Somente esses três documentos integram o aceite `mvp-1.2`, junto às regras da campanha. O aceite não autoriza dados sensíveis nem serviços financeiros futuros. Registros anteriores conservam suas versões, incluindo `demo-1.0` e `mvp-1.1`.
+
+Doações aparecem como anônimas por padrão. Quem escolher pessoa ou empresa informa um nome fictício de 2 a 60 caracteres e aceita sua exibição pública com o tipo, o valor e a data da doação simulada. Não há CPF, CNPJ ou identidade verificada. Nome e tipo ficam no banco fora do ledger financeiro imutável e não integram seus hashes; a verificação financeira não comprova esses campos. A opção anônima não elimina os dados técnicos de conexão descritos na política.
 
 ## Fonte e minutas
 

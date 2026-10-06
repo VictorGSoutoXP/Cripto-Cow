@@ -128,7 +128,7 @@ test('doação exige versão e hash vigentes sem alterar valores em tentativas d
     assert.match(result.body.error, /Recarregue/);
   }
   assert.deepEqual(await store.campaign('horta-do-amanha'), before);
-  assert.equal((await store.list('donations')).length, 0);
+  assert.equal((await store.list('donations')).filter((donation) => !donation.example).length, 0);
   const requestKey = randomUUID();
   const result = await request('/campaigns/horta-do-amanha/donations', 'POST', {
     amount: 1000,

@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import { z } from 'zod';
 import { digest, verifyEntries } from './ledger.js';
 import { getAcceptance, getLegalManifest } from './legal.js';
+import { donorSchema } from './donors.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -130,7 +131,7 @@ export function createApp(store, options = {}) {
       (await store.list('campaigns'))
         .filter((item) => item.status !== 'draft')
         .map(async (item) => {
-          const { ledger, expenses, ...campaign } = await store.campaign(item.id);
+          const { ledger, expenses, donations, ...campaign } = await store.campaign(item.id);
           return campaign;
         }),
     );
@@ -167,12 +168,25 @@ export function createApp(store, options = {}) {
   });
   app.post('/api/campaigns/:id/donations', demoOnly, async (req, res) => {
     const input = z
-      .object({ amount: money.max(1000000), requestKey: z.uuid(), ...acceptanceFields })
+      .object({
+        amount: money.max(1000000),
+        requestKey: z.uuid(),
+        donor: donorSchema,
+        ...acceptanceFields,
+      })
       .parse(req.body);
     requireAcceptance(input, 'donor');
     res
       .status(201)
-      .json(await store.donate(req.params.id, input.amount, input.requestKey, input.accepted));
+      .json(
+        await store.donate(
+          req.params.id,
+          input.amount,
+          input.requestKey,
+          input.accepted,
+          input.donor,
+        ),
+      );
   });
   app.post('/api/campaigns/:id/reports', demoOnly, async (req, res) => {
     const input = z

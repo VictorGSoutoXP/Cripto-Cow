@@ -36,6 +36,8 @@ O build é servido em `http://127.0.0.1:3001`.
 
 O banco local fica em `data/`, fora do Git. Valores são armazenados em centavos. Pedidos reservam saldo; a aprovação registra a saída numa transação atômica. O ledger aceita apenas novos registros.
 
+A demonstração tem valores variados e doações anônimas ou com nomes fictícios de pessoas e empresas. A atualização acrescenta oito exemplos por campanha original de forma idempotente, preservando os registros existentes. Nome e tipo são opcionais, públicos quando escolhidos e ficam fora dos hashes financeiros, sem verificação de identidade.
+
 ## Hospedagem
 
 Site e API estão publicados no Render Free, com dados persistentes no Turso. `/api/health` verifica a conexão com o banco. O primeiro acesso após inatividade pode demorar enquanto o Render reativa o serviço. Configuração e manutenção em [docs/deploy.md](docs/deploy.md).

@@ -1,9 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { campaigns } from './seed.js';
+import { campaigns, demoDonations, seedAmounts } from './seed.js';
 import { digest, evidenceDigest, makeEntry, verifyEntries } from './ledger.js';
 import { openDatabase } from './database.js';
 import { getAcceptance } from './legal.js';
+import { donorSchema, publicDonation } from './donors.js';
 
 const tables = ['campaigns', 'expenses', 'reports', 'donations', 'anchors'];
 const locks = new Map();
@@ -192,7 +193,7 @@ export class Store {
   }
 
   async campaign(id) {
-    const [records, history, requests, anchors] = await this.batch(
+    const [records, history, requests, anchors, donations] = await this.batch(
       [
         { sql: 'SELECT payload FROM campaigns WHERE id = ?', args: [id] },
         {
@@ -201,6 +202,7 @@ export class Store {
         },
         { sql: 'SELECT payload FROM expenses WHERE campaign_id = ?', args: [id] },
         { sql: 'SELECT payload FROM anchors WHERE campaign_id = ?', args: [id] },
+        { sql: 'SELECT payload FROM donations WHERE campaign_id = ?', args: [id] },
       ],
       'read',
     );
@@ -235,6 +237,7 @@ export class Store {
             ?.evidenceHash ?? null,
       })),
       ledger,
+      donations: donations.rows.map((row) => publicDonation(JSON.parse(row.payload))),
       integrity: verifyEntries(ledger),
       anchors: anchors.rows
         .map((row) => JSON.parse(row.payload))
@@ -242,7 +245,8 @@ export class Store {
     };
   }
 
-  async donate(campaignId, amount, requestKey, accepted) {
+  async donate(campaignId, amount, requestKey, accepted, donor) {
+    const profile = donorSchema.parse(donor);
     return this.transaction(async () => {
       const { rows } = await this.execute({
         sql: 'SELECT payload FROM donations WHERE request_key = ?',
@@ -250,7 +254,11 @@ export class Store {
       });
       if (rows[0]) {
         const donation = JSON.parse(rows[0].payload);
-        if (donation.campaignId !== campaignId || donation.amount !== amount)
+        if (
+          donation.campaignId !== campaignId ||
+          donation.amount !== amount ||
+          digest(donorSchema.parse(donation.donor)) !== digest(profile)
+        )
           throw new Error('Identificador de doação já utilizado.');
         return donation;
       }
@@ -270,6 +278,7 @@ export class Store {
         campaignId,
         amount,
         requestKey,
+        donor: profile,
         termsVersion: acceptance.version,
         termsHash: acceptance.hash,
         termsDocumentIds: acceptance.documents,
@@ -393,7 +402,10 @@ export class Store {
   async seed() {
     return this.transaction(async () => {
       const existing = await this.execute('SELECT id FROM campaigns LIMIT 1');
-      if (existing.rows.length) return;
+      if (existing.rows.length) {
+        await this.seedDemoDonations();
+        return;
+      }
       const statements = [];
       for (const item of campaigns) {
         const { raised, donors, expenses, ...campaign } = item;
@@ -410,11 +422,11 @@ export class Store {
           statements.push(ledgerStatement(previous));
         };
         append({ type: 'campaign_created', createdAt: '2026-09-29T10:00:00.000Z' });
-        const portion = Math.floor(raised / donors);
+        const amounts = seedAmounts(raised, donors);
         for (let index = 0; index < donors; index += 1) {
           append({
             type: 'donation',
-            amount: index === donors - 1 ? raised - portion * index : portion,
+            amount: amounts[index],
             referenceId: randomUUID(),
             createdAt: new Date(Date.UTC(2026, 8, 30, 10, index * 13)).toISOString(),
           });
@@ -446,6 +458,60 @@ export class Store {
         }
       }
       await this.batch(statements);
+      await this.seedDemoDonations();
+    });
+  }
+
+  async seedDemoDonations() {
+    return this.transaction(async () => {
+      const sources = Object.entries(demoDonations);
+      const results = await this.batch(
+        sources.flatMap(([campaignId]) => [
+          { sql: 'SELECT payload FROM campaigns WHERE id = ?', args: [campaignId] },
+          { sql: 'SELECT request_key FROM donations WHERE campaign_id = ?', args: [campaignId] },
+          {
+            sql: 'SELECT payload FROM ledger WHERE campaign_id = ? ORDER BY sequence DESC LIMIT 1',
+            args: [campaignId],
+          },
+        ]),
+      );
+      const statements = [];
+      for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex += 1) {
+        const [campaignId, examples] = sources[sourceIndex];
+        const [campaigns, donations, history] = results.slice(sourceIndex * 3, sourceIndex * 3 + 3);
+        const campaign = campaigns.rows[0] ? JSON.parse(campaigns.rows[0].payload) : null;
+        if (!campaign?.simulated || campaign.status !== 'active') continue;
+        const keys = new Set(donations.rows.map((record) => record.request_key));
+        let previous = history.rows[0] ? JSON.parse(history.rows[0].payload) : null;
+        for (let index = 0; index < examples.length; index += 1) {
+          const requestKey = `demo-donors-v1:${campaignId}:${index}`;
+          if (keys.has(requestKey)) continue;
+          const example = examples[index];
+          const id = randomUUID();
+          previous = makeEntry(previous, {
+            campaignId,
+            type: 'donation',
+            amount: example.amount,
+            referenceId: id,
+          });
+          statements.push(
+            ledgerStatement(previous),
+            saveStatement('donations', {
+              id,
+              campaignId,
+              amount: example.amount,
+              requestKey,
+              donor: donorSchema.parse(example.donor),
+              ledgerId: previous.id,
+              createdAt: previous.createdAt,
+              simulated: true,
+              example: true,
+              seedVersion: 'demo-donors-v1',
+            }),
+          );
+        }
+      }
+      if (statements.length) await this.batch(statements);
     });
   }
 }
