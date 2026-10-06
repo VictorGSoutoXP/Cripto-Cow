@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: cripto-cow
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: NODE_VERSION
+        value: '24'
+      - key: NODE_ENV
+        value: production
+      - key: NPM_CONFIG_INCLUDE
+        value: dev
+      - key: HOST
+        value: 0.0.0.0
+      - key: DEMO_MODE
+        value: 'true'
+      - key: SEED_DEMO
+        value: 'true'
+      - key: SOLANA_RPC_URL
+        value: https://api.devnet.solana.com
+      - key: ADMIN_PASSWORD
+        generateValue: true
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
