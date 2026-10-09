@@ -2,7 +2,7 @@
   "source": {
     "title": "Doações Transparentes — Estudo de viabilidade jurídica e compliance",
     "date": "2026-10-02",
-    "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas preservam as seções 7, 8 e 9; as políticas atuais descrevem o MVP publicado."
+    "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
     "version": "mvp-1.2",
@@ -214,10 +214,10 @@
       "title": "Termos do doador — minuta",
       "summary": "Texto do documento jurídico para uma futura operação com doações reais.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
         "Orientação da fonte: o doador deve ver os pontos essenciais antes de pagar, em destaque, e aceitar com uma caixa de seleção própria."
       ],
@@ -268,7 +268,7 @@
           "id": "clausula-7",
           "title": "Cláusula 7. Devolução",
           "paragraphs": [
-            "O doador tem direito à devolução nas seguintes hipóteses: sobra, quando a regra da campanha for de devolução; campanha cancelada ou reprovada na verificação; fraude ou desvio confirmados (quanto aos valores ainda não liberados); erro operacional ou cobrança em duplicidade; e, se aplicável, arrependimento. A devolução é feita ao meio de pagamento de origem, quando possível, em até [A definir pelo time] dias."
+            "O doador tem direito à devolução nas seguintes hipóteses: sobra, quando a regra da campanha for de devolução; campanha cancelada ou reprovada na verificação; fraude ou desvio confirmados (quanto aos valores ainda não liberados); erro operacional ou cobrança em duplicidade. A devolução é feita ao meio de pagamento de origem, quando possível, em até 7 (sete) dias."
           ]
         },
         {
@@ -304,7 +304,7 @@
           "id": "clausula-12",
           "title": "Cláusula 12. Atendimento e foro",
           "paragraphs": [
-            "O doador pode contatar o atendimento (SAC) pelo canal [A definir pelo time], com resposta em até [A definir pelo time] dias. Aplica-se o foro do domicílio do consumidor."
+            "O doador pode contatar o atendimento (SAC), com resposta em até 7 (sete) dias úteis. Aplica-se o foro do domicílio do consumidor."
           ]
         }
       ]
@@ -314,10 +314,10 @@
       "title": "Termos do organizador — minuta",
       "summary": "As vinte cláusulas de trabalho para a futura criação e administração de campanhas reais.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real."
       ],
       "sections": [
@@ -325,7 +325,7 @@
           "id": "clausula-1",
           "title": "Cláusula 1. Definições",
           "paragraphs": [
-            "Plataforma: Cripto Cow. Organizador: quem cria a campanha. Beneficiário: quem recebe o benefício final. Doador: quem contribui. Parceiro de pagamento: instituição de pagamento autorizada (A definir pelo time). Evidência: documento ou registro que comprova um gasto. Encargo: conjunto de obrigações do organizador descritas nestes Termos."
+            "Plataforma: Cripto Cow. Organizador: quem cria a campanha. Beneficiário: quem recebe o benefício final. Doador: quem contribui. Parceiro de pagamento: instituição de pagamento autorizada. Evidência: documento ou registro que comprova um gasto. Encargo: conjunto de obrigações do organizador descritas nestes Termos."
           ]
         },
         {
@@ -360,7 +360,7 @@
           "id": "clausula-6",
           "title": "Cláusula 6. Orçamento e remanejamento",
           "paragraphs": [
-            "O organizador define o orçamento por categorias. O remanejamento entre categorias até [A definir pelo time]% do total pode ser feito mediante justificativa. Acima disso, depende de aprovação da plataforma e de aviso aos doadores, com prazo de [A definir pelo time] dias para manifestação."
+            "O organizador define o orçamento por categorias. O remanejamento entre categorias até 30% do total pode ser feito mediante justificativa. Acima disso, depende de aprovação da plataforma e de aviso aos doadores, com prazo de 5 (cinco) dias para manifestação."
           ]
         },
         {
@@ -373,7 +373,7 @@
             "pagamento direto ao fornecedor identificado;",
             "liberação por etapa, mediante comprovação;",
             "reembolso de despesa já paga pelo organizador, com comprovante;",
-            "adiantamento de até [A definir pelo time]% do valor orçado, com prova retroativa em até [A definir pelo time] dias."
+            "adiantamento de até 30% do valor orçado, com prova retroativa em até 5 (cinco) dias."
           ]
         },
         {
@@ -387,14 +387,14 @@
           "id": "clausula-9",
           "title": "Cláusula 9. Prazo e consequências da falta de prestação de contas",
           "paragraphs": [
-            "O organizador deve comprovar cada gasto em até [A definir pelo time] dias da liberação. O descumprimento autoriza a suspensão de novas liberações, a sinalização pública da campanha, restrições a campanhas futuras e as medidas de devolução previstas, sem prejuízo de outras providências cabíveis."
+            "O organizador deve comprovar cada gasto em até 5 (cinco) dias da liberação. O descumprimento autoriza a suspensão de novas liberações, a sinalização pública da campanha, restrições a campanhas futuras e as medidas de devolução previstas, sem prejuízo de outras providências cabíveis."
           ]
         },
         {
           "id": "clausula-10",
           "title": "Cláusula 10. Saldo não utilizado",
           "paragraphs": [
-            "Ao criar a campanha, o organizador define o destino da sobra: devolução proporcional aos doadores, causa correlata identificada ou reserva para a mesma causa até [A definir pelo time]. A regra é exibida ao doador antes da doação e exige aceite expresso. Valores de devolução inferiores a R$ [A definir pelo time] ou não reclamados em [A definir pelo time] dias terão o destino de [A definir pelo time]."
+            "Ao criar a campanha, o organizador define o destino da sobra: devolução proporcional aos doadores, causa correlata identificada ou reserva para a mesma causa. A regra é exibida ao doador antes da doação e exige aceite expresso. Valores de devolução inferiores a R$ 100 (cem) reais ou não reclamados em 5 (cinco) dias terão o destino para causas correlatas."
           ]
         },
         {
@@ -415,21 +415,21 @@
           "id": "clausula-13",
           "title": "Cláusula 13. Taxas, tarifas do parceiro de pagamento e eventual gorjeta",
           "paragraphs": [
-            "Percentual: [A definir pelo time]. Tributos incidentes sobre a doação recebida são de responsabilidade do organizador, e a plataforma presta apenas informação geral, não aconselhamento tributário."
+            "Percentual: 10%. Tributos incidentes sobre a doação recebida são de responsabilidade do organizador, e a plataforma presta apenas informação geral, não aconselhamento tributário."
           ]
         },
         {
           "id": "clausula-14",
           "title": "Cláusula 14. Encerramento da campanha",
           "paragraphs": [
-            "A campanha encerra ao atingir a meta, ao fim do prazo, por decisão do organizador mediante cumprimento das regras de sobra, ou por decisão da plataforma nos casos previstos. Após o encerramento, o organizador deve concluir a prestação de contas em [A definir pelo time] dias."
+            "A campanha encerra ao atingir a meta, ao fim do prazo, por decisão do organizador mediante cumprimento das regras de sobra, ou por decisão da plataforma nos casos previstos. Após o encerramento, o organizador deve concluir a prestação de contas em 10 (dez) dias."
           ]
         },
         {
           "id": "clausula-15",
           "title": "Cláusula 15. Denúncia, congelamento e devolução",
           "paragraphs": [
-            "Qualquer pessoa pode denunciar uma campanha ou um gasto. Em caso de indícios graves, a plataforma poderá congelar cautelarmente novas liberações e sinalizar a campanha como \"em análise\", sem acusar fraude. O organizador será avisado dos motivos e terá [A definir pelo time] dias úteis para apresentar documentos. A plataforma decidirá de forma fundamentada em até [A definir pelo time] dias, podendo liberar, manter o congelamento, exigir complementação ou encerrar a campanha e devolver os valores aos doadores. O organizador poderá pedir reconsideração em até [A definir pelo time] dias, e o pedido será analisado por pessoa diferente da que decidiu. A identidade de quem denuncia não é revelada ao organizador."
+            "Qualquer pessoa pode denunciar uma campanha ou um gasto. Em caso de indícios graves, a plataforma poderá congelar cautelarmente novas liberações e sinalizar a campanha como \"em análise\", sem acusar fraude. O organizador será avisado dos motivos e terá 5 (cinco) dias úteis para apresentar documentos. A plataforma decidirá de forma fundamentada em até 5 (cinco) dias, podendo liberar, manter o congelamento, exigir complementação ou encerrar a campanha e devolver os valores aos doadores. O organizador poderá pedir reconsideração em até 3 (três) dias, e o pedido será analisado por pessoa diferente da que decidiu. A identidade de quem denuncia não é revelada ao organizador."
           ]
         },
         {
@@ -459,14 +459,14 @@
           "id": "clausula-19",
           "title": "Cláusula 19. Aceite e registro",
           "paragraphs": [
-            "O aceite é eletrônico. A plataforma registra data, hora, endereço IP e versão dos Termos aceitos, e mantém o registro pelo prazo de [A definir pelo time]."
+            "O aceite é eletrônico. A plataforma registra data, hora, endereço IP e versão dos Termos aceitos, e mantém o registro pelo prazo de 3 (três) meses."
           ]
         },
         {
           "id": "clausula-20",
           "title": "Cláusula 20. Alterações e foro",
           "paragraphs": [
-            "Alterações relevantes serão comunicadas com antecedência de [A definir pelo time] dias. Aplica-se a lei brasileira. Para consumidores, o foro é o do domicílio do consumidor; eventual arbitragem só poderá ocorrer por iniciativa ou com concordância expressa do consumidor (CDC, art. 51, VII)."
+            "Alterações relevantes serão comunicadas com antecedência de 10 (dez) dias. Aplica-se a lei brasileira. Para consumidores, o foro é o do domicílio do consumidor; eventual arbitragem só poderá ocorrer por iniciativa ou com concordância expressa do consumidor (CDC, art. 51, VII)."
           ]
         }
       ]
@@ -476,10 +476,10 @@
       "title": "Aceites, consentimentos e declarações — minutas",
       "summary": "Textos de referência para a operação futura; não são solicitados no MVP.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow e pontos sem decisão identificados como “A definir pelo time”. Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
         "Os campos entre colchetes referentes à campanha, ao beneficiário e às informações a exibir são preenchidos caso a caso. Os parceiros, canais e prazos sem decisão continuam pendentes. A demonstração não solicita consentimento de beneficiário, responsável legal ou tratamento de saúde."
       ],
@@ -502,7 +502,7 @@
           "id": "consentimento-beneficiario",
           "title": "Consentimento do beneficiário para exibição pública",
           "paragraphs": [
-            "“Autorizo a exibição pública, na campanha [nome da campanha], do meu nome [ou apelido], de minha foto [opcional] e de um resumo da minha situação de saúde aprovado por mim. Sei que documentos completos (laudos, exames, documentos pessoais) não serão publicados. Posso retirar este consentimento a qualquer momento pelo canal [A definir pelo time], sabendo que o registro financeiro da campanha será mantido sem identificar-me.”"
+            "“Autorizo a exibição pública, na campanha [nome da campanha], do meu nome [ou apelido], de minha foto [opcional] e de um resumo da minha situação de saúde aprovado por mim. Sei que documentos completos (laudos, exames, documentos pessoais) não serão publicados. Posso retirar este consentimento a qualquer momento pelo canal do e-mail, sabendo que o registro financeiro da campanha será mantido sem identificar-me.”"
           ]
         },
         {
@@ -516,7 +516,7 @@
           "id": "consentimento-saude",
           "title": "Consentimento para tratamento de dados de saúde",
           "paragraphs": [
-            "“Autorizo o tratamento de dados de saúde, como laudos e orçamentos médicos, para verificar a campanha e comprovar gastos. Esses documentos ficarão em área restrita, acessíveis apenas à equipe autorizada e a parceiros [A definir pelo time], e serão eliminados ou arquivados com restrição após prazo [A definir pelo time].”"
+            "“Autorizo o tratamento de dados de saúde, como laudos e orçamentos médicos, para verificar a campanha e comprovar gastos. Esses documentos ficarão em área restrita, acessíveis apenas à equipe autorizada e a parceiros, e serão eliminados ou arquivados com restrição após prazo 3 (três) meses.”"
           ]
         },
         {
