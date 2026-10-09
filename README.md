@@ -62,6 +62,6 @@ Para conferir um histórico baixado:
 node scripts/verify-ledger.js caminho-do-ledger.json
 ```
 
-O roteiro da demonstração, o resumo em inglês e a lista para submissão estão em [docs/hackathon.md](docs/hackathon.md). Uma ancoragem só conta como realizada depois de confirmada e publicada com seu link no Explorer.
+O [pitch em português e inglês](docs/pitch.md) inclui a fala, a versão curta e perguntas da banca. O roteiro da demonstração e a lista para submissão estão em [docs/hackathon.md](docs/hackathon.md). Uma ancoragem só conta como realizada depois de confirmada e publicada com seu link no Explorer.
 
 Pix, cartão, custódia, KYC, validação fiscal, devoluções e documentos privados ainda precisam de integração. Os níveis A/B não são simulados como verificados. Detalhes em [docs/mvp.md](docs/mvp.md).

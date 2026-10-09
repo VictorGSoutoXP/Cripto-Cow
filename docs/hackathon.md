@@ -1,6 +1,6 @@
 # Apresentação para o hackathon
 
-[Abrir a Cripto Cow](https://cripto-cow.onrender.com/) · [Escopo do MVP](mvp.md)
+[Abrir a Cripto Cow](https://cripto-cow.onrender.com/) · [Escopo do MVP](mvp.md) · [Pitch em português e inglês](pitch.md)
 
 ## Resumo em inglês
 
@@ -17,7 +17,7 @@ Antes de gravar, abra o site para aguardar a inicialização do Render, entre no
 | Tempo     | Mostrar                                                                  | Explicar                                                                                                                         |
 | --------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
 | 0:00–0:40 | Campanha, orçamento e regra da sobra                                     | O problema é acompanhar a destinação de uma doação. Os valores e organizações exibidos são fictícios.                            |
-| 0:40–1:20 | “Apoiar esta causa”, aceite das regras e recibo                          | A contribuição é simulada e entra no histórico público sem nome do doador.                                                       |
+| 0:40–1:20 | “Apoiar esta causa”, aceite das regras e recibo                          | A contribuição é simulada; aparece como anônima ou com nome fictício de pessoa ou empresa, conforme a escolha do doador.         |
 | 1:20–2:20 | Painel, solicitação de liberação e evidência fictícia                    | O pedido reserva saldo e orçamento. A reserva ainda não é uma saída.                                                             |
 | 2:20–3:00 | Conferência da evidência e aprovação com justificativa                   | A aprovação registra a saída; uma recusa libera a reserva. Organização e revisão compartilham o painel neste MVP.                |
 | 3:00–3:50 | “Registro verificável”, conferência no navegador e download do histórico | Os hashes permitem detectar alterações no ledger. Eles não comprovam a veracidade da evidência.                                  |
