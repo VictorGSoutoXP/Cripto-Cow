@@ -2,7 +2,7 @@
   "source": {
     "title": "Doações Transparentes — Estudo de viabilidade jurídica e compliance",
     "date": "2026-10-02",
-    "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas preservam as seções 7, 8 e 9; as políticas atuais descrevem o MVP publicado."
+    "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
     "version": "mvp-1.2",
@@ -214,10 +214,10 @@
       "title": "Termos do doador — minuta",
       "summary": "Texto do documento jurídico para uma futura operação com doações reais.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow. Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
         "Orientação da fonte: o doador deve ver os pontos essenciais antes de pagar, em destaque, e aceitar com uma caixa de seleção própria."
       ],
@@ -314,10 +314,10 @@
       "title": "Termos do organizador — minuta",
       "summary": "As vinte cláusulas de trabalho para a futura criação e administração de campanhas reais.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow . Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real."
       ],
       "sections": [
@@ -476,10 +476,10 @@
       "title": "Aceites, consentimentos e declarações — minutas",
       "summary": "Textos de referência para a operação futura; não são solicitados no MVP.",
       "status": "draft",
-      "version": "juridico-2026-10-02",
-      "updatedAt": "2026-10-06",
+      "version": "juridico-2026-10-09",
+      "updatedAt": "2026-10-09",
       "intro": [
-        "Minuta para uma futura operação com doações reais. O texto abaixo preserva a versão de trabalho de 02/10/2026 preparada pelo time para discussão, com o nome atualizado para Cripto Cow. Não constitui parecer jurídico.",
+        "Minuta para uma futura operação com doações reais da Cripto Cow, baseada na versão de trabalho de 02/10/2026 preparada pelo time para discussão e revisada em 09/10/2026 com propostas de prazos e percentuais. Não constitui parecer jurídico.",
         "Esta minuta não integra o aceite do MVP e não descreve serviços já disponíveis. Custódia por parceiro, Pix, cartão, KYC, biometria, documentos originais, pagamentos e devoluções reais ainda não estão implementados. As condições abaixo dependem de decisões do time e revisão antes de uma operação real.",
         "Os campos entre colchetes referentes à campanha, ao beneficiário e às informações a exibir são preenchidos caso a caso. Os parceiros, canais e prazos sem decisão continuam pendentes. A demonstração não solicita consentimento de beneficiário, responsável legal ou tratamento de saúde."
       ],

@@ -14,13 +14,15 @@ Doações aparecem como anônimas por padrão. Quem escolher pessoa ou empresa i
 
 A fonte é o documento **Doações Transparentes — Estudo de viabilidade jurídica e compliance**, versão de trabalho de 02/10/2026, fornecido pelo time no arquivo `Doacoes_Transparentes_Documento_Juridico.pdf`. Ele se identifica como rascunho de hackathon, sem natureza de parecer jurídico.
 
-Foram preservadas as vinte cláusulas do organizador, as doze do doador e os seis textos da seção 9: aceite do doador, declaração do organizador, consentimentos do beneficiário, do responsável e de saúde, além do aviso tributário. A nota de revisão da responsabilidade perante o consumidor permanece na minuta do doador.
+As minutas seguem a estrutura das vinte cláusulas do organizador, das doze do doador e dos seis textos da seção 9: aceite do doador, declaração do organizador, consentimentos do beneficiário, do responsável e de saúde, além do aviso tributário. A nota de revisão da responsabilidade perante o consumidor permanece na minuta do doador.
 
-As adaptações são de apresentação: nome Cripto Cow, títulos, parágrafos, listas e campos pendentes identificados como “A definir pelo time”. Os campos da campanha e do beneficiário continuam para preenchimento caso a caso. As minutas têm versão `juridico-2026-10-02`, não compõem o aceite do MVP e não prometem funcionalidades disponíveis.
+A revisão do time no PR #4, em 09/10/2026, propõe prazos e percentuais para a operação futura, além das adaptações de apresentação. As minutas têm versão `juridico-2026-10-09`. Os campos da campanha e do beneficiário continuam para preenchimento caso a caso. As minutas não compõem o aceite do MVP e não prometem funcionalidades disponíveis.
+
+As propostas incluem taxa de 10%, limites de 30% para remanejamento e adiantamento, comprovação em cinco dias e prestação de contas final em dez dias. Os demais prazos constam das respectivas cláusulas. Esses parâmetros pertencem às minutas; o MVP continua sem taxa e com valores simulados. A revisão não implementa pagamentos, devoluções, retenção por prazo ou envio de avisos.
 
 ## Antes de operar com recursos reais
 
-O documento de origem deixa decisões para o time e revisão jurídica:
+O documento de origem levantou os pontos abaixo. Parte dos parâmetros recebeu propostas no PR #4; sua validação e implementação, assim como as decisões ainda pendentes, são necessárias antes de operar com recursos reais:
 
 - Parceiro autorizado, estrutura societária, taxa, tarifas e gorjeta.
 - Limites de remanejamento e adiantamento; prazos de manifestação, comprovação e prestação de contas final.
@@ -34,4 +36,4 @@ A fonte também pede conferir os textos e a tramitação dos projetos de lei 320
 
 ## Versionamento
 
-Alterações relevantes nos documentos atuais exigem atualizar `acceptance.version`, as versões dos três documentos e a data de atualização. Não substitua a versão dos aceites já registrados. Uma alteração da minuta continua como minuta até o time aprovar as decisões e implementar a operação correspondente.
+Alterações relevantes nos documentos atuais exigem atualizar `acceptance.version`, as versões dos três documentos e a data de atualização. Não substitua a versão dos aceites já registrados. Alterações nas minutas exigem atualizar suas versões e datas, sem mudar o aceite atual quando os documentos vigentes permanecerem iguais. Uma alteração da minuta continua como minuta até o time aprovar as decisões e implementar a operação correspondente.
