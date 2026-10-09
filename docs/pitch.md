@@ -1,12 +1,14 @@
 # Pitch da Cripto Cow
 
-[Produto](https://cripto-cow.onrender.com/) · [Código](https://github.com/VictorGSoutoXP/Cripto-Cow) · [Roteiro da demo](hackathon.md)
+[Produto](https://cripto-cow.onrender.com/) · [Código](https://github.com/VictorGSoutoXP/Cripto-Cow) · [Roteiro da demo](hackathon.md) · [Critérios, dados e impacto](avaliacao-hackathon.md)
 
 ## Apresentação em português
 
 Fala para aproximadamente dois a três minutos. Faça uma pausa depois da pergunta inicial e use a demonstração em um vídeo separado, conforme os formatos da [FAQ da Colosseum](https://colosseum.com/hackathon).
 
 Você já doou para uma causa e depois ficou sem saber o que aconteceu com aquele dinheiro?
+
+Na Pesquisa Doação Brasil 2024, apenas 33% dos entrevistados percebem clareza no uso dos recursos pelas ONGs.
 
 A campanha mostra a meta. Mas o doador precisa entender também o orçamento, as despesas e o que foi entregue. Para quem organiza, prestar contas costuma significar juntar comprovantes e responder às mesmas perguntas em canais diferentes.
 
@@ -25,6 +27,8 @@ Cripto Cow. Quem doa acompanha. Quem realiza presta contas.
 ## Presentation in English
 
 Have you ever donated to a cause and then wondered what happened to the money?
+
+In the Brazil Giving Survey 2024, only 33% of respondents perceive clarity about how NGOs use their funds.
 
 A campaign shows its fundraising goal. But donors also need to understand the budget, the expenses, and what was delivered. For organizers, accountability often means collecting receipts and answering the same questions across different channels.
 
@@ -45,6 +49,8 @@ Cripto Cow. Donors follow the journey. Organizers show the results.
 A Cripto Cow ajuda quem doa a acompanhar o destino dos recursos. A campanha apresenta o orçamento, o organizador registra evidências e cada movimentação entra em um histórico verificável. Integramos a Solana devnet para ancorar hashes desse histórico. O MVP já está publicado, com código aberto e pagamentos simulados. Agora queremos validar o fluxo com campanhas comunitárias antes de integrar doações reais. Cripto Cow: quem doa acompanha; quem realiza presta contas.
 
 ## Apoio visual para a apresentação
+
+Para o slide do problema, use **“APENAS 33%”**, seguido de **“percebem clareza no uso dos recursos pelas ONGs”**. Identifique a fonte como **IDIS/Ipsos, Pesquisa Doação Brasil 2024, p. 70** e inclua o [link do relatório](https://www.idis.org.br/wp-content/uploads/2025/08/Pesquisa-Doacao-Brasil-2024_IDIS.pdf#page=70). É uma medida de percepção dos entrevistados.
 
 | Parte         | Tela ou slide                    | Mensagem                                                      |
 | ------------- | -------------------------------- | ------------------------------------------------------------- |
