@@ -5,10 +5,11 @@
     "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
-    "version": "mvp-1.2",
+    "version": "mvp-1.4",
     "documents": ["uso-demonstrativo", "privacidade", "transparencia"],
     "donorText": "Tenho 18 anos ou mais, li os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP e aceito as regras de liberação e sobra desta campanha na demonstração. Usarei apenas dados fictícios. Se escolher pessoa ou empresa, o nome fictício informado ficará público junto ao valor e à data da doação simulada. Entendo que não há pagamento real nem retorno financeiro.",
-    "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro."
+    "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro.",
+    "accountText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Entendo que meu e-mail, nome de exibição e dados de autenticação serão usados para manter minha conta e meu painel. Usarei dados fictícios nas campanhas e evidências. As doações e liberações são simuladas."
   },
   "documents": [
     {
@@ -16,8 +17,8 @@
       "title": "Termos de uso do MVP",
       "summary": "Regras válidas para participar da demonstração da Cripto Cow.",
       "status": "current",
-      "version": "mvp-1.2",
-      "updatedAt": "2026-10-06",
+      "version": "mvp-1.4",
+      "updatedAt": "2026-10-12",
       "intro": [
         "A Cripto Cow é um protótipo de doações transparentes criado para o hackathon. Campanhas, valores, comprovantes e decisões da demonstração devem usar dados fictícios. Uma doação no site é uma simulação e não movimenta dinheiro.",
         "Estes termos, a Política de Privacidade do MVP e a Política de Transparência do MVP compõem o aceite atual. As minutas para operação futura estão disponíveis para consulta e não fazem parte desse aceite."
@@ -29,7 +30,10 @@
           "paragraphs": [
             "O uso é destinado a pessoas com 18 anos ou mais. O aceite é uma declaração do participante; o MVP não realiza verificação de idade ou identidade.",
             "Utilize apenas nomes, organizações, localidades, histórias, fornecedores e evidências fictícios. Não envie CPF, RG, endereço pessoal, chave Pix, dados bancários, laudos, informações de saúde, biometria ou dados de crianças e adolescentes.",
-            "A doação aparece como anônima por padrão. Você pode escolher pessoa ou empresa e informar um nome fictício de 2 a 60 caracteres. Nessa opção, o nome e o tipo escolhido ficam públicos junto ao valor e à data da doação simulada. Essa identificação é declarada por você e não é verificada pela Cripto Cow. Não use nome real, CPF ou CNPJ."
+            "A doação aparece como anônima por padrão. Você pode escolher pessoa ou empresa e informar um nome fictício de 2 a 60 caracteres. Nessa opção, o nome e o tipo escolhido ficam públicos junto ao valor e à data da doação simulada. Essa identificação é declarada por você e não é verificada pela Cripto Cow. Não use nome real, CPF ou CNPJ.",
+            "O participante pode criar uma conta com e-mail, nome de exibição e senha. O e-mail não é verificado por envio de mensagem e não constitui comprovação de identidade. A conta permite criar e publicar seus rascunhos demonstrativos e solicitar despesas das próprias campanhas. Aprovações de despesas, suspensão ou retomada de campanhas publicadas e revisão de denúncias são reservadas à moderação. A recuperação de senha por e-mail ainda não está disponível.",
+            "O cadastro fornece um código privado de recuperação, exibido uma vez. Guarde-o para poder definir uma nova senha. No perfil é possível editar o nome, trocar a senha, gerar outro código e encerrar a conta mediante confirmação da senha. O encerramento remove os dados privados do cadastro, sessões e vínculos de carteiras, mas preserva os textos públicos das campanhas e o ledger demonstrativo. As campanhas da conta encerrada permanecem sob acesso da moderação.",
+            "Cada perfil pode vincular uma carteira Solana e um endereço transparente Zcash testnet mediante assinatura de um desafio com prazo de cinco minutos e uso único. A assinatura comprova a posse de uma chave para esse endereço; não comprova identidade, não realiza pagamento e não dá acesso à chave privada. O vínculo Zcash não inclui endereços protegidos e não oferece sigilo para um endereço transparente."
           ]
         },
         {
@@ -58,7 +62,7 @@
           "id": "blockchain",
           "title": "4. Registro na Solana devnet",
           "paragraphs": [
-            "A integração com a Phantom permite ao administrador assinar uma transação de testes para registrar um hash do histórico na Solana devnet. Ela não envia os valores das doações nem transfere recursos a um beneficiário.",
+            "A integração com a Phantom permite ao organizador da campanha ou à moderação assinar uma transação de testes para registrar um hash do histórico na Solana devnet. Ela não envia os valores das doações nem transfere recursos a um beneficiário.",
             "O endereço da carteira e a transação assinada são públicos na blockchain. A Cripto Cow não solicita a frase de recuperação ou a chave privada da carteira. Utilize uma carteira de testes com SOL de devnet, sem valor real.",
             "Um registro só é apresentado como confirmado após a consulta da transação. Um hash pode demonstrar a correspondência de um histórico com o registro, mas não comprova que uma história ou evidência seja verdadeira."
           ]
@@ -86,10 +90,10 @@
       "title": "Política de Privacidade do MVP",
       "summary": "Quais informações o protótipo utiliza, publica e mantém restritas.",
       "status": "current",
-      "version": "mvp-1.2",
-      "updatedAt": "2026-10-06",
+      "version": "mvp-1.4",
+      "updatedAt": "2026-10-12",
       "intro": [
-        "Esta política descreve o funcionamento atual da Cripto Cow. A demonstração deve receber somente dados fictícios e não possui cadastro de identidade, KYC, biometria ou envio de documentos originais.",
+        "Esta política descreve o funcionamento atual da Cripto Cow. O cadastro utiliza e-mail, nome de exibição e senha para autenticar uma conta individual. Campanhas, doações, evidências e justificativas continuam demonstrativas e devem receber somente dados fictícios. Não há KYC, biometria ou envio de documentos originais.",
         "Campos de texto podem identificar pessoas se forem preenchidos com dados reais. Por isso, não inclua informações pessoais ou sensíveis nas campanhas, justificativas, evidências ou denúncias."
       ],
       "sections": [
@@ -98,8 +102,10 @@
           "title": "1. Informações registradas",
           "paragraphs": [
             "O banco Turso armazena os dados enviados aos formulários e os registros da demonstração, incluindo nome da organização, localização, título e descrição da campanha, orçamento, prazo e regras; título, fornecedor, valor e resumo de evidência de despesas; justificativas de decisões; motivo e estado das denúncias; valores simulados, identificadores e aceites versionados. Se a doação usar a opção pessoa ou empresa, também armazena o nome fictício de exibição e o tipo escolhido.",
-            "A doação demonstrativa aparece como anônima por padrão. A identificação é opcional: você pode escolher pessoa ou empresa e preencher um nome fictício de 2 a 60 caracteres para exibição pública. O MVP não verifica essa identidade e não solicita CPF, CNPJ, cartão, conta bancária ou chave Pix do doador. O acesso ao painel usa uma senha administrativa e não um cadastro individual de participante.",
-            "A preparação e confirmação de ancoragens também registram o endereço público da carteira, assinatura e dados técnicos da transação. Uma assinatura de transação não dá ao site acesso à chave privada."
+            "A doação demonstrativa aparece como anônima por padrão. A identificação é opcional: você pode escolher pessoa ou empresa e preencher um nome fictício de 2 a 60 caracteres para exibição pública. O MVP não verifica essa identidade e não solicita CPF, CNPJ, cartão, conta bancária ou chave Pix do doador. O participante entra no próprio painel com e-mail e senha. A moderação utiliza um acesso administrativo separado.",
+            "A preparação e confirmação de ancoragens também registram o endereço público da carteira, assinatura e dados técnicos da transação. Uma assinatura de transação não dá ao site acesso à chave privada.",
+            "O cadastro registra identificador da conta, e-mail normalizado, nome de exibição, data de criação e aceite versionado das políticas. A senha é armazenada como hash scrypt com salt aleatório, sem guardar seu texto original. As sessões individuais guardam o hash de um token aleatório e o prazo de validade. Campanhas novas são vinculadas ao identificador da conta responsável. O e-mail e o nome de perfil não são incluídos no histórico público ou na blockchain pelo cadastro.",
+            "Os vínculos de carteira guardam rede, endereço público, identificador da conta e data da verificação. Desafios temporários de assinatura guardam a mensagem, um nonce aleatório, a conta, o endereço e a validade; são descartados quando usados ou substituídos. Os códigos de recuperação são armazenados somente como hashes; o código completo é entregue ao participante uma vez no cadastro ou ao gerar seu substituto. Ele não é enviado por e-mail."
           ]
         },
         {
@@ -108,15 +114,16 @@
           "paragraphs": [
             "Campanhas publicadas, organização, localização, descrição, orçamento, movimentações, resumos de evidência, fornecedor e decisões sobre despesas ou estado da campanha podem ser consultados publicamente. O histórico e seus hashes também podem ser exportados.",
             "Quando a opção pessoa ou empresa é escolhida, o nome fictício e o tipo informado aparecem publicamente com o valor e a data da doação simulada. Esses campos ficam no banco de dados fora do ledger financeiro imutável e não integram seus hashes. A opção anônima descreve a exibição pública e não elimina os dados técnicos de conexão tratados pela infraestrutura.",
-            "Denúncias, seus motivos e a decisão de revisão ficam restritos ao painel administrativo. Organização e revisão compartilham esse mesmo painel no MVP; a separação de acesso por função ainda não foi implementada. O formulário não solicita a identidade do denunciante, mas qualquer pessoa com acesso administrativo pode consultar o texto enviado. Não inclua dados que identifiquem quem denuncia.",
-            "Não existe, neste MVP, mecanismo para ocultar automaticamente dados pessoais, tarjar documentos ou remover metadados. Os formulários recebem textos demonstrativos, não documentos originais. Não copie informações reais para esses textos."
+            "Denúncias, seus motivos e a decisão de revisão ficam restritos à moderação. Cada participante consulta no painel somente suas próprias campanhas e solicitações. Não recebe acesso às denúncias nem pode aprovar despesas. O formulário de denúncia não solicita a identidade do denunciante. Não inclua dados que identifiquem quem denuncia.",
+            "Não existe, neste MVP, mecanismo para ocultar automaticamente dados pessoais, tarjar documentos ou remover metadados. Os formulários recebem textos demonstrativos, não documentos originais. Não copie informações reais para esses textos.",
+            "A lista de carteiras vinculadas ao perfil fica restrita ao participante. Um endereço usado para ancorar uma campanha na Solana passa a integrar os dados públicos dessa ancoragem. Um pedido Zcash de teste gerado no perfil pode revelar seu endereço a quem receber o link; o site não publica esses pedidos na lista de campanhas nem registra uma doação a partir deles."
           ]
         },
         {
           "id": "sessao",
-          "title": "3. Cookie administrativo e armazenamento no navegador",
+          "title": "3. Cookie de sessão e armazenamento no navegador",
           "paragraphs": [
-            "O cookie essencial elo_session mantém a autenticação do painel por até oito horas. Ele usa HttpOnly e SameSite=Strict, além de Secure no ambiente publicado. As sessões ficam na memória do servidor e terminam também quando o servidor reinicia ou o usuário sai do painel.",
+            "O cookie essencial elo_session mantém a autenticação do painel por até oito horas. Ele usa HttpOnly e SameSite=Strict, além de Secure no ambiente publicado. Sessões individuais ficam no banco e podem continuar após um reinício dentro de sua validade; são revogadas ao sair. Sessões administrativas ficam na memória do servidor e terminam também quando ele reinicia. Tokens de sessões individuais são armazenados no banco apenas como hashes; entradas expiradas são limpas quando uma nova sessão individual é criada.",
             "O navegador pode guardar temporariamente, em sessionStorage, o identificador e a assinatura de uma ancoragem pendente para permitir sua confirmação após uma falha de conexão. Isso não armazena a chave privada da carteira.",
             "O MVP não utiliza ferramentas de analytics, publicidade ou cookies de rastreamento. O aceite das regras da demonstração não é uma autorização geral para novos usos de dados."
           ]
@@ -142,8 +149,8 @@
           "id": "retencao",
           "title": "6. Retenção, atendimento e operação futura",
           "paragraphs": [
-            "O banco preserva os registros da demonstração entre reinícios. Ainda não há prazo formal de retenção para dados pessoais, canal de atendimento definido ou interface para solicitar acesso, correção, eliminação e retirada de consentimento.",
-            "Esses pontos precisam ser definidos e implementados antes de receber dados reais. Esta política não promete um procedimento ainda inexistente nem declara conformidade jurídica. Durante o MVP, mantenha todas as entradas fictícias."
+            "O banco preserva contas e registros demonstrativos entre reinícios. O perfil permite corrigir o nome de exibição, alterar a senha, substituir o código de recuperação, remover vínculos de carteiras e encerrar a conta. O encerramento remove o e-mail, nome, hash da senha, código de recuperação, sessões, desafios e vínculos privados daquela conta. Campanhas, seus textos públicos, aceites de campanhas e eventos financeiros demonstrativos são preservados para continuidade do histórico. O e-mail não é verificado por envio de mensagem e não há recuperação de senha por e-mail.",
+            "Ainda não há prazo formal de retenção nem canal de atendimento para solicitações sobre informações publicadas e retirada de consentimento. O cadastro se limita ao acesso descrito nesta política; entradas públicas e evidências devem ser fictícias. Esta política não declara conformidade jurídica nem promete apagar transações já publicadas em blockchain."
           ]
         }
       ]
@@ -153,8 +160,8 @@
       "title": "Política de Transparência do MVP",
       "summary": "Como consultar o histórico, entender evidências e acompanhar decisões simuladas.",
       "status": "current",
-      "version": "mvp-1.2",
-      "updatedAt": "2026-10-06",
+      "version": "mvp-1.4",
+      "updatedAt": "2026-10-12",
       "intro": [
         "A Cripto Cow demonstra prestação de contas por campanha: entradas, saídas, orçamento, evidências e decisões ficam disponíveis para consulta pública, com os limites descritos nesta política.",
         "A demonstração não substitui auditoria, verificação documental, comprovação de identidade ou análise jurídica. Os dados e valores são simulados."

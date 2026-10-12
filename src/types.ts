@@ -1,4 +1,18 @@
 export type Category = { id: string; name: string; planned: number; spent: number };
+export type ProfileWallet = {
+  id: string;
+  network: 'solana' | 'zcash';
+  address: string;
+  verifiedAt: string;
+  chain: 'devnet' | 'testnet';
+};
+export type WalletChallenge = {
+  id: string;
+  network: 'solana' | 'zcash';
+  address: string;
+  message: string;
+  expiresAt: string;
+};
 export type LedgerEntry = {
   id: string;
   campaignId: string;
@@ -83,6 +97,7 @@ export type Report = {
 };
 
 export type Overlay =
+  | { type: 'recoveryCode'; code: string }
   | { type: 'donation'; campaign: Campaign }
   | { type: 'create' }
   | { type: 'expense'; campaign: Campaign }

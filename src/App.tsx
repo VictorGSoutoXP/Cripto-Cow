@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, CircleCheck, LockKeyhole, Menu, X, LoaderCircle } from 'lucide-react';
-import { api } from './lib/api';
+import { api, sessionExpiredEvent } from './lib/api';
 import { Logo, Button } from './components/ui';
 import { CampaignForm, DonationForm, ExpenseForm, ReportForm } from './components/forms';
 import { Proof, Decision, About } from './components/overlays';
@@ -9,6 +9,7 @@ import CampaignPage from './pages/CampaignPage';
 import Admin from './pages/Admin';
 import Policies from './pages/Policies';
 import type { Campaign, Overlay } from './types';
+import RecoveryCode from './components/RecoveryCode';
 
 type View = 'home' | 'transparency' | 'admin' | 'campaign' | 'policies';
 
@@ -19,6 +20,7 @@ function useRoute() {
       return { view: 'campaign' as View, id: parts[1], sectionId: '' };
     if (parts[0] === 'politicas')
       return { view: 'policies' as View, id: parts[1] || '', sectionId: parts[2] || '' };
+    if (parts[0] === 'perfil') return { view: 'admin' as View, id: 'profile', sectionId: '' };
     return {
       view:
         parts[0] === 'transparencia'
@@ -52,6 +54,16 @@ export default function App() {
   const [epoch, setEpoch] = useState(0);
   const [notice, setNotice] = useState('');
   const [menu, setMenu] = useState(false);
+
+  useEffect(() => {
+    const expired = () => {
+      setOverlay(null);
+      setNotice('Sua sessão terminou. Entre novamente para continuar.');
+      setEpoch((value) => value + 1);
+    };
+    window.addEventListener(sessionExpiredEvent, expired);
+    return () => window.removeEventListener(sessionExpiredEvent, expired);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -107,7 +119,7 @@ export default function App() {
           </nav>
           <div className="header-actions">
             <span className="network-indicator">
-              <i /> Solana devnet
+              <i /> Redes de teste
             </span>
             <a href="#/painel" className="button header-button">
               Meu painel <ArrowUpRight size={16} />
@@ -137,6 +149,14 @@ export default function App() {
       <main>
         {route.view === 'policies' ? (
           <Policies documentId={route.id} sectionId={route.sectionId} />
+        ) : route.view === 'admin' ? (
+          <Admin
+            epoch={epoch}
+            refresh={refresh}
+            show={setOverlay}
+            notify={setNotice}
+            profile={route.id === 'profile'}
+          />
         ) : loading ? (
           <div className="loading-state">
             <LoaderCircle className="spin" /> Carregando as causas...
@@ -158,8 +178,6 @@ export default function App() {
             }}
             onInfo={() => setOverlay({ type: 'info' })}
           />
-        ) : route.view === 'admin' ? (
-          <Admin epoch={epoch} refresh={refresh} show={setOverlay} notify={setNotice} />
         ) : (
           <CampaignPage
             campaignId={route.id || campaigns[0]?.id}
@@ -190,9 +208,7 @@ export default function App() {
           </div>
           <div className="footer-note">
             <span>Construído para conectar pessoas e causas.</span>
-            <span>
-              Cripto Cow · MVP 2026 <span className="solana-symbol">≋</span> Solana
-            </span>
+            <span>Cripto Cow · MVP 2026 · Solana e Zcash</span>
           </div>
         </div>
       </footer>
@@ -211,6 +227,9 @@ export default function App() {
           onClose={() => setOverlay(null)}
           onSaved={refresh}
         />
+      )}
+      {overlay?.type === 'recoveryCode' && (
+        <RecoveryCode code={overlay.code} onClose={() => setOverlay(null)} />
       )}
       {overlay?.type === 'create' && (
         <CampaignForm

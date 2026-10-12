@@ -5,6 +5,9 @@ import { z } from 'zod';
 import { digest, verifyEntries } from './ledger.js';
 import { getAcceptance, getLegalManifest } from './legal.js';
 import { donorSchema } from './donors.js';
+import { Accounts, sessionDuration, sessionToken } from './accounts.js';
+import { ProfileWallets } from './profile-wallets.js';
+import { zcashPaymentRequest } from './zcash.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -41,6 +44,19 @@ const expenseSchema = z.object({
   amount: money,
   evidenceSummary: text(30, 1500),
 });
+const credentialsSchema = z.strictObject({
+  email: z.string().trim().max(254).email().toLowerCase(),
+  password: z.string().min(1).max(128),
+});
+const registrationSchema = credentialsSchema.extend({
+  name: text(2, 60),
+  password: z.string().min(12).max(128),
+  ...acceptanceFields,
+});
+
+function publicCampaign({ ownerId, ...campaign }) {
+  return campaign;
+}
 
 export function createApp(store, options = {}) {
   const app = express();
@@ -49,7 +65,10 @@ export function createApp(store, options = {}) {
   const rpcUrl = options.rpcUrl ?? process.env.SOLANA_RPC_URL ?? 'https://api.devnet.solana.com';
   const production = options.production ?? process.env.NODE_ENV === 'production';
   const sessions = new Map();
+  const accounts = new Accounts(store);
+  const wallets = new ProfileWallets(store);
   const rate = new Map();
+  const authRate = new Map();
   app.disable('x-powered-by');
   app.set('trust proxy', options.trustProxy ?? false);
   app.use(express.json({ limit: '32kb' }));
@@ -84,17 +103,62 @@ export function createApp(store, options = {}) {
     next();
   });
 
-  const admin = (req, res, next) => {
-    const token = req.headers.cookie
-      ?.split(';')
-      .map((item) => item.trim())
-      .find((item) => item.startsWith('elo_session='))
-      ?.slice(12);
+  const authenticated = async (req, res, next) => {
+    const token = sessionToken(req);
     const session = sessions.get(token);
-    if (!session || session.expires < Date.now())
-      return res.status(401).json({ error: 'Entre no painel para continuar.' });
+    if (session && session.expires > Date.now())
+      req.account = { id: null, name: 'Administração', role: 'admin' };
+    else {
+      sessions.delete(token);
+      req.account = await accounts.current(token);
+    }
+    if (!req.account)
+      return res
+        .status(401)
+        .json({ error: 'Entre na sua conta para continuar.', code: 'SESSION_REQUIRED' });
     next();
   };
+  const admin = [
+    authenticated,
+    (req, res, next) => {
+      if (req.account.role !== 'admin')
+        return res
+          .status(403)
+          .json({ error: 'Esta ação é reservada à moderação.', code: 'FORBIDDEN' });
+      next();
+    },
+  ];
+  const individual = [
+    authenticated,
+    (req, res, next) => {
+      if (!req.account.id)
+        return res.status(403).json({
+          error: 'Entre com uma conta individual para acessar o perfil.',
+          code: 'INDIVIDUAL_ACCOUNT_REQUIRED',
+        });
+      next();
+    },
+  ];
+  const limitAuthentication = (req, res, next) => {
+    const now = Date.now();
+    for (const [key, record] of authRate) if (record.expires <= now) authRate.delete(key);
+    const record = authRate.get(req.ip);
+    if (record && ++record.count > 10)
+      return res.status(429).json({
+        error: 'Muitas tentativas de acesso. Aguarde um minuto.',
+        code: 'AUTH_RATE_LIMIT',
+      });
+    if (!record) authRate.set(req.ip, { count: 1, expires: now + 60000 });
+    next();
+  };
+  const setSessionCookie = (req, res, token) =>
+    res.cookie('elo_session', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: production || req.secure,
+      maxAge: sessionDuration,
+      path: '/',
+    });
   const demoOnly = (req, res, next) =>
     demo
       ? next()
@@ -105,6 +169,15 @@ export function createApp(store, options = {}) {
   const requireCampaign = async (id) => {
     const campaign = await store.campaign(id);
     if (!campaign) throw Object.assign(new Error('Campanha não encontrada.'), { status: 404 });
+    return campaign;
+  };
+  const requireOwnedCampaign = async (req, id) => {
+    const campaign = await requireCampaign(id);
+    if (req.account.role !== 'admin' && campaign.ownerId !== req.account.id)
+      throw Object.assign(new Error('Você não tem acesso a esta campanha.'), {
+        status: 403,
+        code: 'FORBIDDEN',
+      });
     return campaign;
   };
   const requireAcceptance = (input, role) => {
@@ -132,7 +205,7 @@ export function createApp(store, options = {}) {
         .filter((item) => item.status !== 'draft')
         .map(async (item) => {
           const { ledger, expenses, donations, ...campaign } = await store.campaign(item.id);
-          return campaign;
+          return publicCampaign(campaign);
         }),
     );
     res.json({ campaigns, demo });
@@ -141,7 +214,7 @@ export function createApp(store, options = {}) {
     const campaign = await requireCampaign(req.params.id);
     if (campaign.status === 'draft')
       return res.status(404).json({ error: 'Esta campanha ainda não foi publicada.' });
-    res.json(campaign);
+    res.json(publicCampaign(campaign));
   });
   app.get('/api/campaigns/:id/ledger', async (req, res) => {
     const campaign = await requireCampaign(req.params.id);
@@ -206,7 +279,38 @@ export function createApp(store, options = {}) {
     res.status(201).json({ id: report.id, status: report.status, createdAt: report.createdAt });
   });
 
-  app.post('/api/admin/session', (req, res) => {
+  app.post('/api/auth/register', limitAuthentication, async (req, res) => {
+    const input = registrationSchema.parse(req.body);
+    const acceptance = requireAcceptance(input, 'account');
+    const previousToken = sessionToken(req);
+    const { user, token, recoveryCode } = await accounts.register(input, acceptance, previousToken);
+    sessions.delete(previousToken);
+    setSessionCookie(req, res, token);
+    res.status(201).json({ authenticated: true, user, demo, recoveryCode });
+  });
+  app.post('/api/auth/recovery', limitAuthentication, async (req, res) => {
+    const input = z
+      .strictObject({
+        email: credentialsSchema.shape.email,
+        code: text(48, 64),
+        password: z.string().min(12).max(128),
+      })
+      .parse(req.body);
+    const previousToken = sessionToken(req);
+    const { user, token, recoveryCode } = await accounts.recover(input, previousToken);
+    sessions.delete(previousToken);
+    setSessionCookie(req, res, token);
+    res.json({ authenticated: true, user, demo, recoveryCode });
+  });
+  app.post('/api/auth/session', limitAuthentication, async (req, res) => {
+    const input = credentialsSchema.parse(req.body);
+    const previousToken = sessionToken(req);
+    const { user, token } = await accounts.login(input, previousToken);
+    sessions.delete(previousToken);
+    setSessionCookie(req, res, token);
+    res.json({ authenticated: true, user, demo });
+  });
+  app.post('/api/admin/session', limitAuthentication, async (req, res) => {
     const input = z.object({ password: z.string().max(200).optional() }).parse(req.body);
     const local =
       ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress) &&
@@ -219,32 +323,105 @@ export function createApp(store, options = {}) {
         error: 'Senha inválida. Para acesso remoto, configure ADMIN_PASSWORD no servidor.',
       });
     for (const [key, value] of sessions) if (value.expires < Date.now()) sessions.delete(key);
+    const previousToken = sessionToken(req);
+    await accounts.revoke(previousToken);
+    sessions.delete(previousToken);
     const token = randomBytes(32).toString('hex');
-    sessions.set(token, { expires: Date.now() + 8 * 60 * 60 * 1000 });
-    res.cookie('elo_session', token, {
-      httpOnly: true,
-      sameSite: 'strict',
-      secure: production || req.secure,
-      maxAge: 8 * 60 * 60 * 1000,
-    });
+    sessions.set(token, { expires: Date.now() + sessionDuration });
+    setSessionCookie(req, res, token);
     res.json({ authenticated: true, demo });
   });
-  app.delete('/api/admin/session', (req, res) => {
-    const token = req.headers.cookie
-      ?.split(';')
-      .map((item) => item.trim())
-      .find((item) => item.startsWith('elo_session='))
-      ?.slice(12);
+  app.delete(['/api/admin/session', '/api/auth/session'], async (req, res) => {
+    const token = sessionToken(req);
+    await accounts.revoke(token);
     sessions.delete(token);
     res.clearCookie('elo_session');
     res.json({ authenticated: false });
   });
-  app.get('/api/admin', admin, async (req, res) => {
-    const [records, reports] = await Promise.all([store.list('campaigns'), store.list('reports')]);
-    const campaigns = await Promise.all(records.map((item) => store.campaign(item.id)));
-    res.json({ campaigns, reports, demo });
+  app.get('/api/profile', individual, async (req, res) => {
+    res.json({ user: req.account, wallets: await wallets.list(req.account.id) });
   });
-  app.post('/api/campaigns', admin, demoOnly, async (req, res) => {
+  app.patch('/api/profile', individual, async (req, res) => {
+    const { name } = z.strictObject({ name: text(2, 60) }).parse(req.body);
+    await store.execute({
+      sql: 'UPDATE users SET display_name = ? WHERE id = ?',
+      args: [name, req.account.id],
+    });
+    res.json({ user: { ...req.account, name } });
+  });
+  app.post('/api/profile/password', individual, limitAuthentication, async (req, res) => {
+    const { currentPassword, password } = z
+      .strictObject({
+        currentPassword: z.string().min(1).max(128),
+        password: z.string().min(12).max(128),
+      })
+      .parse(req.body);
+    const { user, token, recoveryCode } = await accounts.changePassword(
+      req.account.id,
+      currentPassword,
+      password,
+      sessionToken(req),
+    );
+    setSessionCookie(req, res, token);
+    res.json({ user, recoveryCode });
+  });
+  app.post('/api/profile/recovery', individual, limitAuthentication, async (req, res) => {
+    const { password } = z.strictObject({ password: z.string().min(1).max(128) }).parse(req.body);
+    const recoveryCode = await store.transaction(async () => {
+      await accounts.requirePassword(req.account.id, password);
+      return accounts.rotateRecovery(req.account.id);
+    });
+    res.json({ recoveryCode });
+  });
+  app.delete('/api/profile', individual, limitAuthentication, async (req, res) => {
+    const { password } = z.strictObject({ password: z.string().min(1).max(128) }).parse(req.body);
+    await accounts.close(req.account.id, password);
+    res.clearCookie('elo_session');
+    res.json({ closed: true });
+  });
+  app.post('/api/profile/wallets/challenge', individual, async (req, res) => {
+    const { network, address } = z
+      .strictObject({ network: z.enum(['solana', 'zcash']), address: text(32, 100) })
+      .parse(req.body);
+    const origin = req.get('origin') ?? `${req.protocol}://${req.get('host')}`;
+    res.json(await wallets.prepare(req.account.id, network, address, origin));
+  });
+  app.post('/api/profile/wallets/confirm', individual, async (req, res) => {
+    const { id, signature } = z
+      .strictObject({ id: z.uuid(), signature: text(80, 100) })
+      .parse(req.body);
+    res.json({ wallets: await wallets.confirm(req.account.id, id, signature) });
+  });
+  app.delete('/api/profile/wallets/:network', individual, limitAuthentication, async (req, res) => {
+    const network = z.enum(['solana', 'zcash']).parse(req.params.network);
+    const { password } = z.strictObject({ password: z.string().min(1).max(128) }).parse(req.body);
+    await store.transaction(async () => {
+      await accounts.requirePassword(req.account.id, password);
+      await wallets.remove(req.account.id, network);
+    });
+    res.json({ wallets: await wallets.list(req.account.id) });
+  });
+  app.post('/api/profile/wallets/zcash/request', individual, async (req, res) => {
+    const { amount } = z.strictObject({ amount: text(1, 18) }).parse(req.body);
+    const wallet = (await wallets.list(req.account.id)).find((item) => item.network === 'zcash');
+    if (!wallet)
+      return res.status(409).json({ error: 'Vincule primeiro seu endereço Zcash testnet.' });
+    res.json({
+      uri: zcashPaymentRequest(wallet.address, amount),
+      network: 'testnet',
+      asset: 'ZEC',
+      reconciled: false,
+    });
+  });
+  app.get('/api/admin', authenticated, async (req, res) => {
+    const records = (await store.list('campaigns')).filter(
+      (item) => req.account.role === 'admin' || item.ownerId === req.account.id,
+    );
+    const reports = req.account.role === 'admin' ? await store.list('reports') : [];
+    const campaigns = await Promise.all(records.map((item) => store.campaign(item.id)));
+    res.json({ campaigns: campaigns.map(publicCampaign), reports, demo, user: req.account });
+  });
+  app.post('/api/campaigns', authenticated, demoOnly, async (req, res) => {
     const input = campaignSchema.parse(req.body);
     const acceptance = requireAcceptance(input, 'organizer');
     if (new Date(`${input.deadline}T23:59:59-03:00`) <= new Date())
@@ -255,6 +432,7 @@ export function createApp(store, options = {}) {
       const record = await store.save('campaigns', {
         ...fields,
         id,
+        ownerId: req.account.id,
         shortTitle: fields.title,
         goal: fields.budget.reduce((sum, item) => sum + item.planned, 0),
         budget: fields.budget.map((item) => ({ ...item, id: randomUUID() })),
@@ -274,22 +452,32 @@ export function createApp(store, options = {}) {
       await store.append(id, { type: 'campaign_created' });
       return record;
     });
-    res.status(201).json(campaign);
+    res.status(201).json(publicCampaign(campaign));
   });
-  app.post('/api/campaigns/:id/expenses', admin, demoOnly, async (req, res) =>
-    res.status(201).json(await store.requestExpense(req.params.id, expenseSchema.parse(req.body))),
-  );
+  app.post('/api/campaigns/:id/expenses', authenticated, demoOnly, async (req, res) => {
+    await requireOwnedCampaign(req, req.params.id);
+    res.status(201).json(await store.requestExpense(req.params.id, expenseSchema.parse(req.body)));
+  });
   app.post('/api/expenses/:id/decision', admin, demoOnly, async (req, res) => {
     const { approved, reason } = z
       .object({ approved: z.boolean(), reason: text(10, 500) })
       .parse(req.body);
     res.json(await store.decideExpense(req.params.id, approved, reason));
   });
-  app.patch('/api/campaigns/:id/status', admin, demoOnly, async (req, res) => {
+  app.patch('/api/campaigns/:id/status', authenticated, demoOnly, async (req, res) => {
     const { status, reason } = z
       .object({ status: z.enum(['active', 'frozen', 'closed']), reason: text(10, 500) })
       .parse(req.body);
-    res.json(await store.setStatus(req.params.id, status, reason));
+    const result = await store.transaction(async () => {
+      const campaign = await requireOwnedCampaign(req, req.params.id);
+      if (req.account.role !== 'admin' && !(campaign.status === 'draft' && status === 'active'))
+        throw Object.assign(new Error('Esta mudança de estado é reservada à moderação.'), {
+          status: 403,
+          code: 'FORBIDDEN',
+        });
+      return store.setStatus(req.params.id, status, reason);
+    });
+    res.json(publicCampaign(result));
   });
   app.post('/api/reports/:id/decision', admin, demoOnly, async (req, res) => {
     const { reason } = z.object({ reason: text(10, 500) }).parse(req.body);
@@ -308,11 +496,22 @@ export function createApp(store, options = {}) {
     );
   });
 
-  app.post('/api/campaigns/:id/anchors/prepare', admin, async (req, res) => {
-    const campaign = await requireCampaign(req.params.id);
+  app.post('/api/campaigns/:id/anchors/prepare', authenticated, async (req, res) => {
+    const campaign = await requireOwnedCampaign(req, req.params.id);
     if (!campaign.integrity.valid)
       throw new Error('O histórico está inconsistente e não pode ser registrado.');
     const wallet = validateWallet(z.object({ wallet: text(32, 50) }).parse(req.body).wallet);
+    if (
+      req.account.id &&
+      !(await wallets.list(req.account.id)).some(
+        (item) => item.network === 'solana' && item.address === wallet,
+      )
+    )
+      return res.status(403).json({
+        error:
+          'Use a carteira Solana vinculada ao seu perfil. Confira o vínculo em Perfil e carteiras.',
+        code: 'WALLET_NOT_LINKED',
+      });
     const anchor = {
       id: randomUUID(),
       campaignId: campaign.id,
@@ -327,11 +526,12 @@ export function createApp(store, options = {}) {
     await store.save('anchors', { ...anchor, ...blockhash });
     res.json({ ...anchor, ...blockhash, memoProgram, network: 'devnet' });
   });
-  app.post('/api/anchors/:id/submit', admin, async (req, res) => {
+  app.post('/api/anchors/:id/submit', authenticated, async (req, res) => {
     const { transaction } = z.object({ transaction: text(50, 3000) }).parse(req.body);
     const anchor = await store.get('anchors', req.params.id);
     if (!anchor || anchor.status !== 'pending')
       throw new Error('Solicitação de registro não encontrada ou já confirmada.');
+    await requireOwnedCampaign(req, anchor.campaignId);
     const signature = await submitAnchor(anchor, transaction, rpcUrl);
     await store.transaction(async () => {
       const current = await store.get('anchors', anchor.id);
@@ -344,7 +544,7 @@ export function createApp(store, options = {}) {
     });
     res.json({ signature });
   });
-  app.post('/api/anchors/:id/confirm', admin, async (req, res) => {
+  app.post('/api/anchors/:id/confirm', authenticated, async (req, res) => {
     const { signature } = z
       .object({ signature: z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{80,90}$/) })
       .parse(req.body);
@@ -354,6 +554,7 @@ export function createApp(store, options = {}) {
         status: 404,
         code: 'ANCHOR_NOT_FOUND',
       });
+    await requireOwnedCampaign(req, anchor.campaignId);
     if (anchor.status === 'confirmed') {
       if (anchor.signature !== signature)
         throw Object.assign(new Error('Este registro já possui outra transação.'), {

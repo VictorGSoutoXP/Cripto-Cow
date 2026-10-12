@@ -39,7 +39,7 @@ O [Blueprint](https://render.com/docs/blueprint-spec) configura Node.js 24, inst
 | `SEED_DEMO`          | `true`, preenche um banco vazio com campanhas de exemplo |
 | `SOLANA_RPC_URL`     | `https://api.devnet.solana.com`                          |
 
-Acesse o endereço HTTPS exibido pelo Render. Para entrar no painel da Cripto Cow, use a senha de `ADMIN_PASSWORD`, disponível na aba **Environment** do serviço. Você pode substituí-la por uma senha própria de 16 a 200 caracteres nessa mesma aba.
+Acesse o endereço HTTPS exibido pelo Render. Participantes usam **Meu painel → Criar conta** e depois entram com e-mail e senha. Para a moderação, use **Acesso da moderação** e a senha de `ADMIN_PASSWORD`, disponível na aba **Environment** do serviço. Você pode substituí-la por uma senha própria de 16 a 200 caracteres nessa mesma aba. O cadastro cria as tabelas de contas e sessões automaticamente no banco existente, preservando campanhas e ledger.
 
 ## 3. Conferir
 
@@ -49,10 +49,12 @@ O SQLite em `data/` continua disponível para desenvolvimento local. No Render, 
 
 ## Manutenção
 
+As tabelas de contas, sessões, recuperação e vínculos de carteiras são criadas automaticamente ao iniciar a versão atual. Não é necessária uma nova variável de ambiente para os vínculos Solana/Zcash: a prova Zcash é verificada localmente e o RPC Solana continua em `SOLANA_RPC_URL`. As chaves privadas dos participantes não ficam no Render ou no Turso. Antes de publicar, confira o registro de [retomada](retomada.md) e preserve as credenciais existentes.
+
 - Envie alterações por pull request para `main`. O CI verifica build e testes; o Render acompanha essa branch e publica quando as verificações passam.
 - A senha do painel e as credenciais do banco ficam em **Environment** no Render. Atualize o token nesse painel caso ele seja revogado ou substituído no Turso.
 - `SEED_DEMO=true` preenche somente um banco vazio. Reinícios e novas publicações preservam o histórico existente.
-- Sessões administrativas ficam em memória. Após reiniciar ou publicar, entre novamente no painel.
+- Sessões da moderação ficam em memória. Após reiniciar ou publicar, entre novamente nesse acesso. As contas e sessões individuais ficam no Turso; participantes podem continuar conectados dentro da validade de oito horas. Sair revoga a sessão.
 - Para investigar falhas, confira **Events**, **Logs** e `/api/health`. Um health check indisponível pode indicar problema na conexão com o Turso.
 
 ## Plano gratuito

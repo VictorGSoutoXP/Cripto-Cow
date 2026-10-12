@@ -4,6 +4,8 @@
 
 ## Apresentação em português
 
+**Entrega desta branch, com publicação pendente:** ao apresentar a evolução, mostre cadastro e recuperação, painel individual com moderação separada e carteiras verificadas por perfil. A Solana continua responsável pela ancoragem em devnet; a Zcash acrescenta prova de posse de endereço transparente testnet e pedidos ZIP 321. Não apresente esse pedido como pagamento confirmado, doação protegida ou entrada de valor no ledger. O registro de [retomada](retomada.md) distingue implementação, verificações e evidências pendentes.
+
 Fala para aproximadamente dois a três minutos. Faça uma pausa depois da pergunta inicial e use a demonstração em um vídeo separado, conforme os formatos da [FAQ da Colosseum](https://colosseum.com/hackathon).
 
 Você já doou para uma causa e depois ficou sem saber o que aconteceu com aquele dinheiro?
@@ -25,6 +27,8 @@ Nosso próximo passo é validar o fluxo com organizadores e doadores: medir o te
 Cripto Cow. Quem doa acompanha. Quem realiza presta contas.
 
 ## Presentation in English
+
+**This branch, pending deployment:** the updated demo adds individual accounts, recovery codes, separate organizer/moderator permissions, and verified wallet links. Solana devnet anchors the ledger; Zcash testnet supports transparent-address ownership proofs and ZIP 321 test requests. A request does not confirm payment or credit a campaign, and this flow does not implement shielded donations.
 
 Have you ever donated to a cause and then wondered what happened to the money?
 

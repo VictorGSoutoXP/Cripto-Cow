@@ -7,12 +7,58 @@ import {
   submitPendingAnchor,
 } from './anchor-pending';
 import type { PendingAnchor } from './anchor-pending';
-import type { Anchor } from '../types';
+import type { Anchor, ProfileWallet, WalletChallenge } from '../types';
 
 type Wallet = {
+  publicKey?: { toString: () => string };
   connect: () => Promise<{ publicKey: { toString: () => string } }>;
+  disconnect?: () => Promise<void>;
+  signMessage?: (
+    message: Uint8Array,
+    display: 'utf8',
+  ) => Promise<{ signature: Uint8Array; publicKey: { toString: () => string } }>;
+  on?: (
+    event: 'accountChanged' | 'disconnect',
+    callback: (key?: { toString: () => string } | null) => void,
+  ) => void;
+  removeListener?: (
+    event: 'accountChanged' | 'disconnect',
+    callback: (key?: { toString: () => string } | null) => void,
+  ) => void;
   signTransaction: (transaction: unknown) => Promise<{ serialize: () => Uint8Array }>;
 };
+
+export function solanaProvider(): Wallet | undefined {
+  const scope = window as unknown as { phantom?: { solana?: Wallet }; solana?: Wallet };
+  return scope.phantom?.solana ?? scope.solana;
+}
+
+export async function linkSolanaWallet(): Promise<ProfileWallet[]> {
+  const provider = solanaProvider();
+  if (!provider?.signMessage)
+    throw new Error(
+      'Abra no navegador da Phantom ou em um navegador com a extensão instalada e assinatura de mensagens disponível.',
+    );
+  const { publicKey } = await provider.connect();
+  const address = publicKey.toString();
+  const challenge = await api<WalletChallenge>('/profile/wallets/challenge', {
+    method: 'POST',
+    body: JSON.stringify({ network: 'solana', address }),
+  });
+  const signed = await provider.signMessage(new TextEncoder().encode(challenge.message), 'utf8');
+  if (signed.publicKey.toString() !== address)
+    throw new Error(
+      'A conta da carteira mudou durante a assinatura. Conecte a conta desejada e tente novamente.',
+    );
+  const result = await api<{ wallets: ProfileWallet[] }>('/profile/wallets/confirm', {
+    method: 'POST',
+    body: JSON.stringify({
+      id: challenge.id,
+      signature: Buffer.from(signed.signature).toString('base64'),
+    }),
+  });
+  return result.wallets;
+}
 
 type Prepared = {
   id: string;
@@ -29,8 +75,7 @@ export async function anchorHistory(campaignId: string): Promise<Anchor> {
     });
   const recovered = await recoverPendingAnchor(sessionStorage, campaignId, confirm);
   if (recovered) return recovered;
-  const scope = window as unknown as { phantom?: { solana?: Wallet }; solana?: Wallet };
-  const provider = scope.phantom?.solana ?? scope.solana;
+  const provider = solanaProvider();
   if (!provider)
     throw new Error(
       'Abra em um navegador com a carteira Phantom instalada. Use uma carteira de testes com SOL de devnet.',

@@ -8,6 +8,8 @@ import { mkdtemp, rm, rmdir } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Store } from '../server/store.js';
+import { Accounts } from '../server/accounts.js';
+import { getAcceptance } from '../server/legal.js';
 
 function decodeValue(value) {
   if (value.type === 'null') return null;
@@ -204,6 +206,37 @@ test('cliente libSQL HTTP registra, consulta e reabre o banco sem conexão à nu
   assert.deepEqual(await reopened.campaign('horta-do-amanha'), seeded);
   assert.equal((await reopened.list('campaigns')).length, 4);
   assert.deepEqual([...remote.stats.authorization], ['Bearer token-ficticio']);
+});
+
+test('contas e sessões funcionam com libSQL HTTP e preservam o vínculo ao reabrir', async (t) => {
+  const remote = await fixture(t);
+  const store = await remote.open();
+  const accounts = new Accounts(store);
+  const input = {
+    email: 'remoto@example.test',
+    name: 'Conta remota',
+    password: 'senha-remota-de-teste',
+  };
+  const results = await Promise.allSettled([
+    accounts.register(input, getAcceptance('account')),
+    accounts.register(input, getAcceptance('account')),
+  ]);
+  assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1);
+  const created = results.find((result) => result.status === 'fulfilled').value;
+  assert.equal(
+    results.find((result) => result.status === 'rejected').reason.code,
+    'ACCOUNT_EXISTS',
+  );
+  assert.deepEqual(await accounts.current(created.token), created.user);
+  await store.close();
+  const reopened = await remote.open();
+  const restored = new Accounts(reopened);
+  assert.deepEqual(await restored.current(created.token), created.user);
+  const signedIn = await restored.login(input, created.token);
+  assert.equal(await restored.current(created.token), null);
+  assert.deepEqual(await restored.current(signedIn.token), created.user);
+  await restored.revoke(signedIn.token);
+  assert.equal(await restored.current(signedIn.token), null);
 });
 
 test('falha financeira aninhada impede commit mesmo quando o callback captura o erro', async (t) => {

@@ -1,15 +1,27 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import { X, LoaderCircle, ArrowUpRight, HeartHandshake } from 'lucide-react';
+import { X, LoaderCircle, ArrowUpRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export function Logo() {
   return (
     <a className="logo" href="#/" aria-label="Cripto Cow, página inicial">
       <span className="logo-mark">
-        <HeartHandshake size={25} strokeWidth={1.7} />
+        <svg
+          viewBox="0 0 40 40"
+          aria-hidden="true"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M13 10C10 9 7 7 5 4c-1 4 1 9 6 10M27 10c3-1 6-3 8-6 1 4-1 9-6 10M11 15l-7-2c-1 5 2 8 7 8m18-6 7-2c1 5-2 8-7 8M11 17l1 11c1 5 5 7 8 7s7-2 8-7l1-11c0-5-4-8-9-8s-9 3-9 8Z" />
+          <ellipse cx="20" cy="27" rx="7" ry="4" />
+          <path d="M15 19h.01M25 19h.01M17 27h.01M23 27h.01" strokeWidth="3" />
+        </svg>
       </span>
-      <span>
-        Cripto Cow<span className="logo-dot">.</span>
+      <span className="logo-type">
+        Cripto Cow<small>TRANSPARÊNCIA E IMPACTO</small>
       </span>
     </a>
   );
