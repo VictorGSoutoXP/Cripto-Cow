@@ -10,13 +10,32 @@ export class ApiError extends Error {
   }
 }
 
+export const sessionExpiredEvent = 'cripto-cow:session-expired';
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`/api${path}`, {
-    ...options,
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    credentials: 'same-origin',
-  });
+  let response: Response;
+  try {
+    response = await fetch(`/api${path}`, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+      credentials: 'same-origin',
+    });
+  } catch (error) {
+    if (options.signal?.aborted) throw error;
+    throw new ApiError(
+      'Não foi possível conectar ao servidor. Confira sua conexão e tente novamente.',
+      0,
+      'NETWORK_ERROR',
+    );
+  }
   const body = await response.json().catch(() => null);
+  if (
+    response.status === 401 &&
+    body?.code === 'SESSION_REQUIRED' &&
+    (path !== '/admin' || (options.method && options.method !== 'GET')) &&
+    typeof window !== 'undefined'
+  )
+    window.dispatchEvent(new Event(sessionExpiredEvent));
   if (!response.ok)
     throw new ApiError(
       typeof body?.error === 'string'

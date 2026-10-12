@@ -13,7 +13,8 @@ const acceptedDocuments = legalDocuments.acceptance.documents.map((id) => {
 });
 
 export function getAcceptance(role) {
-  if (!['donor', 'organizer'].includes(role)) throw new Error('Tipo de aceite inválido.');
+  if (!['donor', 'organizer', 'account'].includes(role))
+    throw new Error('Tipo de aceite inválido.');
   const version = legalDocuments.acceptance.version;
   const text = legalDocuments.acceptance[`${role}Text`];
   return {
@@ -32,6 +33,7 @@ export function getLegalManifest() {
       version: legalDocuments.acceptance.version,
       donor: getAcceptance('donor'),
       organizer: getAcceptance('organizer'),
+      account: getAcceptance('account'),
     },
   });
 }

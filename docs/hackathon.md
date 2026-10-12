@@ -14,15 +14,15 @@ Cripto Cow is a donation transparency prototype for community campaigns. Donors 
 
 Antes de gravar, abra o site para aguardar a inicialização do Render, entre no painel e prepare uma carteira Phantom em devnet com SOL de teste. Use uma campanha demonstrativa com saldo e orçamento disponíveis. Não mostre senhas, tokens ou dados pessoais na gravação. O roteiro abaixo serve para ensaio ou apresentação ao vivo; para envio, a [FAQ oficial da Colosseum](https://colosseum.com/hackathon) pede apresentação de dois a três minutos e vídeo de demonstração de no máximo três minutos.
 
-| Tempo     | Mostrar                                                                  | Explicar                                                                                                                         |
-| --------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 0:00–0:40 | Campanha, orçamento e regra da sobra                                     | O problema é acompanhar a destinação de uma doação. Os valores e organizações exibidos são fictícios.                            |
-| 0:40–1:20 | “Apoiar esta causa”, aceite das regras e recibo                          | A contribuição é simulada; aparece como anônima ou com nome fictício de pessoa ou empresa, conforme a escolha do doador.         |
-| 1:20–2:20 | Painel, solicitação de liberação e evidência fictícia                    | O pedido reserva saldo e orçamento. A reserva ainda não é uma saída.                                                             |
-| 2:20–3:00 | Conferência da evidência e aprovação com justificativa                   | A aprovação registra a saída; uma recusa libera a reserva. Organização e revisão compartilham o painel neste MVP.                |
-| 3:00–3:50 | “Registro verificável”, conferência no navegador e download do histórico | Os hashes permitem detectar alterações no ledger. Eles não comprovam a veracidade da evidência.                                  |
-| 3:50–4:40 | “Registrar hash na Solana” e, após confirmação, Explorer em devnet       | A carteira assina um Memo. A blockchain recebe somente o identificador da campanha, a quantidade de eventos e o hash.            |
-| 4:40–5:00 | Limites do protótipo e próximo teste com usuários                        | Pagamentos e devoluções reais dependem de integração. Apresentar entrevistas e resultados somente quando houver dados coletados. |
+| Tempo     | Mostrar                                                                  | Explicar                                                                                                                            |
+| --------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 0:00–0:40 | Campanha, orçamento e regra da sobra                                     | O problema é acompanhar a destinação de uma doação. Os valores e organizações exibidos são fictícios.                               |
+| 0:40–1:20 | “Apoiar esta causa”, aceite das regras e recibo                          | A contribuição é simulada; aparece como anônima ou com nome fictício de pessoa ou empresa, conforme a escolha do doador.            |
+| 1:20–2:20 | Painel, solicitação de liberação e evidência fictícia                    | O pedido reserva saldo e orçamento. A reserva ainda não é uma saída.                                                                |
+| 2:20–3:00 | Conferência da evidência e aprovação com justificativa                   | A aprovação registra a saída; uma recusa libera a reserva. Organização usa conta individual; aprovação fica no acesso da moderação. |
+| 3:00–3:50 | “Registro verificável”, conferência no navegador e download do histórico | Os hashes permitem detectar alterações no ledger. Eles não comprovam a veracidade da evidência.                                     |
+| 3:50–4:40 | “Registrar hash na Solana” e, após confirmação, Explorer em devnet       | A carteira assina um Memo. A blockchain recebe somente o identificador da campanha, a quantidade de eventos e o hash.               |
+| 4:40–5:00 | Limites do protótipo e próximo teste com usuários                        | Pagamentos e devoluções reais dependem de integração. Apresentar entrevistas e resultados somente quando houver dados coletados.    |
 
 Se a confirmação demorar, informe que a transação está pendente. No ensaio, retome a confirmação preservando a assinatura já enviada. Só apresente a ancoragem como concluída quando a API confirmar e o link do Explorer exibir a transação correspondente. Uma gravação anterior pode complementar a demo se mostrar uma transação real e verificável.
 
@@ -46,6 +46,8 @@ Para o vídeo de demo de até três minutos, use este corte do ensaio:
 No vídeo separado de apresentação, desenvolva o pitch com o problema, o usuário inicial, a solução, a diferença do produto e a distribuição planejada. Complete com a experiência real do time e validações realizadas, sem presumir parceiros, usuários ou receita.
 
 ## Preparação técnica
+
+A evolução de cadastro, perfil/carteiras e design desta branch ainda precisa ser publicada antes de ser incluída na gravação do site remoto. Para contas individuais, guarde o código privado fora da gravação e vincule a Phantom antes de preparar a ancoragem. A demonstração Zcash mostra uma assinatura verificada e um pedido de teste, sem afirmar pagamento ou doação protegida. Veja [retomada](retomada.md).
 
 Estes itens são verificações do projeto para a apresentação, não uma declaração de inscrição concluída ou uma lista de exigências do evento.
 

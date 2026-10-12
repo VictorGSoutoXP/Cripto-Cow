@@ -15,7 +15,7 @@ import type { LegalRole } from '../lib/legal';
 import { Modal, Button } from './ui';
 import type { Campaign, Donor, Expense } from '../types';
 
-function LegalAcceptance({
+export function LegalAcceptance({
   legal,
   role,
   accepted,
@@ -355,7 +355,7 @@ export function CampaignForm({ onClose, onSaved }: { onClose: () => void; onSave
   return (
     <Modal
       title="Uma nova causa começa aqui."
-      description="Crie uma campanha fictícia. Ela ficará em revisão até ser publicada no painel."
+      description="Crie uma campanha fictícia. Ela ficará como rascunho até você publicá-la no painel."
       onClose={onClose}
       wide
     >
@@ -502,7 +502,7 @@ export function CampaignForm({ onClose, onSaved }: { onClose: () => void; onSave
           className="button primary full"
           disabled={!accepted || !consent || legal.loading}
         >
-          Enviar campanha para revisão <ArrowRight size={17} />
+          Criar rascunho <ArrowRight size={17} />
         </Button>
       </form>
     </Modal>

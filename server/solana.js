@@ -1,6 +1,7 @@
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 
 export const memoProgram = 'MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr';
+export const devnetGenesisHash = 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG';
 
 export function anchorMemo(campaignId, count, root) {
   return `elo:v1:${campaignId}:${count}:${root}`;
@@ -79,7 +80,7 @@ export async function getBlockhash(rpcUrl) {
 
 async function requireDevnet(connection) {
   const genesis = await connection.getGenesisHash();
-  if (genesis !== 'EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG')
+  if (genesis !== devnetGenesisHash)
     throw new Error('O RPC configurado não pertence à Solana devnet.');
 }
 

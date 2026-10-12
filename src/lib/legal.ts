@@ -15,7 +15,12 @@ const acceptance = z.object({
 const manifestSchema = z
   .object({
     source: z.object({ title: text, date: timestamp, description: text }),
-    acceptance: z.object({ version: text, donor: acceptance, organizer: acceptance }),
+    acceptance: z.object({
+      version: text,
+      donor: acceptance,
+      organizer: acceptance,
+      account: acceptance,
+    }),
     documents: z
       .array(
         z.object({
@@ -49,7 +54,7 @@ const manifestSchema = z
         (document) =>
           new Set(document.sections.map((section) => section.id)).size === document.sections.length,
       ) &&
-      [manifest.acceptance.donor, manifest.acceptance.organizer].every(
+      [manifest.acceptance.donor, manifest.acceptance.organizer, manifest.acceptance.account].every(
         (item) =>
           item.version === manifest.acceptance.version &&
           item.documents.every((id) =>
@@ -63,7 +68,7 @@ const manifestSchema = z
 
 export type LegalManifest = z.infer<typeof manifestSchema>;
 export type LegalDocument = LegalManifest['documents'][number];
-export type LegalRole = 'donor' | 'organizer';
+export type LegalRole = 'donor' | 'organizer' | 'account';
 
 export async function getLegalManifest(): Promise<LegalManifest> {
   const response = await api<unknown>('/legal', { cache: 'no-store' });

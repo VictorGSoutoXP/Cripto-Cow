@@ -15,7 +15,7 @@ npm ci
 npm run dev
 ```
 
-Abra `http://127.0.0.1:5173`. Para configurar o ambiente, copie `.env.example` para `.env`. O painel local funciona sem senha. No site publicado, use `ADMIN_PASSWORD`, disponível em **Environment** no Render.
+Abra `http://127.0.0.1:5173`. Para configurar o ambiente, copie `.env.example` para `.env`. Em **Meu painel**, use **Criar conta** para cadastrar e-mail e senha ou **Entrar** para acessar suas campanhas. O **Acesso da moderação** usa `ADMIN_PASSWORD`, disponível em **Environment** no Render; no ambiente local demonstrativo sem senha configurada, deixe o campo vazio. Veja [cadastro e permissões](docs/contas.md).
 
 ```bash
 npm run check
@@ -27,9 +27,12 @@ O build é servido em `http://127.0.0.1:3001`.
 
 ## Estrutura
 
+A página inicial apresenta a proposta, as campanhas e o registro público. O painel separa as campanhas do participante da moderação. **Perfil e carteiras** reúne dados da conta, recuperação de acesso e vínculos verificados Solana/Zcash em redes de teste. A [direção visual](docs/design.md) registra as decisões de design.
+
 - `src/pages/`: campanhas, transparência e painel em React/TypeScript.
 - `src/components/` e `src/lib/`: formulários, interface, API e carteira.
 - `server/`: API Express, SQLite local ou Turso/libSQL e ledger com SHA-256.
+- `server/accounts.js`: contas individuais, senhas com scrypt e sessões persistentes.
 - `tests/`: integridade, saldo, revisão, acesso e ancoragem.
 - `scripts/`: verificação independente do histórico exportado.
 - `shared/`: textos publicados de termos, privacidade e transparência.
@@ -44,6 +47,8 @@ Site e API estão publicados no Render Free, com dados persistentes no Turso. `/
 
 ## Contribuir
 
+O [checklist de evolução](docs/checklist-evolucao.md) organiza as pendências de login, perfis, carteiras, design, lobby, Solana, Zcash e documentação, com dependências e critérios de conclusão.
+
 Crie uma branch a partir de `main`, mantenha `.env` e `data/` fora do Git e abra um pull request com o que mudou e como foi conferido. Antes de enviar, rode `npm run check` e `npm run format:check`. Mudanças aprovadas em `main` são publicadas depois que o CI passa.
 
 ## Termos e políticas
@@ -54,7 +59,19 @@ Os textos ficam em `shared/legal-documents.json` e são exibidos no site, sem PD
 
 No painel, use uma Phantom configurada para devnet com [SOL de teste](https://faucet.solana.com/). “Registrar hash na Solana” envia um Memo com o identificador da campanha e o hash do histórico. A API confere transação, assinatura e conteúdo antes de publicar o link do Explorer.
 
+Organizadores devem primeiro vincular a Phantom em **Perfil e carteiras**, assinando uma mensagem. A preparação da ancoragem exige o mesmo endereço vinculado. Para a moderação, o fluxo anterior de campanhas demonstrativas é preservado.
+
 Se a conexão cair ou a confirmação demorar, clique novamente para retomar a mesma assinatura. Transações expiradas ou recusadas encerram a pendência e permitem preparar outra tentativa.
+
+`npm run verify:devnet` executa uma verificação real usando banco temporário e uma carteira efêmera de teste. Depende de disponibilidade do RPC e do airdrop; só imprime uma ancoragem concluída após a confirmação. Não usa nem grava chaves do participante.
+
+## Zcash e recuperação de acesso
+
+O perfil verifica a posse de um endereço transparente Zcash testnet `tm…` mediante assinatura de mensagem e gera pedidos de teste [ZIP 321](https://zips.z.cash/zip-0321). O fluxo não usa endereços protegidos, não oferece conciliação de pagamentos e não altera o saldo demonstrativo. Veja [carteiras e redes](docs/carteiras-redes.md).
+
+Guarde o código privado exibido no cadastro: ele permite recuperar sua conta em **Esqueci minha senha**. O perfil permite gerar outro código, alterar a senha e encerrar a conta. Não há envio de códigos nem verificação de e-mail por mensagem. Detalhes em [contas e permissões](docs/contas.md).
+
+## Verificação do histórico
 
 Para conferir um histórico baixado:
 

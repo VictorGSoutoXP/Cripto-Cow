@@ -9,6 +9,12 @@ import { donorSchema, publicDonation } from './donors.js';
 const tables = ['campaigns', 'expenses', 'reports', 'donations', 'anchors'];
 const locks = new Map();
 const schema = [
+  'CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT NOT NULL UNIQUE, display_name TEXT NOT NULL, password_hash TEXT NOT NULL, acceptance TEXT NOT NULL, created_at TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS user_sessions (token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at INTEGER NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS user_sessions_expiry ON user_sessions(expires_at)',
+  'CREATE TABLE IF NOT EXISTS profile_wallets (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, network TEXT NOT NULL, address TEXT NOT NULL, verified_at TEXT NOT NULL, UNIQUE(user_id, network), UNIQUE(network, address))',
+  'CREATE TABLE IF NOT EXISTS wallet_challenges (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, network TEXT NOT NULL, address TEXT NOT NULL, message TEXT NOT NULL, expires_at INTEGER NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS user_recovery (user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, secret_hash TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS campaigns (id TEXT PRIMARY KEY, payload TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS ledger (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), sequence INTEGER NOT NULL, payload TEXT NOT NULL, UNIQUE(campaign_id, sequence))',
   'CREATE TABLE IF NOT EXISTS expenses (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), payload TEXT NOT NULL)',

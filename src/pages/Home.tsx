@@ -13,7 +13,6 @@ import {
   Plus,
   Search,
   ShieldCheck,
-  Sparkles,
   Sprout,
   Users,
   SlidersHorizontal,
@@ -50,23 +49,18 @@ export default function Home({
     <div className="page-width">
       <section className="home-hero">
         <div className="hero-copy">
-          <span className="eyebrow">
-            <span className="tiny-sun">
-              <Sparkles size={15} />
-            </span>{' '}
-            CADA GESTO IMPORTA. CADA REAL TAMBÉM.
-          </span>
+          <span className="eyebrow">TRANSPARÊNCIA PARA O BEM COMUM</span>
           <h1>
-            O bem que você faz.
+            Uma causa.
             <br />
             <span>
-              O caminho que
-              <br className="desktop-break" /> você acompanha.
+              Um compromisso
+              <br className="desktop-break" /> com o coletivo.
             </span>
           </h1>
           <p>
-            Apoie uma causa e veja sua doação virar ação.
-            <br className="desktop-break" /> Do primeiro gesto à última prestação de contas.
+            Conheça iniciativas, acompanhe o orçamento e veja como cada etapa deixa um registro. Uma
+            comunidade mais forte começa com contas abertas.
           </p>
           <div className="hero-buttons">
             <a
@@ -77,10 +71,10 @@ export default function Home({
                 document.getElementById('causas')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Encontrar uma causa <ArrowRight size={18} />
+              Explorar campanhas <ArrowRight size={18} />
             </a>
             <button className="hero-secondary" onClick={onInfo}>
-              Conheça a Cripto Cow <ArrowUpRight size={17} />
+              Nossa proposta <ArrowUpRight size={17} />
             </button>
           </div>
           <div className="hero-trust">
@@ -90,7 +84,7 @@ export default function Home({
             <span>
               Orçamento aberto. Evidências públicas.
               <br />
-              <strong>Menos promessa, mais prestação de contas.</strong>
+              <strong>Um protótipo aberto para aprender e construir confiança.</strong>
             </span>
           </div>
         </div>
@@ -103,11 +97,11 @@ export default function Home({
             <img
               className="hero-photo"
               src={featured.image}
-              alt="Mãos cuidando de plantas em uma horta"
+              alt={`Imagem ilustrativa da causa ${featured.shortTitle}`}
             />
             <div className="hero-image-shade" />
             <span className="photo-label">
-              <i /> UMA CAUSA, MUITOS RECOMEÇOS
+              <i /> INICIATIVA EM DESTAQUE
             </span>
             <span className="hero-orbit">
               <Sprout size={37} strokeWidth={1.4} />
@@ -183,11 +177,50 @@ export default function Home({
           </div>
         </div>
       </section>
-      <section className="causes-section" id="causas">
+      <section className="mission-section" aria-labelledby="mission-title">
+        <div>
+          <span className="eyebrow small">NOSSA PROPOSTA</span>
+          <h2 id="mission-title">
+            A confiança se constrói
+            <br />
+            com informação aberta.
+          </h2>
+          <p>
+            Conectamos pessoas e iniciativas em um caminho que pode ser acompanhado, do planejamento
+            à prestação de contas.
+          </p>
+        </div>
+        <ol>
+          <li>
+            <span>01</span>
+            <div>
+              <h3>Conheça o plano</h3>
+              <p>Cada campanha apresenta suas metas e o orçamento por categoria.</p>
+            </div>
+          </li>
+          <li>
+            <span>02</span>
+            <div>
+              <h3>Acompanhe as evidências</h3>
+              <p>
+                Solicitações de despesas passam por análise antes de virar uma saída no histórico.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span>03</span>
+            <div>
+              <h3>Confira os registros</h3>
+              <p>Consulte a cadeia de hashes e as ancoragens confirmadas na Solana devnet.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+      <section className="causes-section" id="causas" aria-labelledby="causes-title">
         <div className="section-heading">
           <div>
-            <span className="eyebrow small">ENCONTRE SEU PRÓXIMO GESTO</span>
-            <h2>Causas que aproximam.</h2>
+            <span className="eyebrow small">INICIATIVAS DA COMUNIDADE</span>
+            <h2 id="causes-title">Explore. Conheça. Acompanhe.</h2>
           </div>
           <button className="text-link" onClick={onCreate}>
             Criar uma campanha <Plus size={17} />
@@ -199,6 +232,7 @@ export default function Home({
               <button
                 key={item}
                 className={category === item ? 'selected' : ''}
+                aria-pressed={category === item}
                 onClick={() => setCategory(item)}
               >
                 {item === 'Todas as causas' && <SlidersHorizontal size={15} />}
@@ -222,7 +256,7 @@ export default function Home({
           ))}
         </div>
         {filtered.length === 0 && (
-          <div className="empty-state">
+          <div className="empty-state" role="status">
             <Search size={28} />
             <h3>Nenhuma causa encontrada.</h3>
             <p>Experimente outra categoria ou termo de busca.</p>
@@ -237,6 +271,19 @@ export default function Home({
             </button>
           </div>
         )}
+      </section>
+      <section className="participate-section">
+        <div>
+          <span className="eyebrow small">FAÇA PARTE</span>
+          <h2>Boas ideias precisam de um primeiro passo.</h2>
+          <p>
+            Crie sua conta, organize uma campanha demonstrativa e conheça as ferramentas de
+            transparência.
+          </p>
+        </div>
+        <button className="button primary" onClick={onCreate}>
+          Começar minha campanha <ArrowRight size={18} />
+        </button>
       </section>
       <section className="transparency-callout">
         <div className="callout-illustration">

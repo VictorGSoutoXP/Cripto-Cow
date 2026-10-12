@@ -63,7 +63,7 @@ test('manifesto publica texto e hashes reproduzíveis e mantém minutas fora do 
     documents.every((document) => document.status === 'current'),
     true,
   );
-  for (const role of ['donor', 'organizer']) {
+  for (const role of ['donor', 'organizer', 'account']) {
     const acceptance = manifest.acceptance[role];
     assert.equal(
       acceptance.hash,
