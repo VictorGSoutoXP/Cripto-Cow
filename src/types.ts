@@ -37,6 +37,7 @@ export type CryptoPayment = {
   amount: string;
   units: string;
   requestedAmount: string;
+  brlReference?: DemoQuote['rates']['solana'] & { cents: number; quoteId: string };
   status: 'pending' | 'confirmed';
   testnetOnly: true;
   createdAt: string;
@@ -90,6 +91,7 @@ export type DemoCryptoDonation = {
   asset: string;
   units: string;
   amount: string;
+  brlCents?: number;
   status: 'simulated';
   simulated: true;
   ledgerId: string;

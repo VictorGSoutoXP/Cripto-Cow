@@ -22,7 +22,7 @@ const brl = (amount = 5050) => ({
   donor: { type: 'anonymous' },
   ...terms(),
 });
-async function fixture(t) {
+async function fixture(t, options = {}) {
   const store = await Store.open({ path: ':memory:' });
   const server = createApp(store, {
     demoQuotes: new DemoQuotes({
@@ -42,6 +42,7 @@ async function fixture(t) {
       height: async () => 300,
       confirm: async (_, txid) => ({ txid, height: 301, blockHash: 'c'.repeat(64) }),
     },
+    ...options,
   }).listen(0, '127.0.0.1');
   await once(server, 'listening');
   t.after(async () => {
@@ -80,6 +81,85 @@ async function fixture(t) {
   }
   return { store, client, register };
 }
+
+test('doação automática mantém autoria privada e pedido de rede converte reais somente no servidor', async (t) => {
+  const quotes = new DemoQuotes({
+    fetchPrices: async () => ({
+      ok: true,
+      json: async () => ({
+        solana: { brl: 500, last_updated_at: Date.now() / 1000 },
+        zcash: { brl: 200, last_updated_at: Date.now() / 1000 },
+      }),
+    }),
+  });
+  const { client, register } = await fixture(t, { demoQuotes: quotes });
+  const request = client();
+  await register(request);
+  await request('/demo-exchange/wallet', {});
+  await request('/demo-exchange/credit', { amount: '500', requestKey: randomUUID() });
+  const quote = (await request('/demo-exchange/quote')).body;
+  const donation = await request('/demo-exchange/donate-brl', {
+    amount: '500',
+    network: 'solana',
+    quoteId: quote.id,
+    campaignId,
+    requestKey: randomUUID(),
+    ...terms(),
+  });
+  assert.equal(donation.status, 200);
+  const summary = (await request('/profile/contributions')).body;
+  assert.equal(summary.totals.virtual.solana.amount, '1.000000000');
+  assert.equal(summary.totals.brl.cents, 0);
+  const input = {
+    brlAmount: '500',
+    network: 'solana',
+    quoteId: quote.id,
+    payer: Keypair.generate().publicKey.toBase58(),
+    requestKey: randomUUID(),
+    ...terms(),
+  };
+  const intent = await request(`/campaigns/${campaignId}/crypto-payments`, input);
+  assert.equal(intent.status, 201);
+  assert.equal(intent.body.units, '1000000000');
+  assert.equal(intent.body.brlReference.cents, 50000);
+  assert.equal(intent.body.status, 'pending');
+  assert.equal(
+    (
+      await request(`/campaigns/${campaignId}/crypto-payments`, {
+        ...input,
+        requestKey: randomUUID(),
+        amount: '9',
+      })
+    ).status,
+    400,
+  );
+  assert.equal(
+    (
+      await request(`/campaigns/${campaignId}/crypto-payments`, {
+        ...input,
+        requestKey: randomUUID(),
+        quoteId: 'f'.repeat(64),
+      })
+    ).body.code,
+    'QUOTE_CHANGED',
+  );
+});
+
+test('taxa fictícia não prepara uma contribuição de rede informada em reais', async (t) => {
+  const { client } = await fixture(t);
+  const request = client();
+  const quote = (await request('/demo-exchange/quote')).body;
+  const result = await request(`/campaigns/${campaignId}/crypto-payments`, {
+    brlAmount: '500',
+    network: 'solana',
+    quoteId: quote.id,
+    payer: Keypair.generate().publicKey.toBase58(),
+    requestKey: randomUUID(),
+    ...terms(),
+  });
+  assert.equal(result.status, 503);
+  assert.equal(result.body.code, 'QUOTE_UNAVAILABLE');
+});
 
 test('totais em reais pertencem só à conta autenticada; repetição não duplica nem transfere autoria', async (t) => {
   const { client, register, store } = await fixture(t);

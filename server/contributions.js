@@ -44,6 +44,7 @@ export async function profileContributions(store, userId, offset = 0) {
         network: receipt.network ?? null,
         asset: row.kind === 'brl' ? 'BRL' : receipt.asset,
         amount: row.kind === 'brl' ? receipt.amount : unitsAmount(receipt.units, receipt.network),
+        brlReferenceCents: receipt.brlCents ?? receipt.brlReference?.cents ?? null,
         ledgerId: receipt.ledgerId ?? null,
         txid: receipt.txid ?? null,
       };

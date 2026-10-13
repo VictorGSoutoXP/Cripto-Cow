@@ -1,5 +1,7 @@
 # Retomada do projeto
 
+**Conversão automática — 13/10/2026:** um único valor em reais e escolha SOL/ZEC, equivalente automático e doação virtual com conversão/debito atômicos. Pagamentos nas redes de teste também aceitam referência BRL calculada no servidor, exigindo cotação de mercado válida. Coinbase spot é a segunda fonte pública quando CoinGecko estiver indisponível. Não há compra de criptomoedas ou depósito real. Políticas `mvp-1.8`; consulte [saldo virtual](saldo-virtual.md) e [moedas de teste](doacoes-cripto.md).
+
 **Contribuições por perfil — 13/10/2026:** vínculo privado das novas doações com a conta autenticada, totais separados em reais fictícios, SOL/ZEC virtuais e SOL/ZEC confirmados nas redes de teste, histórico paginado e indicação dos pedidos pendentes. Registros antigos sem vínculo não são atribuídos automaticamente. [Contas](contas.md) detalha o comportamento. Políticas atuais `mvp-1.7`; 110 testes aprovados. O simulador foi publicado pelo PR #9. Os registros de entregas anteriores abaixo preservam seus números e pendências históricas.
 
 **Simulador de 13/10/2026:** adicionar reais fictícios, calcular SOL/ZEC com referência identificada e doar saldo virtual sem carteira. Os recibos ficam separados dos pagamentos confirmados e do saldo em reais. Leia [saldo virtual](saldo-virtual.md). Cadastro e contribuições de teste foram publicados nos PRs #7 e #8.

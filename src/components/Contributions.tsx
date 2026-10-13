@@ -15,6 +15,7 @@ type Receipt = {
   network: 'solana' | 'zcash' | null;
   asset: 'BRL' | 'SOL' | 'ZEC';
   amount: number | string;
+  brlReferenceCents: number | null;
   ledgerId: string | null;
   txid: string | null;
 };
@@ -146,6 +147,9 @@ export function Contributions() {
                         {date(receipt.confirmedAt ?? receipt.createdAt)} · {mode(receipt.kind)}
                       </small>
                       <small className="contribution-reference">Recibo: {receipt.id}</small>
+                      {receipt.brlReferenceCents !== null && (
+                        <small>Referência da conversão: {money(receipt.brlReferenceCents)}</small>
+                      )}
                       {receipt.txid && (
                         <small className="contribution-reference">Transação: {receipt.txid}</small>
                       )}

@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Buffer } from 'buffer';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, money } from '../lib/api';
+import { estimateCrypto } from '../lib/conversion';
+import { ConversionQuote } from './ConversionQuote';
 import { solanaProvider } from '../lib/wallet';
 import { signedAnchorSignature } from '../lib/anchor-pending';
 import { useLegalManifest } from '../lib/legal';
 import { Button, Modal, ExternalLink } from './ui';
 import { LegalAcceptance } from './forms';
-import type { Campaign, CryptoPayment, PaymentMethods } from '../types';
+import type { Campaign, CryptoPayment, PaymentMethods, DemoQuote } from '../types';
 
 const keyFor = (id: string) => `cripto-cow:payment:${id}`;
 function pending(id: string) {
@@ -25,18 +27,21 @@ export function CryptoDonation({
   onBack,
   onClose,
   onSaved,
-  initialAmount,
+  initialBrlAmount,
 }: {
   campaign: Campaign;
   network: 'solana' | 'zcash';
   onBack: () => void;
   onClose: () => void;
   onSaved: () => void;
-  initialAmount?: string;
+  initialBrlAmount?: string;
 }) {
   const [methods, setMethods] = useState<PaymentMethods | null>(null);
   const [intent, setIntent] = useState<CryptoPayment | null>(() => pending(campaign.id));
-  const [amount, setAmount] = useState(initialAmount ?? (network === 'solana' ? '0.01' : '0.001'));
+  const [amount, setAmount] = useState(network === 'solana' ? '0.01' : '0.001');
+  const [brlAmount, setBrlAmount] = useState(initialBrlAmount ?? '50');
+  const [valueMode, setValueMode] = useState<'brl' | 'crypto'>('brl');
+  const [quote, setQuote] = useState<DemoQuote | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -45,10 +50,14 @@ export function CryptoDonation({
   const legal = useLegalManifest();
   const consent = legal.manifest?.acceptance.donor;
   const method = methods?.methods.find((item) => item.network === network);
+  const equivalent = estimateCrypto(brlAmount, network, quote?.rates[network].rateCents);
   useEffect(() => {
     let active = true;
     api<PaymentMethods>(`/campaigns/${campaign.id}/payment-methods`)
       .then((result) => active && setMethods(result))
+      .catch((err) => active && setError(err.message));
+    api<DemoQuote>('/demo-exchange/quote')
+      .then((result) => active && setQuote(result))
       .catch((err) => active && setError(err.message));
     return () => {
       active = false;
@@ -65,6 +74,13 @@ export function CryptoDonation({
     setError('');
     try {
       if (!consent || !accepted) throw new Error('Leia e aceite as condições antes de continuar.');
+      if (
+        valueMode === 'brl' &&
+        (!equivalent || !quote || quote.rates[network].basis !== 'market-reference')
+      )
+        throw new Error(
+          'A cotação de mercado está indisponível ou o valor em reais é inválido. Atualize a cotação ou informe a quantidade de moedas de teste.',
+        );
       let payer: string | undefined;
       if (network === 'solana') {
         const provider = solanaProvider();
@@ -78,7 +94,9 @@ export function CryptoDonation({
         method: 'POST',
         body: JSON.stringify({
           network,
-          amount: amount.replace(',', '.'),
+          ...(valueMode === 'brl'
+            ? { brlAmount, quoteId: quote!.id }
+            : { amount: amount.replace(',', '.') }),
           payer,
           requestKey: crypto.randomUUID(),
           accepted,
@@ -91,6 +109,13 @@ export function CryptoDonation({
       if (err instanceof ApiError && err.code === 'TERMS_CHANGED') {
         setAccepted(false);
         legal.reload();
+      }
+      if (
+        err instanceof ApiError &&
+        ['QUOTE_CHANGED', 'QUOTE_UNAVAILABLE'].includes(err.code ?? '')
+      ) {
+        setAccepted(false);
+        setQuote(await api<DemoQuote>('/demo-exchange/quote').catch(() => null));
       }
       setError((err as Error).message);
     } finally {
@@ -197,6 +222,13 @@ export function CryptoDonation({
           <strong>
             {intent.amount} {intent.asset} · {intent.chain}
           </strong>
+          {intent.brlReference && (
+            <p>
+              Referência escolhida: {money(intent.brlReference.cents)} ·{' '}
+              {intent.brlReference.source}. O envio usa a quantidade em {intent.asset} acima, com
+              moedas de teste e taxas de rede separadas.
+            </p>
+          )}
           <p>
             {intent.status === 'confirmed'
               ? 'O recibo foi adicionado ao histórico verificável. Esse valor não altera o saldo demonstrativo em reais.'
@@ -317,16 +349,62 @@ export function CryptoDonation({
                 </p>
               )}
               <label>
-                Valor em {network === 'solana' ? 'SOL' : 'ZEC'} de teste
-                <input
-                  aria-label="Valor em cripto de teste"
-                  value={amount}
-                  onChange={(event) => setAmount(event.target.value)}
-                  inputMode="decimal"
-                  maxLength={20}
-                  required
-                />
+                Como informar o valor
+                <select
+                  value={valueMode}
+                  onChange={(event) => setValueMode(event.target.value as 'brl' | 'crypto')}
+                  disabled={busy}
+                >
+                  <option value="brl">Em reais · conversão automática</option>
+                  <option value="crypto">Em {network === 'solana' ? 'SOL' : 'ZEC'} de teste</option>
+                </select>
               </label>
+              {valueMode === 'brl' ? (
+                <>
+                  <label>
+                    Valor de referência em reais
+                    <input
+                      value={brlAmount}
+                      onChange={(event) => setBrlAmount(event.target.value)}
+                      inputMode="decimal"
+                      maxLength={20}
+                      required
+                      disabled={busy}
+                    />
+                  </label>
+                  <ConversionQuote quote={quote} network={network} equivalent={equivalent} />
+                  <Button
+                    type="button"
+                    className="button outline"
+                    busy={busy}
+                    onClick={async () => {
+                      setBusy(true);
+                      setError('');
+                      try {
+                        setQuote(await api<DemoQuote>('/demo-exchange/quote'));
+                      } catch (err) {
+                        setError((err as Error).message);
+                      } finally {
+                        setBusy(false);
+                      }
+                    }}
+                  >
+                    Atualizar cotação
+                  </Button>
+                </>
+              ) : (
+                <label>
+                  Valor em {network === 'solana' ? 'SOL' : 'ZEC'} de teste
+                  <input
+                    aria-label="Valor em cripto de teste"
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    inputMode="decimal"
+                    maxLength={20}
+                    required
+                  />
+                </label>
+              )}
               <label>
                 Destinatário<code className="payment-address">{method.receiver}</code>
               </label>
@@ -341,7 +419,16 @@ export function CryptoDonation({
                 onAccepted={setAccepted}
                 busy={busy}
               />
-              <Button className="button primary" busy={busy} disabled={!accepted || !consent}>
+              <Button
+                className="button primary"
+                busy={busy}
+                disabled={
+                  !accepted ||
+                  !consent ||
+                  (valueMode === 'brl' &&
+                    (!equivalent || quote?.rates[network].basis !== 'market-reference'))
+                }
+              >
                 Preparar contribuição de teste
               </Button>
             </>
