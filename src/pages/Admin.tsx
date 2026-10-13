@@ -174,11 +174,11 @@ export default function Admin({
       </div>
       {!moderating && (
         <nav className="panel-navigation" aria-label="Navegação do painel">
-          <a href="#/painel" aria-current={!showingProfile ? 'page' : undefined}>
-            Minhas campanhas
-          </a>
           <a href="#/perfil" aria-current={showingProfile ? 'page' : undefined}>
             Perfil e carteiras
+          </a>
+          <a href="#/painel/campanhas" aria-current={!showingProfile ? 'page' : undefined}>
+            Minhas campanhas
           </a>
         </nav>
       )}

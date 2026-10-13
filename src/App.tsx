@@ -21,13 +21,14 @@ function useRoute() {
     if (parts[0] === 'politicas')
       return { view: 'policies' as View, id: parts[1] || '', sectionId: parts[2] || '' };
     if (parts[0] === 'perfil') return { view: 'admin' as View, id: 'profile', sectionId: '' };
+    if (parts[0] === 'painel')
+      return {
+        view: 'admin' as View,
+        id: parts[1] === 'campanhas' ? '' : 'profile',
+        sectionId: '',
+      };
     return {
-      view:
-        parts[0] === 'transparencia'
-          ? ('transparency' as View)
-          : parts[0] === 'painel'
-            ? ('admin' as View)
-            : ('home' as View),
+      view: parts[0] === 'transparencia' ? ('transparency' as View) : ('home' as View),
       id: '',
       sectionId: '',
     };
@@ -121,8 +122,8 @@ export default function App() {
             <span className="network-indicator">
               <i /> Redes de teste
             </span>
-            <a href="#/painel" className="button header-button">
-              Meu painel <ArrowUpRight size={16} />
+            <a href="#/perfil" className="button header-button">
+              Meu perfil <ArrowUpRight size={16} />
             </a>
             <button
               className="icon-button mobile-menu"
@@ -173,7 +174,7 @@ export default function App() {
           <Home
             campaigns={campaigns}
             onCreate={() => {
-              window.location.hash = '/painel';
+              window.location.hash = '/painel/campanhas';
               setNotice('Entre no painel para criar sua campanha demonstrativa.');
             }}
             onInfo={() => setOverlay({ type: 'info' })}
@@ -235,6 +236,7 @@ export default function App() {
         <CampaignForm
           onClose={() => setOverlay(null)}
           onSaved={() => {
+            window.location.hash = '/painel/campanhas';
             refresh();
             setNotice('Campanha criada. Publique-a após revisar as informações no painel.');
           }}
