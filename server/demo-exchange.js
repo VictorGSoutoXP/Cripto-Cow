@@ -8,8 +8,9 @@ const coinIds = { solana: 'solana', zcash: 'zcash' };
 const asset = (network) => (network === 'solana' ? 'SOL' : 'ZEC');
 
 export class DemoQuotes {
-  constructor({ fetchPrices = fetch, now = () => Date.now() } = {}) {
+  constructor({ fetchPrices = fetch, fetchSpotPrices = fetchPrices, now = () => Date.now() } = {}) {
     this.fetchPrices = fetchPrices;
+    this.fetchSpotPrices = fetchSpotPrices;
     this.now = now;
     this.cache = null;
     this.inflight = null;
@@ -66,6 +67,38 @@ export class DemoQuotes {
         ];
       }),
     );
+    // A second public spot source avoids displaying a fixed example when one provider fails.
+    await Promise.all(
+      Object.entries(rates).map(async ([network, rate]) => {
+        if (rate.basis !== 'fictional') return;
+        try {
+          const response = await this.fetchSpotPrices(
+            `https://api.coinbase.com/v2/prices/${rate.asset}-BRL/spot`,
+            { signal: AbortSignal.timeout(7000) },
+          );
+          if (!response.ok) return;
+          const { data: spot } = await response.json();
+          const cents = Math.round(Number(spot?.amount) * 100);
+          if (
+            spot?.base !== rate.asset ||
+            spot?.currency !== 'BRL' ||
+            !Number.isSafeInteger(cents) ||
+            cents <= 0 ||
+            cents > 1000000000
+          )
+            return;
+          rates[network] = {
+            ...rate,
+            rateCents: cents,
+            source: 'Coinbase spot',
+            basis: 'market-reference',
+            quotedAt: new Date(this.now()).toISOString(),
+          };
+        } catch {
+          /* The explicit educational fallback remains available. */
+        }
+      }),
+    );
     this.cache = {
       id: digest(rates),
       rates,
@@ -85,6 +118,13 @@ export function demoUnits(amount) {
   if (cents < 100n || cents > 1000000n)
     throw error('Adicione de R$ 1 a R$ 10.000 fictícios por vez.', 'INVALID_AMOUNT');
   return Number(cents);
+}
+
+export function convertedUnits(amount, network, rate) {
+  const units =
+    (BigInt(demoUnits(amount)) * 10n ** BigInt(precision[network])) / BigInt(rate.rateCents);
+  if (units === 0n) throw error('O valor é pequeno demais para esta referência.', 'INVALID_AMOUNT');
+  return units.toString();
 }
 
 export class DemoExchange {
@@ -148,7 +188,7 @@ export class DemoExchange {
       return { ...JSON.parse(row.payload), wallet: await this.state(token) };
     }
     let quote;
-    if (kind === 'convert') {
+    if (kind === 'convert' || kind === 'donate-brl') {
       quote = await this.quotes.get();
       if (quote.id !== input.quoteId)
         throw error(
@@ -200,7 +240,7 @@ export class DemoExchange {
         wallet.units[input.network] = (
           BigInt(wallet.units[input.network]) + BigInt(result.units)
         ).toString();
-      } else if (kind === 'donate') {
+      } else if (kind === 'donate' || kind === 'donate-brl') {
         const campaign = await this.store.campaign(input.campaignId);
         if (
           !campaign ||
@@ -208,24 +248,38 @@ export class DemoExchange {
           new Date(`${campaign.deadline}T23:59:59-03:00`) < new Date()
         )
           throw error('A campanha não está recebendo contribuições.', 'CAMPAIGN_UNAVAILABLE');
-        if (
-          !/^\d+$/.test(input.units) ||
-          BigInt(input.units) <= 0n ||
-          BigInt(input.units) > BigInt(wallet.units[input.network])
-        )
-          throw error(
-            'Seu saldo fictício não cobre esta contribuição.',
-            'INSUFFICIENT_DEMO_BALANCE',
-          );
+        let units;
+        if (kind === 'donate-brl') {
+          result.brlCents = demoUnits(input.amount);
+          if (result.brlCents > wallet.brlCents)
+            throw error(
+              'Adicione reais fictícios para cobrir esta contribuição.',
+              'INSUFFICIENT_DEMO_BALANCE',
+            );
+          units = convertedUnits(input.amount, input.network, quote.rates[input.network]);
+          result.quote = { ...quote.rates[input.network], id: quote.id };
+          wallet.brlCents -= result.brlCents;
+        } else {
+          if (
+            !/^\d+$/.test(input.units) ||
+            BigInt(input.units) <= 0n ||
+            BigInt(input.units) > BigInt(wallet.units[input.network])
+          )
+            throw error(
+              'Seu saldo fictício não cobre esta contribuição.',
+              'INSUFFICIENT_DEMO_BALANCE',
+            );
+          units = BigInt(input.units).toString();
+          wallet.units[input.network] = (
+            BigInt(wallet.units[input.network]) - BigInt(units)
+          ).toString();
+        }
         result.campaignId = campaign.id;
         result.network = input.network;
         result.asset = asset(input.network);
-        result.units = BigInt(input.units).toString();
+        result.units = units;
         result.amount = unitsAmount(result.units, input.network);
         result.status = 'simulated';
-        wallet.units[input.network] = (
-          BigInt(wallet.units[input.network]) - BigInt(result.units)
-        ).toString();
         const commitment = {
           id: result.id,
           campaignId: campaign.id,

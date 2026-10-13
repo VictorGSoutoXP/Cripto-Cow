@@ -12,6 +12,8 @@ As três campanhas fictícias originais usam os endereços demonstrativos públi
 
 ## Fluxo Solana
 
+O formulário começa por **Em reais · conversão automática**. Informe, por exemplo, R$ 500 e confira o equivalente calculado, a fonte e o horário. Preparar o pagamento envia `brlAmount` e `quoteId`; a API valida a referência e calcula a quantidade de moedas antes de criar o pedido. Taxas fictícias não são usadas nesse fluxo; mudança de cotação exige nova confirmação. **Em SOL/ZEC de teste** mantém a entrada direta de quantidade como alternativa. O valor em reais é apenas uma referência dos ativos reais, sem cobrança, compra ou conversão de dinheiro real. O recibo conserva essa referência; o envio e as taxas são pagos com moedas de teste da carteira.
+
 1. Escolher SOL, conferir devnet, valor e destinatário; aceitar as políticas vigentes.
 2. Conectar a Phantom para preparar o pedido; depois autorizar uma transação com transferência nativa de SOL e Memo único.
 3. O navegador guarda a assinatura antes do envio. A API guarda o mesmo identificador antes de transmitir, de modo que a recuperação não autorize outro pagamento.

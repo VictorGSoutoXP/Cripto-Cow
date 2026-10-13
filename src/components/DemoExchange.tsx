@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError, cents, money } from '../lib/api';
+import { estimateCrypto } from '../lib/conversion';
 import { useLegalManifest } from '../lib/legal';
 import { LegalAcceptance } from './forms';
+import { ConversionQuote } from './ConversionQuote';
 import { Button, Modal } from './ui';
 import type { Campaign, DemoWallet, DemoQuote, DemoCryptoDonation } from '../types';
 
 type Network = 'solana' | 'zcash';
-type Pending = { kind: 'credit' | 'convert' | 'donate'; input: Record<string, unknown> };
+type Pending = {
+  kind: 'credit' | 'convert' | 'donate' | 'donate-brl';
+  input: Record<string, unknown>;
+};
 type Result = {
   wallet: DemoWallet;
   id: string;
   amount?: string;
+  brlCents?: number;
   network?: Network;
   status?: 'simulated';
 };
@@ -18,7 +24,9 @@ const pendingKey = 'cow-demo-operation';
 function readPending(): Pending | null {
   try {
     const data = JSON.parse(sessionStorage.getItem(pendingKey) ?? 'null');
-    return data && ['credit', 'convert', 'donate'].includes(data.kind) && data.input?.requestKey
+    return data &&
+      ['credit', 'convert', 'donate', 'donate-brl'].includes(data.kind) &&
+      data.input?.requestKey
       ? data
       : null;
   } catch {
@@ -34,13 +42,6 @@ function openWallet() {
   );
   return opening;
 }
-function amountFromUnits(units: string, network: Network) {
-  const precision = network === 'solana' ? 9 : 8;
-  const value = BigInt(units)
-    .toString()
-    .padStart(precision + 1, '0');
-  return `${value.slice(0, -precision)}.${value.slice(-precision)}`;
-}
 export function DemoExchange({
   campaign,
   onClose,
@@ -52,12 +53,11 @@ export function DemoExchange({
   onClose: () => void;
   onBack: () => void;
   onSaved: () => void;
-  onTransfer: (network: Network, amount: string) => void;
+  onTransfer: (network: Network, brlAmount: string) => void;
 }) {
   const [wallet, setWallet] = useState<DemoWallet | null>(null);
   const [quote, setQuote] = useState<DemoQuote | null>(null);
-  const [deposit, setDeposit] = useState('50');
-  const [convert, setConvert] = useState('50');
+  const [amount, setAmount] = useState('50');
   const [network, setNetwork] = useState<Network>('solana');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -74,6 +74,10 @@ export function DemoExchange({
         if (active) {
           setWallet(state);
           setQuote(rates);
+          if (state.brlCents > 0)
+            setAmount((value) =>
+              value === '50' ? (Math.min(state.brlCents, 1000000) / 100).toFixed(2) : value,
+            );
         }
       })
       .catch((err) => active && setError(err.message));
@@ -82,19 +86,14 @@ export function DemoExchange({
     };
   }, []);
   const rate = quote?.rates[network];
-  let estimated = '';
+  const estimated = estimateCrypto(amount, network, rate?.rateCents);
+  let requiredCents = 0;
   try {
-    if (rate)
-      estimated = amountFromUnits(
-        (
-          (BigInt(cents(convert)) * 10n ** BigInt(network === 'solana' ? 9 : 8)) /
-          BigInt(rate.rateCents)
-        ).toString(),
-        network,
-      );
+    requiredCents = cents(amount);
   } catch {
-    /* Invalid input is explained on submit. */
+    /* Submission explains invalid input. */
   }
+  const enoughBalance = Boolean(wallet && estimated && wallet.brlCents >= requiredCents);
   async function execute(operation: Pending) {
     setBusy(true);
     setError('');
@@ -110,22 +109,26 @@ export function DemoExchange({
       setUnresolved(null);
       setWallet(result.wallet);
       if (operation.kind === 'credit')
-        setMessage('Reais fictícios adicionados. Nenhuma cobrança foi feita.');
+        setMessage(
+          'Saldo fictício adicionado. O equivalente já está calculado abaixo; nenhuma cobrança foi feita.',
+        );
       if (operation.kind === 'convert')
         setMessage(
-          `${result.amount} ${result.network === 'solana' ? 'SOL' : 'ZEC'} adicionados ao saldo simulado. Nenhuma moeda foi criada na blockchain.`,
+          `${result.amount} ${result.network === 'solana' ? 'SOL' : 'ZEC'} adicionados ao saldo fictício.`,
         );
-      if (operation.kind === 'donate') {
+      if (operation.kind === 'donate' || operation.kind === 'donate-brl') {
         setReceipt(result as unknown as DemoCryptoDonation);
         onSaved();
-        setMessage('Doação fictícia registrada. Ela não é uma transação confirmada na rede.');
+        setMessage('Doação fictícia registrada. Sem transferência na blockchain.');
       }
     } catch (err) {
       if (err instanceof ApiError && err.status >= 400 && err.status < 500 && err.status !== 408) {
         sessionStorage.removeItem(pendingKey);
         setUnresolved(null);
-        if (err.code === 'QUOTE_CHANGED')
+        if (err.code === 'QUOTE_CHANGED') {
+          setAccepted(false);
           setQuote(await api<DemoQuote>('/demo-exchange/quote').catch(() => null));
+        }
         if (err.code === 'TERMS_CHANGED') {
           setAccepted(false);
           legal.reload();
@@ -137,24 +140,25 @@ export function DemoExchange({
     }
   }
   function operation(kind: Pending['kind'], input: Record<string, unknown>) {
-    if (unresolved) {
-      setError('Confira a operação pendente antes de iniciar outra.');
-      return;
-    }
+    if (busy || unresolved) return;
     void execute({ kind, input: { ...input, requestKey: crypto.randomUUID() } });
   }
   const blocked = busy || Boolean(unresolved) || !wallet;
+  const asset = network === 'solana' ? 'SOL' : 'ZEC';
+  const acceptance = consent
+    ? { accepted: true, termsVersion: consent.version, termsHash: consent.hash }
+    : {};
   return (
     <Modal
-      title="Experimente doar com SOL ou ZEC"
-      description="Adicione reais fictícios, converta e doe no simulador. Sem cobrança e sem carteira obrigatória."
+      title="Quanto você quer doar?"
+      description="Informe o valor em reais. O equivalente em SOL ou ZEC é calculado automaticamente."
       onClose={onClose}
       wide
     >
       <div className="form-stack demo-exchange">
         <p className="muted">
-          Para acompanhar suas doações no perfil, entre na conta antes de contribuir. O saldo
-          fictício continua pertencendo a este navegador.
+          Demonstração com dinheiro fictício. Entre na conta antes de doar para acompanhar seu apoio
+          no perfil.
         </p>
         <div className="demo-wallet-balances" aria-label="Saldo virtual deste navegador">
           <div>
@@ -162,50 +166,44 @@ export function DemoExchange({
             <strong>{money(wallet?.brlCents ?? 0)}</strong>
           </div>
           <div>
-            <span>SOL simulado</span>
+            <span>SOL fictício</span>
             <strong>{wallet?.balances.solana ?? '0.000000000'}</strong>
           </div>
           <div>
-            <span>ZEC simulado</span>
+            <span>ZEC fictício</span>
             <strong>{wallet?.balances.zcash ?? '0.00000000'}</strong>
           </div>
         </div>
-        <p className="privacy-note">
-          Saldo fictício deste navegador. As moedas de teste na sua carteira continuam separadas.
-        </p>
         <form
           className="form-stack"
           onSubmit={(event) => {
             event.preventDefault();
-            operation('credit', { amount: deposit });
+            if (quote && consent && accepted && enoughBalance)
+              operation('donate-brl', {
+                amount,
+                network,
+                quoteId: quote.id,
+                campaignId: campaign.id,
+                ...acceptance,
+              });
           }}
         >
-          <h3>1. Adicione reais fictícios</h3>
           <label>
-            Valor fictício em reais
+            Valor da doação em reais
             <input
-              value={deposit}
-              onChange={(event) => setDeposit(event.target.value)}
+              value={amount}
+              onChange={(event) => {
+                setAmount(event.target.value);
+                setReceipt(null);
+              }}
               inputMode="decimal"
               maxLength={20}
               required
               disabled={blocked}
             />
           </label>
-          <Button className="button outline" disabled={blocked}>
-            Adicionar saldo fictício
-          </Button>
-        </form>
-        <form
-          className="form-stack"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (quote) operation('convert', { amount: convert, network, quoteId: quote.id });
-          }}
-        >
-          <h3>2. Converta para SOL ou ZEC no simulador</h3>
           <label>
-            Moeda para simular
+            Moeda da doação
             <select
               value={network}
               onChange={(event) => {
@@ -214,66 +212,24 @@ export function DemoExchange({
               }}
               disabled={blocked}
             >
-              <option value="solana">SOL · referência Solana</option>
-              <option value="zcash">ZEC · referência Zcash</option>
+              <option value="solana">SOL · Solana</option>
+              <option value="zcash">ZEC · Zcash</option>
             </select>
           </label>
-          <label>
-            Reais fictícios para converter
-            <input
-              value={convert}
-              onChange={(event) => setConvert(event.target.value)}
-              inputMode="decimal"
-              maxLength={20}
-              disabled={blocked}
-              required
-            />
-          </label>
-          {rate ? (
-            <div className="rule-box">
-              <div>
-                <strong>
-                  Equivalente simulado: {estimated || '—'} {rate.asset}
-                </strong>
-                <p>
-                  Referência: 1 {rate.asset} = {money(rate.rateCents)} · {rate.source}
-                </p>
-                {rate.quotedAt ? (
-                  <small>
-                    {new Intl.DateTimeFormat('pt-BR', {
-                      dateStyle: 'short',
-                      timeStyle: 'short',
-                      timeZone: 'America/Sao_Paulo',
-                    }).format(new Date(rate.quotedAt))}{' '}
-                    · preço do ativo real usado somente para este cálculo fictício. Moedas de teste
-                    não têm valor monetário.
-                  </small>
-                ) : (
-                  <small>
-                    Taxa didática fixa. A cotação de mercado está indisponível; este exemplo não é
-                    um preço atual.
-                  </small>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p role="status">Carregando a referência de conversão...</p>
-          )}
-          <Button
-            className="button primary"
-            disabled={blocked || !rate || !estimated || !wallet?.brlCents}
-            busy={busy}
-          >
-            Converter saldo fictício
-          </Button>
-        </form>
-        <div className="form-stack">
-          <h3>3. Doe o saldo simulado para {campaign.shortTitle}</h3>
-          <p>
-            Disponível: {wallet?.balances[network] ?? '0'} {network === 'solana' ? 'SOL' : 'ZEC'}{' '}
-            fictícios. Este registro ficará identificado como simulação, sem TXID ou confirmação na
-            blockchain.
+          <ConversionQuote quote={quote} network={network} equivalent={estimated} />
+          <p className="privacy-note">
+            Digite de R$ 1 a R$ 10.000 fictícios. A conversão e a doação acontecem juntas, sem
+            precisar digitar uma quantidade em {asset}. Destino: {campaign.shortTitle}.
           </p>
+          <Button
+            type="button"
+            className="button outline"
+            disabled={blocked || !estimated}
+            onClick={() => operation('credit', { amount })}
+          >
+            Adicionar {estimated ? money(requiredCents) : 'reais'} ao saldo fictício
+          </Button>
+          {!enoughBalance && estimated && <p>Adicione saldo fictício para cobrir esta doação.</p>}
           <LegalAcceptance
             legal={legal}
             role="donor"
@@ -283,31 +239,27 @@ export function DemoExchange({
           />
           <Button
             className="button primary"
-            disabled={blocked || !accepted || !consent || wallet?.units[network] === '0'}
-            onClick={() => {
-              if (consent && wallet)
-                operation('donate', {
-                  campaignId: campaign.id,
-                  network,
-                  units: wallet.units[network],
-                  accepted: true,
-                  termsVersion: consent.version,
-                  termsHash: consent.hash,
-                });
-            }}
+            busy={busy}
+            disabled={blocked || !accepted || !consent || !enoughBalance}
           >
-            Doar saldo fictício de {network === 'solana' ? 'SOL' : 'ZEC'}
+            Doar {estimated ? money(requiredCents) : 'reais'} fictícios em {asset}
           </Button>
-        </div>
+        </form>
         {message && <p role="status">{message}</p>}
         {!wallet && !error && <p role="status">Carregando seu saldo fictício...</p>}
         {receipt && (
           <div className="receipt">
             <strong>
-              Recibo de simulação · {receipt.amount} {receipt.network === 'solana' ? 'SOL' : 'ZEC'}
+              Recibo de simulação · {receipt.amount} {receipt.asset}
             </strong>
+            {receipt.brlCents !== undefined && (
+              <span>{money(receipt.brlCents)} fictícios convertidos e doados automaticamente.</span>
+            )}
             <code>{receipt.id}</code>
-            <p>Registrado no histórico fictício da campanha. Sem transferência na rede.</p>
+            <p>
+              Sem transferência na blockchain. Este valor não entra no saldo demonstrativo em reais
+              da campanha.
+            </p>
           </div>
         )}
         {error && (
@@ -340,21 +292,56 @@ export function DemoExchange({
             }
           }}
         >
-          Atualizar saldos e referência
+          Atualizar saldo e cotação
         </Button>
-        <div className="rule-box">
-          <div>
-            <strong>Quer enviar moedas de teste pela blockchain?</strong>
+        <details>
+          <summary>Usar meu saldo fictício em SOL ou ZEC</summary>
+          <div className="form-stack">
             <p>
-              Use SOL de devnet ou ZEC de testnet que já estejam na sua carteira. O saldo fictício
-              acima não financia essa transferência.
+              Você já tem {wallet?.balances[network] ?? '0'} {asset} fictícios. Pode doar esse saldo
+              ou converter o valor em reais informado acima e guardar a moeda para depois.
             </p>
             <Button
               className="button outline"
-              disabled={busy || Boolean(unresolved) || !estimated}
-              onClick={() => onTransfer(network, estimated)}
+              disabled={blocked || !enoughBalance}
+              onClick={() => {
+                if (quote) operation('convert', { amount, network, quoteId: quote.id });
+              }}
             >
-              Usar este valor em uma transferência de teste
+              Converter e guardar {asset} fictício
+            </Button>
+            <Button
+              className="button outline"
+              disabled={
+                blocked || !accepted || !consent || !wallet || wallet.units[network] === '0'
+              }
+              onClick={() => {
+                if (wallet && consent)
+                  operation('donate', {
+                    campaignId: campaign.id,
+                    network,
+                    units: wallet.units[network],
+                    ...acceptance,
+                  });
+              }}
+            >
+              Doar meu saldo fictício de {asset}
+            </Button>
+          </div>
+        </details>
+        <div className="rule-box">
+          <div>
+            <strong>Enviar moedas de teste pela blockchain</strong>
+            <p>
+              O equivalente pode preparar um envio com SOL de devnet ou ZEC de testnet que já
+              estejam na sua carteira. O saldo fictício não compra nem financia moedas de teste.
+            </p>
+            <Button
+              className="button outline"
+              disabled={blocked || !estimated || rate?.basis !== 'market-reference'}
+              onClick={() => onTransfer(network, amount)}
+            >
+              Doar este equivalente pela carteira de teste
             </Button>
           </div>
         </div>

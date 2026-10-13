@@ -8,8 +8,8 @@ import { donorSchema } from './donors.js';
 import { Accounts, sessionDuration, sessionToken } from './accounts.js';
 import { ProfileWallets } from './profile-wallets.js';
 import { zcashPaymentRequest } from './zcash.js';
-import { Payments, cryptoPaymentSchema, publicPayment } from './payments.js';
-import { DemoExchange } from './demo-exchange.js';
+import { Payments, cryptoPaymentSchema, publicPayment, unitsAmount } from './payments.js';
+import { DemoExchange, convertedUnits, demoUnits } from './demo-exchange.js';
 import { profileContributions } from './contributions.js';
 import {
   anchorMemo,
@@ -297,34 +297,64 @@ export function createApp(store, options = {}) {
     });
     res.json(await demoExchange.state(opened.token));
   });
-  for (const kind of ['credit', 'convert', 'donate'])
+  for (const kind of ['credit', 'convert', 'donate', 'donate-brl'])
     app.post(`/api/demo-exchange/${kind}`, demoOnly, async (req, res) => {
       const shape =
         kind === 'credit'
           ? { amount: text(1, 20) }
           : kind === 'convert'
             ? { amount: text(1, 20), network: z.enum(['solana', 'zcash']), quoteId: text(64, 64) }
-            : {
-                campaignId: text(1, 100),
-                network: z.enum(['solana', 'zcash']),
-                units: z.string().regex(/^\d{1,20}$/),
-                ...acceptanceFields,
-              };
+            : kind === 'donate-brl'
+              ? {
+                  campaignId: text(1, 100),
+                  network: z.enum(['solana', 'zcash']),
+                  amount: text(1, 20),
+                  quoteId: text(64, 64),
+                  ...acceptanceFields,
+                }
+              : {
+                  campaignId: text(1, 100),
+                  network: z.enum(['solana', 'zcash']),
+                  units: z.string().regex(/^\d{1,20}$/),
+                  ...acceptanceFields,
+                };
       const input = z.strictObject({ requestKey: z.uuid(), ...shape }).parse(req.body);
-      const consent = kind === 'donate' ? requireAcceptance(input, 'donor') : undefined;
+      const isDonation = kind === 'donate' || kind === 'donate-brl';
+      const consent = isDonation ? requireAcceptance(input, 'donor') : undefined;
       res.json(
         await demoExchange.operation(
           demoToken(req),
           kind,
           input,
           consent,
-          kind === 'donate' ? await contributorId(req) : null,
+          isDonation ? await contributorId(req) : null,
         ),
       );
     });
   app.post('/api/campaigns/:id/crypto-payments', demoOnly, async (req, res) => {
-    const input = cryptoPaymentSchema.parse(req.body);
+    let input = cryptoPaymentSchema.parse(req.body);
     const acceptance = requireAcceptance(input, 'donor');
+    if (input.brlAmount !== undefined) {
+      const quote = await demoExchange.quotes.get();
+      const rate = quote.rates[input.network];
+      if (rate.basis !== 'market-reference')
+        throw Object.assign(
+          new Error(
+            'A cotação de mercado está indisponível. Atualize ou informe o valor diretamente em moedas de teste.',
+          ),
+          { status: 503, code: 'QUOTE_UNAVAILABLE' },
+        );
+      if (input.quoteId !== quote.id)
+        throw Object.assign(
+          new Error('A cotação mudou. Confira o valor atualizado antes de preparar o pagamento.'),
+          { status: 409, code: 'QUOTE_CHANGED' },
+        );
+      input = {
+        ...input,
+        amount: unitsAmount(convertedUnits(input.brlAmount, input.network, rate), input.network),
+        brlReference: { cents: demoUnits(input.brlAmount), quoteId: quote.id, ...rate },
+      };
+    }
     res
       .status(201)
       .json(await payments.create(req.params.id, input, acceptance, await contributorId(req)));

@@ -106,7 +106,7 @@ export function DonationForm({
     'conversion',
   );
   const [transfer, setTransfer] = useState<
-    { network: 'solana' | 'zcash'; amount: string } | undefined
+    { network: 'solana' | 'zcash'; brlAmount: string } | undefined
   >();
   const [amount, setAmount] = useState('50');
   const [donorType, setDonorType] = useState<Donor['type']>('anonymous');
@@ -175,7 +175,7 @@ export function DonationForm({
         onBack={() => setMethod('simulation')}
         onSaved={onSaved}
         onTransfer={(network, amount) => {
-          setTransfer({ network, amount });
+          setTransfer({ network, brlAmount: amount });
           setMethod(network);
         }}
       />
@@ -188,7 +188,7 @@ export function DonationForm({
         onBack={() => setMethod('simulation')}
         onClose={onClose}
         onSaved={onSaved}
-        initialAmount={transfer?.network === method ? transfer.amount : undefined}
+        initialBrlAmount={transfer?.network === method ? transfer.brlAmount : undefined}
       />
     );
   return (

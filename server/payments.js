@@ -153,6 +153,7 @@ export class Payments {
         units,
         amount: unitsAmount(units, input.network),
         requestedAmount: input.amount,
+        brlReference: input.brlReference,
         payer: input.network === 'solana' ? input.payer : undefined,
         memo: input.network === 'solana' ? `cripto-cow:donation:v1:${id}` : undefined,
         uri:
@@ -270,13 +271,20 @@ export class Payments {
   }
 }
 
-export const cryptoPaymentSchema = z.strictObject({
+const cryptoPaymentFields = {
   network: z.enum(['solana', 'zcash']),
-  amount: z.string().max(20),
   payer: z.string().max(60).optional(),
   requestKey: z.uuid(),
   donor: z.object({ type: z.literal('anonymous') }).default({ type: 'anonymous' }),
   accepted: z.literal(true),
   termsVersion: z.string().max(100),
   termsHash: z.string().max(128),
-});
+};
+export const cryptoPaymentSchema = z.union([
+  z.strictObject({ ...cryptoPaymentFields, amount: z.string().max(20) }),
+  z.strictObject({
+    ...cryptoPaymentFields,
+    brlAmount: z.string().max(20),
+    quoteId: z.string().length(64),
+  }),
+]);

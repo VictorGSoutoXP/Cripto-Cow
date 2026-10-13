@@ -8,6 +8,7 @@ import { DemoQuotes, DemoExchange, demoUnits } from '../server/demo-exchange.js'
 import { getAcceptance } from '../server/legal.js';
 import { verifyDemoReceipts } from '../server/demo-receipts.js';
 import { verifyPaymentReceipts } from '../server/ledger.js';
+import { estimateCrypto } from '../src/lib/conversion.ts';
 
 const now = Date.parse('2026-10-13T03:00:00Z');
 function quotes(options = {}) {
@@ -59,6 +60,141 @@ test('valor fictício em reais usa centavos inteiros e rejeita entradas inválid
   assert.equal(demoUnits('50.25'), 5025);
   for (const amount of ['0', '-50', '1e2', '0.99', '1.001', '10000.01', 'Infinity'])
     assert.throws(() => demoUnits(amount));
+});
+
+test('equivalente automático usa o mesmo valor em reais com precisão de SOL e ZEC', () => {
+  assert.equal(estimateCrypto('500', 'solana', 50000), '1.000000000');
+  assert.equal(estimateCrypto('500,25', 'zcash', 20000), '2.50125000');
+  assert.equal(estimateCrypto('1', 'solana', 30000), '0.003333333');
+  for (const value of ['-500', '0', '1e3', '1.001', '10000.01', ''])
+    assert.equal(estimateCrypto(value, 'solana', 50000), '');
+});
+
+test('falha do CoinGecko usa spot em BRL validado da Coinbase; ativos ou moedas incorretos não viram cotação', async () => {
+  const fallback = (spot) =>
+    quotes({
+      fetchPrices: async () => {
+        throw new Error('down');
+      },
+      fetchSpotPrices: async (url) => ({
+        ok: true,
+        json: async () => ({
+          data: {
+            base: url.includes('SOL-') ? 'SOL' : 'ZEC',
+            currency: 'BRL',
+            amount: '500.25',
+            ...spot,
+          },
+        }),
+      }),
+    });
+  const valid = await fallback({}).get();
+  assert.equal(valid.rates.solana.source, 'Coinbase spot');
+  assert.equal(valid.rates.zcash.rateCents, 50025);
+  assert.equal(valid.rates.zcash.basis, 'market-reference');
+  assert.equal(valid.rates.zcash.quotedAt, new Date(now).toISOString());
+  for (const invalid of [{ currency: 'USD' }, { base: 'BTC' }, { amount: '-1' }, { amount: 'NaN' }])
+    assert.equal((await fallback(invalid).get()).rates.solana.basis, 'fictional');
+});
+
+test('doação em reais converte e debita uma única vez, sem deixar saldo cripto intermediário', async (t) => {
+  const f = await fixture(t);
+  await f.request('/demo-exchange/credit', operation({ amount: '1000' }));
+  const quote = await f.quotes.get();
+  const input = operation({
+    amount: '500',
+    network: 'solana',
+    quoteId: quote.id,
+    campaignId: 'horta-do-amanha',
+    ...terms(),
+  });
+  const responses = await Promise.all(
+    Array.from({ length: 3 }, () => f.request('/demo-exchange/donate-brl', input)),
+  );
+  assert.ok(
+    responses.every(
+      (r) =>
+        r.status === 200 &&
+        r.body.amount === '1.000000000' &&
+        r.body.brlCents === 50000 &&
+        r.body.wallet.brlCents === 50000,
+    ),
+  );
+  assert.equal(responses[0].body.wallet.units.solana, '0');
+  assert.equal(responses[0].body.quote.id, quote.id);
+  const zec = await f.request('/demo-exchange/donate-brl', {
+    ...input,
+    network: 'zcash',
+    requestKey: randomUUID(),
+  });
+  assert.equal(zec.body.amount, '2.50000000');
+  assert.equal(zec.body.wallet.brlCents, 0);
+  assert.equal(zec.body.wallet.units.zcash, '0');
+  const campaign = await f.store.campaign(input.campaignId);
+  assert.equal(campaign.simulatedCryptoDonations.length, 2);
+  assert.equal(verifyDemoReceipts(campaign.ledger, campaign.simulatedCryptoDonations), true);
+  // A lost response can be recovered after a price change without a second debit.
+  f.quotes.cache = null;
+  f.quotes.fetchPrices = async () => {
+    throw new Error('offline');
+  };
+  f.quotes.fetchSpotPrices = f.quotes.fetchPrices;
+  assert.equal((await f.request('/demo-exchange/donate-brl', input)).body.amount, '1.000000000');
+});
+
+test('conversão automática recusa débito sem saldo, com cotação alterada ou campanha bloqueada', async (t) => {
+  const f = await fixture(t);
+  const quote = await f.quotes.get();
+  const input = operation({
+    amount: '500',
+    network: 'solana',
+    quoteId: quote.id,
+    campaignId: 'horta-do-amanha',
+    ...terms(),
+  });
+  assert.equal(
+    (await f.request('/demo-exchange/donate-brl', input)).body.code,
+    'INSUFFICIENT_DEMO_BALANCE',
+  );
+  await f.request('/demo-exchange/credit', operation({ amount: '500' }));
+  assert.equal(
+    (await f.request('/demo-exchange/donate-brl', { ...input, quoteId: 'f'.repeat(64) })).body.code,
+    'QUOTE_CHANGED',
+  );
+  assert.equal(
+    (await f.request('/demo-exchange/donate-brl', { ...input, accepted: false })).status,
+    400,
+  );
+  const campaign = await f.store.get('campaigns', input.campaignId);
+  await f.store.save('campaigns', { ...campaign, status: 'frozen' });
+  assert.equal(
+    (await f.request('/demo-exchange/donate-brl', input)).body.code,
+    'CAMPAIGN_UNAVAILABLE',
+  );
+  assert.equal((await f.request('/demo-exchange/wallet', {})).body.brlCents, 50000);
+  assert.equal((await f.store.execute('SELECT id FROM demo_crypto_donations')).rows.length, 0);
+});
+
+test('falha ao registrar o recibo desfaz o débito em reais da doação automática', async (t) => {
+  const f = await fixture(t);
+  await f.request('/demo-exchange/credit', operation({ amount: '500' }));
+  const quote = await f.quotes.get();
+  t.mock.method(f.store, 'append', async () => {
+    throw new Error('simulated storage failure');
+  });
+  const result = await f.request(
+    '/demo-exchange/donate-brl',
+    operation({
+      amount: '500',
+      network: 'solana',
+      quoteId: quote.id,
+      campaignId: 'horta-do-amanha',
+      ...terms(),
+    }),
+  );
+  assert.notEqual(result.status, 200);
+  assert.equal((await f.request('/demo-exchange/wallet', {})).body.brlCents, 50000);
+  assert.equal((await f.store.execute('SELECT id FROM demo_crypto_donations')).rows.length, 0);
 });
 test('cotações validam fonte e horário, compartilham consulta e mostram fallback fictício em falha ou dados antigos', async () => {
   let calls = 0;
