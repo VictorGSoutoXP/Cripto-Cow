@@ -96,7 +96,7 @@ export class Payments {
       })),
     };
   }
-  async create(campaignId, input, acceptance) {
+  async create(campaignId, input, acceptance, userId = null) {
     const campaign = await this.store.campaign(campaignId);
     if (
       !campaign ||
@@ -167,17 +167,20 @@ export class Payments {
         acceptance: { ...acceptance, acceptedAt: new Date().toISOString() },
       };
       try {
-        await this.store.execute({
-          sql: 'INSERT INTO crypto_payments (id, campaign_id, request_key, network, receiver, units, payload) VALUES (?, ?, ?, ?, ?, ?, ?)',
-          args: [
-            id,
-            campaignId,
-            input.requestKey,
-            input.network,
-            receiver,
-            units,
-            JSON.stringify(intent),
-          ],
+        await this.store.transaction(async () => {
+          await this.store.execute({
+            sql: 'INSERT INTO crypto_payments (id, campaign_id, request_key, network, receiver, units, payload) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            args: [
+              id,
+              campaignId,
+              input.requestKey,
+              input.network,
+              receiver,
+              units,
+              JSON.stringify(intent),
+            ],
+          });
+          await this.store.linkContribution('testnet', id, userId);
         });
         return { ...publicPayment(intent), token, memoProgram };
       } catch (error) {

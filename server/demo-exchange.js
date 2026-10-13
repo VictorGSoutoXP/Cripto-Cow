@@ -132,7 +132,7 @@ export class DemoExchange {
       },
     };
   }
-  async operation(token, kind, input, consent) {
+  async operation(token, kind, input, consent, userId = null) {
     if (!token || !/^[a-zA-Z0-9_-]{32}$/.test(token))
       throw error('Abra novamente o simulador.', 'DEMO_SESSION_REQUIRED', 401);
     const key = digest(token);
@@ -245,6 +245,7 @@ export class DemoExchange {
           sql: 'INSERT INTO demo_crypto_donations (id, campaign_id, payload) VALUES (?, ?, ?)',
           args: [result.id, campaign.id, JSON.stringify({ ...result, acceptance: consent })],
         });
+        await this.store.linkContribution('virtual', result.id, userId);
       } else throw error('Operação inválida.', 'INVALID_OPERATION');
       await this.store.execute({
         sql: 'UPDATE demo_wallets SET payload = ? WHERE key_hash = ?',

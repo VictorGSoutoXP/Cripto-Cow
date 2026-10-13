@@ -10,6 +10,7 @@ import { ProfileWallets } from './profile-wallets.js';
 import { zcashPaymentRequest } from './zcash.js';
 import { Payments, cryptoPaymentSchema, publicPayment } from './payments.js';
 import { DemoExchange } from './demo-exchange.js';
+import { profileContributions } from './contributions.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -68,6 +69,7 @@ export function createApp(store, options = {}) {
   const production = options.production ?? process.env.NODE_ENV === 'production';
   const sessions = new Map();
   const accounts = new Accounts(store);
+  const contributorId = async (req) => (await accounts.current(sessionToken(req)))?.id ?? null;
   const wallets = new ProfileWallets(store);
   const payments = new Payments(store, { ...options, rpcUrl });
   const demoExchange = new DemoExchange(store, options.demoQuotes);
@@ -270,6 +272,7 @@ export function createApp(store, options = {}) {
           input.requestKey,
           input.accepted,
           input.donor,
+          await contributorId(req),
         ),
       );
   });
@@ -309,12 +312,22 @@ export function createApp(store, options = {}) {
               };
       const input = z.strictObject({ requestKey: z.uuid(), ...shape }).parse(req.body);
       const consent = kind === 'donate' ? requireAcceptance(input, 'donor') : undefined;
-      res.json(await demoExchange.operation(demoToken(req), kind, input, consent));
+      res.json(
+        await demoExchange.operation(
+          demoToken(req),
+          kind,
+          input,
+          consent,
+          kind === 'donate' ? await contributorId(req) : null,
+        ),
+      );
     });
   app.post('/api/campaigns/:id/crypto-payments', demoOnly, async (req, res) => {
     const input = cryptoPaymentSchema.parse(req.body);
     const acceptance = requireAcceptance(input, 'donor');
-    res.status(201).json(await payments.create(req.params.id, input, acceptance));
+    res
+      .status(201)
+      .json(await payments.create(req.params.id, input, acceptance, await contributorId(req)));
   });
   app.post('/api/crypto-payments/:id/status', demoOnly, async (req, res) => {
     const { token } = z.strictObject({ token: text(20, 100) }).parse(req.body);
@@ -445,6 +458,15 @@ export function createApp(store, options = {}) {
   });
   app.get('/api/profile', individual, async (req, res) => {
     res.json({ user: req.account, wallets: await wallets.list(req.account.id) });
+  });
+  app.get('/api/profile/contributions', individual, async (req, res) => {
+    const offset = z.coerce
+      .number()
+      .int()
+      .min(0)
+      .max(1000000)
+      .parse(req.query.offset ?? 0);
+    res.json(await profileContributions(store, req.account.id, offset));
   });
   app.patch('/api/profile', individual, async (req, res) => {
     const { name } = z.strictObject({ name: text(2, 60) }).parse(req.body);

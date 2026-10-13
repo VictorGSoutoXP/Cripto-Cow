@@ -152,6 +152,10 @@ export function DemoExchange({
       wide
     >
       <div className="form-stack demo-exchange">
+        <p className="muted">
+          Para acompanhar suas doações no perfil, entre na conta antes de contribuir. O saldo
+          fictício continua pertencendo a este navegador.
+        </p>
         <div className="demo-wallet-balances" aria-label="Saldo virtual deste navegador">
           <div>
             <span>Reais fictícios</span>
