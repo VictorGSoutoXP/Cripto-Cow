@@ -1,5 +1,7 @@
 # Cripto Cow
 
+**Experimente sem carteira:** em “Apoiar esta causa”, adicione reais fictícios, escolha SOL/ZEC e converta no simulador com referência identificada. A doação virtual aparece como simulação, separada das transferências confirmadas em redes de teste. O simulador não compra ou cria moedas na blockchain. [Saldo virtual e conversão](docs/saldo-virtual.md).
+
 [Abrir o site](https://cripto-cow.onrender.com) · [Painel](https://cripto-cow.onrender.com/#/painel) · [Termos e políticas](https://cripto-cow.onrender.com/#/politicas)
 
 MVP de doações com orçamento aberto, prestação de contas e ancoragem de hashes na Solana devnet. Campanhas, doações e liberações são demonstrativas; nenhum dinheiro real é movimentado.

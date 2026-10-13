@@ -26,6 +26,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { verifyInBrowser, verifyPaymentReceipts } from '../lib/verify';
+import { verifyDemoReceipts } from '../lib/demo-verify';
 
 function cryptoTotal(units: string, precision: number) {
   const value = BigInt(units)
@@ -87,6 +88,7 @@ export default function CampaignPage({
     try {
       const result = await verifyInBrowser(campaign.ledger);
       await verifyPaymentReceipts(campaign.ledger, campaign.cryptoPayments);
+      await verifyDemoReceipts(campaign.ledger, campaign.simulatedCryptoDonations);
       for (const anchor of campaign.anchors) {
         const prefix = await verifyInBrowser(campaign.ledger.slice(0, anchor.count));
         if (prefix.root !== anchor.root)
@@ -124,6 +126,7 @@ export default function CampaignPage({
         ? [
             'donation',
             'crypto_donation',
+            'demo_crypto_donation',
             'release',
             'expense_requested',
             'expense_rejected',
@@ -236,6 +239,21 @@ export default function CampaignPage({
               </div>
             ))}
           </div>
+          {(campaign.simulatedCryptoDonations?.length ?? 0) > 0 && (
+            <div className="crypto-summary demo-crypto-summary">
+              <strong>Doações fictícias em SOL e ZEC · simulador</strong>
+              <p>
+                {cryptoTotal(campaign.simulatedCryptoTotals?.solana ?? '0', 9)} SOL simulados
+                <br />
+                {cryptoTotal(campaign.simulatedCryptoTotals?.zcash ?? '0', 8)} ZEC simulados
+              </p>
+              <small>
+                Originados de saldo virtual em reais. Sem envio, TXID ou confirmação na blockchain.
+                Não alteram o saldo demonstrativo em reais nem os totais confirmados das redes de
+                teste.
+              </small>
+            </div>
+          )}
           <div className="detail-tabs" role="tablist" aria-label="Dados da campanha">
             {[
               ['timeline', 'Movimentações'],
@@ -278,6 +296,7 @@ export default function CampaignPage({
                     <option value="all">Todas as movimentações</option>
                     <option value="donation">Doações</option>
                     <option value="crypto_donation">Cripto de teste confirmada</option>
+                    <option value="demo_crypto_donation">Doações fictícias do simulador</option>
                     <option value="release">Liberações</option>
                     <option value="expense_requested">Pedidos de liberação</option>
                   </select>
@@ -562,36 +581,43 @@ function TimelineItem({
     (payment) => payment.id === entry.referenceId,
   );
   const outgoing = entry.type === 'release';
+  const demoDonation = campaign.simulatedCryptoDonations?.find(
+    (item) => item.id === entry.referenceId,
+  );
   const donor = incoming
     ? campaign.donations?.find((donation) => donation.id === entry.referenceId)?.donor
     : undefined;
-  const title = cryptoPayment
-    ? `Contribuição de ${cryptoPayment.amount} ${cryptoPayment.asset}`
-    : incoming
-      ? donor && donor.type !== 'anonymous'
-        ? donor.name
-        : 'Uma nova doação chegou'
-      : (expense?.title ??
-        (entry.type === 'campaign_created'
-          ? 'A campanha começou'
-          : entry.type === 'campaign_frozen'
-            ? 'Campanha em análise'
-            : entry.type === 'campaign_active'
-              ? 'Campanha ativa'
-              : 'Atualização do histórico'));
-  const subtitle = cryptoPayment
-    ? `Confirmada em ${cryptoPayment.chain} · moeda de teste`
-    : incoming
-      ? donor && donor.type !== 'anonymous'
-        ? `${donor.type === 'company' ? 'Empresa' : 'Pessoa'} · nome fictício · demonstração`
-        : 'Apoio anônimo · demonstração'
-      : outgoing
-        ? `${expense?.supplier ?? 'Fornecedor demonstrativo'} · evidência nível ${entry.evidenceLevel}`
-        : entry.type === 'expense_requested'
-          ? 'Pedido enviado, aguardando análise'
-          : entry.type === 'expense_rejected'
-            ? 'Pedido de liberação recusado'
-            : 'Registro público da campanha';
+  const title = demoDonation
+    ? `Simulação: ${demoDonation.amount} ${demoDonation.asset}`
+    : cryptoPayment
+      ? `Contribuição de ${cryptoPayment.amount} ${cryptoPayment.asset}`
+      : incoming
+        ? donor && donor.type !== 'anonymous'
+          ? donor.name
+          : 'Uma nova doação chegou'
+        : (expense?.title ??
+          (entry.type === 'campaign_created'
+            ? 'A campanha começou'
+            : entry.type === 'campaign_frozen'
+              ? 'Campanha em análise'
+              : entry.type === 'campaign_active'
+                ? 'Campanha ativa'
+                : 'Atualização do histórico'));
+  const subtitle = demoDonation
+    ? 'Saldo fictício · sem transferência na blockchain'
+    : cryptoPayment
+      ? `Confirmada em ${cryptoPayment.chain} · moeda de teste`
+      : incoming
+        ? donor && donor.type !== 'anonymous'
+          ? `${donor.type === 'company' ? 'Empresa' : 'Pessoa'} · nome fictício · demonstração`
+          : 'Apoio anônimo · demonstração'
+        : outgoing
+          ? `${expense?.supplier ?? 'Fornecedor demonstrativo'} · evidência nível ${entry.evidenceLevel}`
+          : entry.type === 'expense_requested'
+            ? 'Pedido enviado, aguardando análise'
+            : entry.type === 'expense_rejected'
+              ? 'Pedido de liberação recusado'
+              : 'Registro público da campanha';
   return (
     <div className="timeline-item">
       <span className={`timeline-icon ${incoming ? 'incoming' : outgoing ? 'outgoing' : ''}`}>

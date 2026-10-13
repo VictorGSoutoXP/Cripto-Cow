@@ -9,6 +9,7 @@ import { Accounts, sessionDuration, sessionToken } from './accounts.js';
 import { ProfileWallets } from './profile-wallets.js';
 import { zcashPaymentRequest } from './zcash.js';
 import { Payments, cryptoPaymentSchema, publicPayment } from './payments.js';
+import { DemoExchange } from './demo-exchange.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -69,6 +70,13 @@ export function createApp(store, options = {}) {
   const accounts = new Accounts(store);
   const wallets = new ProfileWallets(store);
   const payments = new Payments(store, { ...options, rpcUrl });
+  const demoExchange = new DemoExchange(store, options.demoQuotes);
+  const demoToken = (req) =>
+    (req.get('cookie') ?? '')
+      .split(';')
+      .map((item) => item.trim())
+      .find((item) => item.startsWith('cow_demo_wallet='))
+      ?.slice('cow_demo_wallet='.length);
   const rate = new Map();
   const authRate = new Map();
   app.disable('x-powered-by');
@@ -228,6 +236,7 @@ export function createApp(store, options = {}) {
       campaignId: campaign.id,
       entries: campaign.ledger,
       cryptoPayments: campaign.cryptoPayments,
+      simulatedCryptoDonations: campaign.simulatedCryptoDonations,
       anchors: campaign.anchors.map(({ wallet, ...anchor }) => anchor),
     });
   });
@@ -270,6 +279,38 @@ export function createApp(store, options = {}) {
       return res.status(404).json({ error: 'Campanha não publicada.' });
     res.json(await payments.methods(campaign));
   });
+  app.get('/api/demo-exchange/quote', demoOnly, async (req, res) =>
+    res.set('Cache-Control', 'no-store').json(await demoExchange.quotes.get()),
+  );
+  app.post('/api/demo-exchange/wallet', demoOnly, async (req, res) => {
+    z.strictObject({}).parse(req.body);
+    const opened = await demoExchange.open(demoToken(req));
+    res.cookie('cow_demo_wallet', opened.token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: production || req.secure,
+      maxAge: sessionDuration,
+      path: '/',
+    });
+    res.json(await demoExchange.state(opened.token));
+  });
+  for (const kind of ['credit', 'convert', 'donate'])
+    app.post(`/api/demo-exchange/${kind}`, demoOnly, async (req, res) => {
+      const shape =
+        kind === 'credit'
+          ? { amount: text(1, 20) }
+          : kind === 'convert'
+            ? { amount: text(1, 20), network: z.enum(['solana', 'zcash']), quoteId: text(64, 64) }
+            : {
+                campaignId: text(1, 100),
+                network: z.enum(['solana', 'zcash']),
+                units: z.string().regex(/^\d{1,20}$/),
+                ...acceptanceFields,
+              };
+      const input = z.strictObject({ requestKey: z.uuid(), ...shape }).parse(req.body);
+      const consent = kind === 'donate' ? requireAcceptance(input, 'donor') : undefined;
+      res.json(await demoExchange.operation(demoToken(req), kind, input, consent));
+    });
   app.post('/api/campaigns/:id/crypto-payments', demoOnly, async (req, res) => {
     const input = cryptoPaymentSchema.parse(req.body);
     const acceptance = requireAcceptance(input, 'donor');
