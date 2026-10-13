@@ -3783,6 +3783,42 @@ select {
 .wallet-card details p {
   margin-block: 12px;
 }
+.wallet-next-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #f2f6fb;
+  min-width: 0;
+}
+.wallet-next-step p,
+.wallet-next-step ol {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.wallet-next-step ol {
+  padding-left: 18px;
+}
+.wallet-next-step h4 {
+  font-size: 14px;
+  margin: 0;
+}
+.wallet-signing-command {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  line-height: 1.7;
+  padding: 12px;
+  background: #edf5fc;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  min-width: 0;
+}
 .wallet-request {
   border-top: 1px solid var(--line);
   padding-top: 20px;
