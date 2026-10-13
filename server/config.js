@@ -52,6 +52,7 @@ export function readConfig(env = process.env) {
     production,
     trustProxy: render ? 1 : false,
     rpcUrl: env.SOLANA_RPC_URL || 'https://api.devnet.solana.com',
+    zcashEndpoint: env.ZCASH_LIGHTWALLETD || 'testnet.zec.rocks:443',
     database: {
       path: env.DATABASE_PATH || './data/elo.sqlite',
       url,

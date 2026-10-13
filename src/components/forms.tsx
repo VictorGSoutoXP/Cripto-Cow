@@ -14,6 +14,7 @@ import { useLegalManifest } from '../lib/legal';
 import type { LegalRole } from '../lib/legal';
 import { Modal, Button } from './ui';
 import type { Campaign, Donor, Expense } from '../types';
+import { CryptoDonation } from './CryptoDonation';
 
 export function LegalAcceptance({
   legal,
@@ -100,6 +101,7 @@ export function DonationForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const [method, setMethod] = useState<'simulation' | 'solana' | 'zcash'>('simulation');
   const [amount, setAmount] = useState('50');
   const [donorType, setDonorType] = useState<Donor['type']>('anonymous');
   const [donorName, setDonorName] = useState('');
@@ -159,10 +161,20 @@ export function DonationForm({
     }
   }
 
+  if (method !== 'simulation')
+    return (
+      <CryptoDonation
+        campaign={campaign}
+        network={method}
+        onBack={() => setMethod('simulation')}
+        onClose={onClose}
+        onSaved={onSaved}
+      />
+    );
   return (
     <Modal
       title={receipt ? 'Seu gesto já faz parte da história.' : 'Faça parte dessa mudança.'}
-      description="Doação de demonstração · nenhum valor será cobrado."
+      description="Escolha uma simulação em reais ou uma contribuição com moedas de teste."
       onClose={onClose}
     >
       {receipt ? (
@@ -190,6 +202,24 @@ export function DonationForm({
         </div>
       ) : (
         <form onSubmit={submit} className="form-stack">
+          <fieldset className="donor-identity">
+            <legend>Como você quer contribuir?</legend>
+            <div className="payment-methods">
+              <Button
+                type="button"
+                className="button outline selected"
+                onClick={() => setMethod('simulation')}
+              >
+                Simular em R$
+              </Button>
+              <Button type="button" className="button outline" onClick={() => setMethod('solana')}>
+                SOL · Solana devnet
+              </Button>
+              <Button type="button" className="button outline" onClick={() => setMethod('zcash')}>
+                ZEC · Zcash testnet
+              </Button>
+            </div>
+          </fieldset>
           <div className="campaign-mini">
             <img src={campaign.image} alt="" />
             <div>

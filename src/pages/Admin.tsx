@@ -21,6 +21,7 @@ import {
 import { anchorHistory } from '../lib/wallet';
 import AccountAccess from '../components/AccountAccess';
 import Profile from './Profile';
+import { CampaignReceivers } from '../components/CampaignReceivers';
 
 export default function Admin({
   epoch,
@@ -309,6 +310,9 @@ export default function Admin({
                   campanha.
                 </p>
                 <ExternalLink href="https://faucet.solana.com/">Obter SOL de teste</ExternalLink>
+                {!moderating && (
+                  <CampaignReceivers key={campaign.id} campaign={campaign} onSaved={refresh} />
+                )}
               </>
             )}
           </div>

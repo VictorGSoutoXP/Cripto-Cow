@@ -5,9 +5,9 @@
     "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
-    "version": "mvp-1.4",
+    "version": "mvp-1.5",
     "documents": ["uso-demonstrativo", "privacidade", "transparencia"],
-    "donorText": "Tenho 18 anos ou mais, li os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP e aceito as regras de liberação e sobra desta campanha na demonstração. Usarei apenas dados fictícios. Se escolher pessoa ou empresa, o nome fictício informado ficará público junto ao valor e à data da doação simulada. Entendo que não há pagamento real nem retorno financeiro.",
+    "donorText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Usarei dados fictícios. Entendo que a simulação em reais e as regras de liberação/sobra são demonstrativas. SOL de devnet e ZEC de testnet vão diretamente ao destinatário indicado, sem valor real, custódia ou devolução automática. Nome fictício escolhido, endereços e transações aplicáveis ficam públicos. Não há retorno financeiro.",
     "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro.",
     "accountText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Entendo que meu e-mail, nome de exibição e dados de autenticação serão usados para manter minha conta e meu painel. Usarei dados fictícios nas campanhas e evidências. As doações e liberações são simuladas."
   },
@@ -17,8 +17,8 @@
       "title": "Termos de uso do MVP",
       "summary": "Regras válidas para participar da demonstração da Cripto Cow.",
       "status": "current",
-      "version": "mvp-1.4",
-      "updatedAt": "2026-10-12",
+      "version": "mvp-1.5",
+      "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow é um protótipo de doações transparentes criado para o hackathon. Campanhas, valores, comprovantes e decisões da demonstração devem usar dados fictícios. Uma doação no site é uma simulação e não movimenta dinheiro.",
         "Estes termos, a Política de Privacidade do MVP e a Política de Transparência do MVP compõem o aceite atual. As minutas para operação futura estão disponíveis para consulta e não fazem parte desse aceite."
@@ -62,7 +62,7 @@
           "id": "blockchain",
           "title": "4. Registro na Solana devnet",
           "paragraphs": [
-            "A integração com a Phantom permite ao organizador da campanha ou à moderação assinar uma transação de testes para registrar um hash do histórico na Solana devnet. Ela não envia os valores das doações nem transfere recursos a um beneficiário.",
+            "A ancoragem pela Phantom registra um hash do histórico na Solana devnet. Esse fluxo é separado da contribuição de SOL de teste, que envia moedas diretamente ao destinatário indicado pela campanha.",
             "O endereço da carteira e a transação assinada são públicos na blockchain. A Cripto Cow não solicita a frase de recuperação ou a chave privada da carteira. Utilize uma carteira de testes com SOL de devnet, sem valor real.",
             "Um registro só é apresentado como confirmado após a consulta da transação. Um hash pode demonstrar a correspondência de um histórico com o registro, mas não comprova que uma história ou evidência seja verdadeira."
           ]
@@ -82,6 +82,17 @@
             "O MVP pode ficar indisponível, ser reiniciado ou ter seu ambiente de demonstração ajustado pelo time. Não o utilize para arrecadar, comprovar despesas reais ou tomar decisões financeiras.",
             "As minutas jurídicas são material de trabalho. A operação com dinheiro e dados reais depende de revisão, parceiro, canais de atendimento, prazos e demais decisões ainda pendentes."
           ]
+        },
+        {
+          "id": "contribuicoes-cripto-teste",
+          "title": "Contribuições em redes de teste",
+          "paragraphs": [
+            "Além da simulação em reais, a campanha pode receber SOL na Solana devnet e ZEC em endereço transparente da Zcash testnet. São moedas de teste sem valor econômico. Nunca envie moedas de mainnet. Não existe conversão para reais; o orçamento e as liberações demonstrativas em reais permanecem separados.",
+            "O destinatário, o valor e a rede são apresentados antes do envio. As moedas vão diretamente à carteira indicada pela campanha, sem custódia da Cripto Cow. Não há contrato que retenha as moedas até a aprovação de despesas, nem execução automática de reembolsos ou regras de sobra.",
+            "A API consulta um RPC Solana ou um servidor lightwalletd Zcash com TLS e confere a rede de teste, o destinatário, o valor e a confirmação. Essas consultas dependem da disponibilidade e da informação fornecida por terceiros. A confirmação em um bloco não elimina o risco de reorganização da rede. O site não é um nó completo independente.",
+            "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
+            "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
+          ]
         }
       ]
     },
@@ -90,8 +101,8 @@
       "title": "Política de Privacidade do MVP",
       "summary": "Quais informações o protótipo utiliza, publica e mantém restritas.",
       "status": "current",
-      "version": "mvp-1.4",
-      "updatedAt": "2026-10-12",
+      "version": "mvp-1.5",
+      "updatedAt": "2026-10-13",
       "intro": [
         "Esta política descreve o funcionamento atual da Cripto Cow. O cadastro utiliza e-mail, nome de exibição e senha para autenticar uma conta individual. Campanhas, doações, evidências e justificativas continuam demonstrativas e devem receber somente dados fictícios. Não há KYC, biometria ou envio de documentos originais.",
         "Campos de texto podem identificar pessoas se forem preenchidos com dados reais. Por isso, não inclua informações pessoais ou sensíveis nas campanhas, justificativas, evidências ou denúncias."
@@ -152,6 +163,17 @@
             "O banco preserva contas e registros demonstrativos entre reinícios. O perfil permite corrigir o nome de exibição, alterar a senha, substituir o código de recuperação, remover vínculos de carteiras e encerrar a conta. O encerramento remove o e-mail, nome, hash da senha, código de recuperação, sessões, desafios e vínculos privados daquela conta. Campanhas, seus textos públicos, aceites de campanhas e eventos financeiros demonstrativos são preservados para continuidade do histórico. O e-mail não é verificado por envio de mensagem e não há recuperação de senha por e-mail.",
             "Ainda não há prazo formal de retenção nem canal de atendimento para solicitações sobre informações publicadas e retirada de consentimento. O cadastro se limita ao acesso descrito nesta política; entradas públicas e evidências devem ser fictícias. Esta política não declara conformidade jurídica nem promete apagar transações já publicadas em blockchain."
           ]
+        },
+        {
+          "id": "contribuicoes-cripto-teste",
+          "title": "Contribuições em redes de teste",
+          "paragraphs": [
+            "Além da simulação em reais, a campanha pode receber SOL na Solana devnet e ZEC em endereço transparente da Zcash testnet. São moedas de teste sem valor econômico. Nunca envie moedas de mainnet. Não existe conversão para reais; o orçamento e as liberações demonstrativas em reais permanecem separados.",
+            "O destinatário, o valor e a rede são apresentados antes do envio. As moedas vão diretamente à carteira indicada pela campanha, sem custódia da Cripto Cow. Não há contrato que retenha as moedas até a aprovação de despesas, nem execução automática de reembolsos ou regras de sobra.",
+            "A API consulta um RPC Solana ou um servidor lightwalletd Zcash com TLS e confere a rede de teste, o destinatário, o valor e a confirmação. Essas consultas dependem da disponibilidade e da informação fornecida por terceiros. A confirmação em um bloco não elimina o risco de reorganização da rede. O site não é um nó completo independente.",
+            "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
+            "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
+          ]
         }
       ]
     },
@@ -160,8 +182,8 @@
       "title": "Política de Transparência do MVP",
       "summary": "Como consultar o histórico, entender evidências e acompanhar decisões simuladas.",
       "status": "current",
-      "version": "mvp-1.4",
-      "updatedAt": "2026-10-12",
+      "version": "mvp-1.5",
+      "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow demonstra prestação de contas por campanha: entradas, saídas, orçamento, evidências e decisões ficam disponíveis para consulta pública, com os limites descritos nesta política.",
         "A demonstração não substitui auditoria, verificação documental, comprovação de identidade ou análise jurídica. Os dados e valores são simulados."
@@ -212,6 +234,17 @@
           "paragraphs": [
             "Os termos do organizador, termos do doador e textos de declarações publicados como minutas reproduzem o documento de trabalho do time de 02/10/2026. Eles descrevem uma operação futura e não compõem o aceite da demonstração.",
             "Parceiro de pagamento, taxas, prazos, regras de devolução, canal de atendimento, retenção, autorização de dados e revisão jurídica continuam pendentes. O time deve resolver essas decisões antes de operar com recursos ou dados reais."
+          ]
+        },
+        {
+          "id": "contribuicoes-cripto-teste",
+          "title": "Contribuições em redes de teste",
+          "paragraphs": [
+            "Além da simulação em reais, a campanha pode receber SOL na Solana devnet e ZEC em endereço transparente da Zcash testnet. São moedas de teste sem valor econômico. Nunca envie moedas de mainnet. Não existe conversão para reais; o orçamento e as liberações demonstrativas em reais permanecem separados.",
+            "O destinatário, o valor e a rede são apresentados antes do envio. As moedas vão diretamente à carteira indicada pela campanha, sem custódia da Cripto Cow. Não há contrato que retenha as moedas até a aprovação de despesas, nem execução automática de reembolsos ou regras de sobra.",
+            "A API consulta um RPC Solana ou um servidor lightwalletd Zcash com TLS e confere a rede de teste, o destinatário, o valor e a confirmação. Essas consultas dependem da disponibilidade e da informação fornecida por terceiros. A confirmação em um bloco não elimina o risco de reorganização da rede. O site não é um nó completo independente.",
+            "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
+            "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
           ]
         }
       ]

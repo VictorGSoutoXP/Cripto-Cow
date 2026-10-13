@@ -25,7 +25,14 @@ import {
   Building2,
   UserRound,
 } from 'lucide-react';
-import { verifyInBrowser } from '../lib/verify';
+import { verifyInBrowser, verifyPaymentReceipts } from '../lib/verify';
+
+function cryptoTotal(units: string, precision: number) {
+  const value = BigInt(units)
+    .toString()
+    .padStart(precision + 1, '0');
+  return `${value.slice(0, -precision)}.${value.slice(-precision)}`;
+}
 
 export default function CampaignPage({
   campaignId,
@@ -79,6 +86,7 @@ export default function CampaignPage({
     setChecking(true);
     try {
       const result = await verifyInBrowser(campaign.ledger);
+      await verifyPaymentReceipts(campaign.ledger, campaign.cryptoPayments);
       for (const anchor of campaign.anchors) {
         const prefix = await verifyInBrowser(campaign.ledger.slice(0, anchor.count));
         if (prefix.root !== anchor.root)
@@ -115,6 +123,7 @@ export default function CampaignPage({
       filter === 'all'
         ? [
             'donation',
+            'crypto_donation',
             'release',
             'expense_requested',
             'expense_rejected',
@@ -204,6 +213,29 @@ export default function CampaignPage({
               <strong>{money(campaign.balance)}</strong>
             </div>
           </div>
+          <div className="crypto-summary">
+            <strong>Contribuições confirmadas nas redes de teste</strong>
+            <p>
+              {cryptoTotal(campaign.cryptoTotals?.solana ?? '0', 9)} SOL · devnet
+              <br />
+              {cryptoTotal(campaign.cryptoTotals?.zcash ?? '0', 8)} ZEC · testnet
+            </p>
+            <small>
+              Moedas de teste enviadas diretamente às carteiras da campanha. Não alteram o orçamento
+              ou o saldo demonstrativo em reais.
+            </small>
+            {campaign.cryptoPayments?.map((payment) => (
+              <div className="crypto-receipt" key={payment.id}>
+                <strong>
+                  {payment.amount} {payment.asset} · confirmado
+                </strong>
+                <code className="payment-address">{payment.txid}</code>
+                {payment.explorerUrl && (
+                  <ExternalLink href={payment.explorerUrl}>Conferir na rede</ExternalLink>
+                )}
+              </div>
+            ))}
+          </div>
           <div className="detail-tabs" role="tablist" aria-label="Dados da campanha">
             {[
               ['timeline', 'Movimentações'],
@@ -245,6 +277,7 @@ export default function CampaignPage({
                   >
                     <option value="all">Todas as movimentações</option>
                     <option value="donation">Doações</option>
+                    <option value="crypto_donation">Cripto de teste confirmada</option>
                     <option value="release">Liberações</option>
                     <option value="expense_requested">Pedidos de liberação</option>
                   </select>
@@ -484,7 +517,7 @@ export default function CampaignPage({
             >
               <Heart size={18} /> Apoiar esta causa
             </Button>
-            <small>Doação simulada. Nenhuma cobrança.</small>
+            <small>Simulação em R$ ou contribuição em SOL/ZEC de teste.</small>
             <div className="sidebar-rule">
               <ShieldCheck size={22} />
               <div>
@@ -525,33 +558,40 @@ function TimelineItem({
 }) {
   const expense = campaign.expenses.find((item) => item.id === entry.referenceId);
   const incoming = entry.type === 'donation';
+  const cryptoPayment = campaign.cryptoPayments?.find(
+    (payment) => payment.id === entry.referenceId,
+  );
   const outgoing = entry.type === 'release';
   const donor = incoming
     ? campaign.donations?.find((donation) => donation.id === entry.referenceId)?.donor
     : undefined;
-  const title = incoming
-    ? donor && donor.type !== 'anonymous'
-      ? donor.name
-      : 'Uma nova doação chegou'
-    : (expense?.title ??
-      (entry.type === 'campaign_created'
-        ? 'A campanha começou'
-        : entry.type === 'campaign_frozen'
-          ? 'Campanha em análise'
-          : entry.type === 'campaign_active'
-            ? 'Campanha ativa'
-            : 'Atualização do histórico'));
-  const subtitle = incoming
-    ? donor && donor.type !== 'anonymous'
-      ? `${donor.type === 'company' ? 'Empresa' : 'Pessoa'} · nome fictício · demonstração`
-      : 'Apoio anônimo · demonstração'
-    : outgoing
-      ? `${expense?.supplier ?? 'Fornecedor demonstrativo'} · evidência nível ${entry.evidenceLevel}`
-      : entry.type === 'expense_requested'
-        ? 'Pedido enviado, aguardando análise'
-        : entry.type === 'expense_rejected'
-          ? 'Pedido de liberação recusado'
-          : 'Registro público da campanha';
+  const title = cryptoPayment
+    ? `Contribuição de ${cryptoPayment.amount} ${cryptoPayment.asset}`
+    : incoming
+      ? donor && donor.type !== 'anonymous'
+        ? donor.name
+        : 'Uma nova doação chegou'
+      : (expense?.title ??
+        (entry.type === 'campaign_created'
+          ? 'A campanha começou'
+          : entry.type === 'campaign_frozen'
+            ? 'Campanha em análise'
+            : entry.type === 'campaign_active'
+              ? 'Campanha ativa'
+              : 'Atualização do histórico'));
+  const subtitle = cryptoPayment
+    ? `Confirmada em ${cryptoPayment.chain} · moeda de teste`
+    : incoming
+      ? donor && donor.type !== 'anonymous'
+        ? `${donor.type === 'company' ? 'Empresa' : 'Pessoa'} · nome fictício · demonstração`
+        : 'Apoio anônimo · demonstração'
+      : outgoing
+        ? `${expense?.supplier ?? 'Fornecedor demonstrativo'} · evidência nível ${entry.evidenceLevel}`
+        : entry.type === 'expense_requested'
+          ? 'Pedido enviado, aguardando análise'
+          : entry.type === 'expense_rejected'
+            ? 'Pedido de liberação recusado'
+            : 'Registro público da campanha';
   return (
     <div className="timeline-item">
       <span className={`timeline-icon ${incoming ? 'incoming' : outgoing ? 'outgoing' : ''}`}>

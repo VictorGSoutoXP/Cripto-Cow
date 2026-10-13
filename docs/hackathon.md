@@ -47,7 +47,7 @@ No vídeo separado de apresentação, desenvolva o pitch com o problema, o usuá
 
 ## Preparação técnica
 
-A evolução de cadastro, perfil/carteiras e design desta branch ainda precisa ser publicada antes de ser incluída na gravação do site remoto. Para contas individuais, guarde o código privado fora da gravação e vincule a Phantom antes de preparar a ancoragem. A demonstração Zcash mostra uma assinatura verificada e um pedido de teste, sem afirmar pagamento ou doação protegida. Veja [retomada](retomada.md).
+Cadastro, perfil/carteiras e design foram publicados pelo PR #7. A evolução seguinte permite escolher simulação em R$, SOL/devnet ou ZEC/testnet em “Apoiar esta causa”. Para a gravação, mostre a carteira destinatária, o valor exato, a confirmação e o recibo; só apresente um pagamento como realizado quando houver confirmação consultada pela API. Os tokens vão diretamente à carteira, sem retenção para análise de despesas e sem conversão para reais. O fluxo Zcash usa destinatário transparente. Guarde o código privado fora da gravação e vincule a Phantom antes de configurar uma carteira de recebimento própria ou ancorar como organizador. Veja [contribuições cripto](doacoes-cripto.md) e [retomada](retomada.md).
 
 Estes itens são verificações do projeto para a apresentação, não uma declaração de inscrição concluída ou uma lista de exigências do evento.
 

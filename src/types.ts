@@ -27,6 +27,41 @@ export type LedgerEntry = {
   previousHash: string;
   hash: string;
 };
+export type CryptoPayment = {
+  id: string;
+  campaignId: string;
+  network: 'solana' | 'zcash';
+  chain: 'devnet' | 'testnet';
+  asset: 'SOL' | 'ZEC';
+  receiver: string;
+  amount: string;
+  units: string;
+  requestedAmount: string;
+  status: 'pending' | 'confirmed';
+  testnetOnly: true;
+  createdAt: string;
+  txid?: string;
+  confirmedAt?: string;
+  explorerUrl?: string;
+  uri?: string;
+  payer?: string;
+  memo?: string;
+  memoProgram?: string;
+  blockhash?: string;
+  lastValidBlockHeight?: number;
+  token?: string;
+  commitment?: Record<string, unknown>;
+};
+export type PaymentMethods = {
+  methods: {
+    network: 'solana' | 'zcash';
+    asset: string;
+    chain: string;
+    available: boolean;
+    receiver: string | null;
+    demoReceiver: boolean;
+  }[];
+};
 export type Expense = {
   id: string;
   campaignId: string;
@@ -86,6 +121,9 @@ export type Campaign = {
   donations?: PublicDonation[];
   integrity: { valid: boolean; count: number; root: string };
   anchors: Anchor[];
+  cryptoPayments?: CryptoPayment[];
+  cryptoTotals?: { solana: string; zcash: string };
+  cryptoReceivers?: { solana?: string; zcash?: string };
 };
 export type Report = {
   id: string;

@@ -65,3 +65,28 @@ export function verifyEntries(entries) {
   }
   return { valid: true, count: entries.length, root: previousHash };
 }
+
+export function verifyPaymentReceipts(entries, receipts = []) {
+  const events = entries.filter((entry) => entry.type === 'crypto_donation');
+  return (
+    events.length === receipts.length &&
+    events.every((entry) => {
+      const matches = receipts.filter((receipt) => receipt.id === entry.referenceId);
+      if (matches.length !== 1) return false;
+      const receipt = matches[0];
+      const proof = receipt.commitment;
+      if (!proof || digest(proof) !== entry.evidenceHash) return false;
+      for (const field of ['id', 'campaignId', 'network', 'receiver', 'units', 'txid'])
+        if (proof[field] !== receipt[field]) return false;
+      if (Object.keys(proof).some((field) => proof[field] !== receipt[field])) return false;
+      const precision = { solana: 9, zcash: 8 }[receipt.network];
+      if (!precision || !/^\d+$/.test(receipt.units)) return false;
+      const units = receipt.units.padStart(precision + 1, '0');
+      return (
+        receipt.amount === `${units.slice(0, -precision)}.${units.slice(-precision)}` &&
+        receipt.campaignId === entry.campaignId &&
+        receipt.status === 'confirmed'
+      );
+    })
+  );
+}
