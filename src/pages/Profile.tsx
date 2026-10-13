@@ -10,6 +10,13 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { linkSolanaWallet, solanaProvider } from '../lib/wallet';
+import {
+  phantomBrowseUrl,
+  phantomDownloadUrl,
+  zcashTestnetGuideUrl,
+  zcashSigningGuideUrl,
+  zcashSigningCommand,
+} from '../lib/wallet-links';
 import { Button } from '../components/ui';
 import { Contributions } from '../components/Contributions';
 import type { Overlay, ProfileWallet, WalletChallenge } from '../types';
@@ -306,10 +313,13 @@ function Wallets({
   const [password, setPassword] = useState('');
   const [amount, setAmount] = useState('0.001');
   const [uri, setUri] = useState('');
+  const [, checkProvider] = useState(0);
+  const provider = solanaProvider();
+  const canSignSolana = Boolean(provider?.signMessage);
+  const phantomMobileLink = phantomBrowseUrl(window.location.origin);
   const solana = wallets.find((wallet) => wallet.network === 'solana');
   const zcash = wallets.find((wallet) => wallet.network === 'zcash');
   useEffect(() => {
-    const provider = solanaProvider();
     const changed = (key?: { toString: () => string } | null) =>
       setConnected(key?.toString() ?? '');
     const disconnected = () => setConnected('');
@@ -319,7 +329,7 @@ function Wallets({
       provider?.removeListener?.('accountChanged', changed);
       provider?.removeListener?.('disconnect', disconnected);
     };
-  }, []);
+  }, [provider]);
   async function run(task: () => Promise<void>) {
     if (busy) return;
     setBusy(true);
@@ -373,19 +383,69 @@ function Wallets({
             A carteira conectada tem outro endereço. Vincule-a se quiser substituir o vínculo.
           </p>
         )}
-        <Button
-          className="button primary"
-          busy={busy}
-          onClick={() =>
-            run(async () => {
-              onChange(await linkSolanaWallet());
-              setConnected(solanaProvider()?.publicKey?.toString() ?? '');
-              setStatus('Carteira Solana vinculada ao perfil.');
-            })
-          }
-        >
-          {solana ? 'Conectar ou substituir Phantom' : 'Vincular Phantom'}
-        </Button>
+        {canSignSolana ? (
+          <Button
+            className="button primary"
+            busy={busy}
+            onClick={() =>
+              run(async () => {
+                onChange(await linkSolanaWallet());
+                setConnected(solanaProvider()?.publicKey?.toString() ?? '');
+                setStatus('Carteira Solana vinculada ao perfil.');
+              })
+            }
+          >
+            {solana ? 'Conectar ou substituir Phantom' : 'Vincular Phantom'}
+          </Button>
+        ) : (
+          <div className="wallet-next-step">
+            <p>
+              A Phantom não foi encontrada neste navegador. Instale a extensão para continuar aqui
+              ou abra o perfil no app da Phantom no celular.
+            </p>
+            <a
+              className="button primary"
+              href={phantomDownloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Instalar Phantom e continuar <ArrowUpRight size={15} />
+            </a>
+            {phantomMobileLink && (
+              <a
+                className="button outline"
+                href={phantomMobileLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Abrir perfil na Phantom (celular) <ArrowUpRight size={15} />
+              </a>
+            )}
+            {phantomMobileLink && (
+              <p>
+                No navegador da Phantom, entre novamente na sua conta e toque em Vincular Phantom. O
+                link abre o perfil; o vínculo só é concluído depois da sua assinatura.
+              </p>
+            )}
+            <button
+              className="text-link"
+              disabled={busy}
+              onClick={() => {
+                checkProvider((value) => value + 1);
+                const current = solanaProvider();
+                setConnected(current?.publicKey?.toString() ?? '');
+                setError('');
+                setStatus(
+                  current?.signMessage
+                    ? 'Phantom encontrada. Agora clique em Vincular Phantom.'
+                    : 'Phantom ainda não detectada. Após instalar e habilitar a extensão, recarregue esta página.',
+                );
+              }}
+            >
+              Já instalei — verificar Phantom
+            </button>
+          </div>
+        )}
         {connected && (
           <button
             className="text-link"
@@ -429,6 +489,20 @@ function Wallets({
           Vincule um endereço transparente de teste com uma assinatura de mensagem. Este fluxo não
           usa endereços protegidos.
         </p>
+        <div className="wallet-next-step">
+          <a
+            className="text-link"
+            href={zcashTestnetGuideUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Preparar carteira Zcash testnet <ArrowUpRight size={14} />
+          </a>
+          <p>
+            Use uma carteira com endereço tm... e assinatura de mensagens, como zcash-cli em
+            testnet. Preparar vínculo gera a mensagem que você assina na sua carteira.
+          </p>
+        </div>
         {zcash && (
           <>
             <div className="wallet-address">
@@ -490,6 +564,31 @@ function Wallets({
               });
             }}
           >
+            <div className="wallet-next-step" role="status">
+              <h4>Próximo passo: assinar na carteira Zcash</h4>
+              <ol>
+                <li>Copie a mensagem completa abaixo.</li>
+                <li>Assine com o endereço {challenge.address} na sua carteira de teste.</li>
+                <li>Cole a assinatura em Base64 e clique em Confirmar vínculo Zcash.</li>
+              </ol>
+              <p>
+                Válido até{' '}
+                {new Intl.DateTimeFormat('pt-BR', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  timeZone: 'America/Sao_Paulo',
+                }).format(new Date(challenge.expiresAt))}
+                . Se expirar, prepare um novo vínculo.
+              </p>
+              <a
+                className="text-link"
+                href={zcashSigningGuideUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Abrir instruções oficiais de assinatura <ArrowUpRight size={14} />
+              </a>
+            </div>
             <label>
               Mensagem para assinar
               <textarea value={challenge.message} readOnly rows={8} />
@@ -499,20 +598,22 @@ function Wallets({
               Copiar mensagem
             </button>
             <details>
-              <summary>Como assinar em uma carteira compatível</summary>
+              <summary>Comando para zcash-cli (Bash, Linux/macOS/WSL)</summary>
               <p>
-                Use a função de assinatura de mensagens para o endereço acima e cole a assinatura em
-                Base64. No zcash-cli em testnet, use signmessage com o endereço e esta mensagem
-                completa. Nunca cole uma chave privada no site.
+                Com o nó e a carteira configurados em testnet, execute o comando no terminal Bash.
+                Ele assina a mensagem com a chave que já está na sua carteira. Copie o resultado em
+                Base64 para o campo abaixo. Nunca cole uma chave privada no site.
               </p>
-              <a
+              <pre className="wallet-signing-command">
+                <code>{zcashSigningCommand(challenge.address, challenge.message)}</code>
+              </pre>
+              <button
+                type="button"
                 className="text-link"
-                href="https://zcash.github.io/rpc/signmessage.html"
-                target="_blank"
-                rel="noreferrer"
+                onClick={() => copy(zcashSigningCommand(challenge.address, challenge.message))}
               >
-                Instruções de assinatura <ArrowUpRight size={14} />
-              </a>
+                <Copy size={15} /> Copiar comando de assinatura
+              </button>
             </details>
             <label>
               Assinatura em Base64

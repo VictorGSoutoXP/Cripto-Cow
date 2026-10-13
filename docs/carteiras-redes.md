@@ -15,6 +15,8 @@ Preparar outro desafio para a mesma rede substitui o anterior. Vincular outro en
 
 ## Solana
 
+Quando a assinatura de mensagens não está disponível, o perfil oferece **Instalar Phantom e continuar**, usando [o download oficial](https://phantom.com/download), e **Já instalei — verificar Phantom** para conferir novamente. No site HTTPS publicado, também aparece **Abrir perfil na Phantom (celular)**, seguindo [o deeplink Browse oficial](https://docs.phantom.com/phantom-deeplinks/other-methods/browse). O link leva ao perfil dentro do app; o participante precisa entrar na conta nesse navegador e tocar em **Vincular Phantom**. Abrir a página não conclui a prova de posse. O deeplink contém somente a origem pública e a rota do perfil, sem sessão, senha, assinatura ou desafio. Atalhos para localhost não são oferecidos.
+
 O navegador usa `signMessage` na Phantom e o servidor verifica Ed25519. Essa assinatura não cobra taxa. A preparação de uma ancoragem por um organizador exige que a carteira assinante esteja vinculada ao seu perfil. A moderação mantém o acesso de ancoragem anterior para campanhas demonstrativas existentes.
 
 A transação de ancoragem contém somente o Memo do histórico: identificador da campanha, quantidade de eventos e hash. O RPC é validado como devnet. A taxa utiliza SOL de teste. Pedidos pendentes conservam a assinatura para retomada; somente transações confirmadas e verificadas aparecem no histórico público. Alterar ou remover o vínculo não apaga uma transação já publicada.
@@ -22,6 +24,10 @@ A transação de ancoragem contém somente o Memo do histórico: identificador d
 Referências oficiais: [Phantom: assinatura de mensagem](https://docs.phantom.com/solana/signing-a-message), [Solana: mensagens e autenticação](https://solana.com/docs/frontend/messages-and-auth).
 
 ## Zcash
+
+**Preparar carteira Zcash testnet** abre [o guia oficial da rede de teste](https://zcash.readthedocs.io/en/latest/rtd_pages/testnet_guide.html) antes de gerar o desafio. Depois de **Preparar vínculo**, a tela mostra imediatamente a próxima etapa, endereço, validade e link para [as instruções oficiais de assinatura](https://zcash.github.io/rpc/signmessage.html). A mensagem é assinada na carteira; a assinatura Base64 volta ao campo do site para confirmação. Esse fluxo exige uma carteira com endereço transparente testnet e assinatura de mensagens; abrir o guia ou um pedido ZIP 321 não comprova posse do endereço.
+
+Um comando copiável para `zcash-cli -testnet signmessage` fica disponível em detalhes, identificado para Bash (Linux/macOS/WSL). Os argumentos ficam entre aspas simples com escape de apóstrofos para preservar exatamente a mensagem multilinha e evitar interpolação. O site não executa o comando nem solicita chaves. É necessário ter o nó/carteira em testnet prontos e possuir a chave do endereço informado. `tests/wallet-links.test.js` verifica URLs sem credenciais, recusa de origens locais e preservação literal do comando.
 
 O vínculo usa **endereços P2PKH transparentes da testnet iniciados por `tm`**, com validação Base58Check. A aplicação verifica localmente assinaturas compactas secp256k1 compatíveis com `zcash-cli -testnet signmessage`. A carteira deve oferecer essa função; não há uma conexão automática com a Phantom para Zcash.
 
