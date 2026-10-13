@@ -1,5 +1,7 @@
 # Cadastro, login e acesso
 
+**Entrada do painel:** o botão **Meu perfil**, o login/cadastro individual e o endereço `#/painel` abrem primeiro **Perfil e carteiras**, incluindo contribuições e vínculos. Essa é a primeira opção da navegação. **Minhas campanhas** fica em `#/painel/campanhas`; criar uma campanha leva à lista para revisar e publicar o rascunho. A moderação continua abrindo seu painel de campanhas e revisões.
+
 ## Minhas contribuições
 
 O perfil mostra os totais históricos e recibos das contribuições realizadas com a conta autenticada. Reais fictícios, SOL/ZEC virtuais e SOL/ZEC confirmados nas redes de teste aparecem separados, sem conversão ou soma entre moedas. Adicionar saldo e converter não são doações. Pedidos de cripto pendentes aparecem no histórico, mas só entram nos totais após confirmação. Os totais são brutos históricos, não o saldo disponível das campanhas nem o valor líquido após suas movimentações.

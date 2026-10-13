@@ -80,6 +80,7 @@ export default function AccountAccess({
       });
       setPassword('');
       setConfirmation('');
+      window.location.hash = mode === 'admin' ? '/painel' : '/perfil';
       onSignedIn(result.recoveryCode);
     } catch (err) {
       if (err instanceof ApiError && err.code === 'TERMS_CHANGED') {
