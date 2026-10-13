@@ -62,6 +62,40 @@ export type PaymentMethods = {
     demoReceiver: boolean;
   }[];
 };
+export type DemoWallet = {
+  brlCents: number;
+  units: { solana: string; zcash: string };
+  balances: { solana: string; zcash: string };
+  simulated: true;
+};
+export type DemoQuote = {
+  id: string;
+  retrievedAt: string;
+  rates: Record<
+    'solana' | 'zcash',
+    {
+      network: 'solana' | 'zcash';
+      asset: string;
+      rateCents: number;
+      source: string;
+      basis: 'market-reference' | 'fictional';
+      quotedAt: string | null;
+    }
+  >;
+};
+export type DemoCryptoDonation = {
+  id: string;
+  campaignId: string;
+  network: 'solana' | 'zcash';
+  asset: string;
+  units: string;
+  amount: string;
+  status: 'simulated';
+  simulated: true;
+  ledgerId: string;
+  createdAt: string;
+  commitment: { id: string; campaignId: string; network: string; units: string; simulated: true };
+};
 export type Expense = {
   id: string;
   campaignId: string;
@@ -124,6 +158,8 @@ export type Campaign = {
   cryptoPayments?: CryptoPayment[];
   cryptoTotals?: { solana: string; zcash: string };
   cryptoReceivers?: { solana?: string; zcash?: string };
+  simulatedCryptoDonations?: DemoCryptoDonation[];
+  simulatedCryptoTotals?: { solana: string; zcash: string };
 };
 export type Report = {
   id: string;

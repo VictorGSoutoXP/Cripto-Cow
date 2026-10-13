@@ -25,16 +25,18 @@ export function CryptoDonation({
   onBack,
   onClose,
   onSaved,
+  initialAmount,
 }: {
   campaign: Campaign;
   network: 'solana' | 'zcash';
   onBack: () => void;
   onClose: () => void;
   onSaved: () => void;
+  initialAmount?: string;
 }) {
   const [methods, setMethods] = useState<PaymentMethods | null>(null);
   const [intent, setIntent] = useState<CryptoPayment | null>(() => pending(campaign.id));
-  const [amount, setAmount] = useState(network === 'solana' ? '0.01' : '0.001');
+  const [amount, setAmount] = useState(initialAmount ?? (network === 'solana' ? '0.01' : '0.001'));
   const [accepted, setAccepted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');

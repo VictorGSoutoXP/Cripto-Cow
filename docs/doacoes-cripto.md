@@ -1,5 +1,7 @@
 # Contribuições SOL e ZEC em redes de teste
 
+O [simulador de saldo virtual](saldo-virtual.md) permite experimentar reais fictícios → SOL/ZEC fictícios → doação sem instalar carteira. Ele não gera moedas de teste. Para enviar tokens pela blockchain, use o fluxo abaixo com uma carteira externa financiada com moedas de teste.
+
 Em **Apoiar esta causa**, o participante escolhe simular em R$, enviar SOL na Solana devnet ou enviar ZEC em endereço transparente da Zcash testnet. A confirmação consultada pela API gera um recibo e um evento `crypto_donation` no histórico verificável. O site nunca envia moedas de mainnet.
 
 ## Destinatários

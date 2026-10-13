@@ -5,9 +5,9 @@
     "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
-    "version": "mvp-1.5",
+    "version": "mvp-1.6",
     "documents": ["uso-demonstrativo", "privacidade", "transparencia"],
-    "donorText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Usarei dados fictícios. Entendo que a simulação em reais e as regras de liberação/sobra são demonstrativas. SOL de devnet e ZEC de testnet vão diretamente ao destinatário indicado, sem valor real, custódia ou devolução automática. Nome fictício escolhido, endereços e transações aplicáveis ficam públicos. Não há retorno financeiro.",
+    "donorText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Usarei dados fictícios. Entendo que a simulação em reais e as regras de liberação/sobra são demonstrativas. SOL de devnet e ZEC de testnet vão diretamente ao destinatário indicado, sem valor real, custódia ou devolução automática. Nome fictício escolhido, endereços e transações aplicáveis ficam públicos. Não há retorno financeiro. O simulador permite adicionar reais fictícios, calcular SOL/ZEC fictícios e doar esse saldo sem criar moedas ou transações na blockchain.",
     "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro.",
     "accountText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Entendo que meu e-mail, nome de exibição e dados de autenticação serão usados para manter minha conta e meu painel. Usarei dados fictícios nas campanhas e evidências. As doações e liberações são simuladas."
   },
@@ -17,7 +17,7 @@
       "title": "Termos de uso do MVP",
       "summary": "Regras válidas para participar da demonstração da Cripto Cow.",
       "status": "current",
-      "version": "mvp-1.5",
+      "version": "mvp-1.6",
       "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow é um protótipo de doações transparentes criado para o hackathon. Campanhas, valores, comprovantes e decisões da demonstração devem usar dados fictícios. Uma doação no site é uma simulação e não movimenta dinheiro.",
@@ -93,6 +93,17 @@
             "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
             "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
           ]
+        },
+        {
+          "id": "saldo-virtual",
+          "title": "Saldo virtual e conversão demonstrativa",
+          "paragraphs": [
+            "O simulador permite adicionar reais fictícios sem cobrança, depósito, Pix, cartão ou transferência. A conversão gera somente unidades virtuais de SOL/ZEC no banco da demonstração; não compra ativos nem cria moedas de teste na blockchain.",
+            "O cálculo usa uma referência em reais dos ativos reais fornecida pela CoinGecko, com fonte e horário visíveis. Essa referência não atribui valor econômico a SOL de devnet ou ZEC de testnet. Quando a consulta falhar ou estiver desatualizada, o simulador identifica claramente uma taxa didática fictícia em vez de apresentá-la como preço de mercado. Nenhum câmbio ou preço de execução é garantido.",
+            "O saldo virtual pertence à sessão deste navegador, separado do cadastro e das carteiras externas. Um cookie HttpOnly com validade de oito horas permite acessar o saldo; o banco guarda somente seu hash. Ao apagar cookies ou perder a sessão, o saldo pode deixar de estar acessível. Valores fictícios não são resgatáveis, transferíveis entre pessoas ou conversíveis em dinheiro.",
+            "As operações de crédito e conversão ficam restritas à sessão de demonstração. Ao doar saldo virtual, moeda, quantidade fictícia, data e identificador do recibo ficam públicos no histórico da campanha, claramente identificados como simulação. Isso não aumenta o saldo em reais ou as contribuições confirmadas nas redes de teste.",
+            "Para enviar SOL de devnet ou ZEC de testnet pela blockchain, o participante precisa dessas moedas em sua carteira externa e autoriza o pagamento no fluxo próprio. O saldo fictício não financia taxas ou transferências. Uma simulação não recebe TXID nem status de transação confirmada."
+          ]
         }
       ]
     },
@@ -101,7 +112,7 @@
       "title": "Política de Privacidade do MVP",
       "summary": "Quais informações o protótipo utiliza, publica e mantém restritas.",
       "status": "current",
-      "version": "mvp-1.5",
+      "version": "mvp-1.6",
       "updatedAt": "2026-10-13",
       "intro": [
         "Esta política descreve o funcionamento atual da Cripto Cow. O cadastro utiliza e-mail, nome de exibição e senha para autenticar uma conta individual. Campanhas, doações, evidências e justificativas continuam demonstrativas e devem receber somente dados fictícios. Não há KYC, biometria ou envio de documentos originais.",
@@ -174,6 +185,17 @@
             "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
             "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
           ]
+        },
+        {
+          "id": "saldo-virtual",
+          "title": "Saldo virtual e conversão demonstrativa",
+          "paragraphs": [
+            "O simulador permite adicionar reais fictícios sem cobrança, depósito, Pix, cartão ou transferência. A conversão gera somente unidades virtuais de SOL/ZEC no banco da demonstração; não compra ativos nem cria moedas de teste na blockchain.",
+            "O cálculo usa uma referência em reais dos ativos reais fornecida pela CoinGecko, com fonte e horário visíveis. Essa referência não atribui valor econômico a SOL de devnet ou ZEC de testnet. Quando a consulta falhar ou estiver desatualizada, o simulador identifica claramente uma taxa didática fictícia em vez de apresentá-la como preço de mercado. Nenhum câmbio ou preço de execução é garantido.",
+            "O saldo virtual pertence à sessão deste navegador, separado do cadastro e das carteiras externas. Um cookie HttpOnly com validade de oito horas permite acessar o saldo; o banco guarda somente seu hash. Ao apagar cookies ou perder a sessão, o saldo pode deixar de estar acessível. Valores fictícios não são resgatáveis, transferíveis entre pessoas ou conversíveis em dinheiro.",
+            "As operações de crédito e conversão ficam restritas à sessão de demonstração. Ao doar saldo virtual, moeda, quantidade fictícia, data e identificador do recibo ficam públicos no histórico da campanha, claramente identificados como simulação. Isso não aumenta o saldo em reais ou as contribuições confirmadas nas redes de teste.",
+            "Para enviar SOL de devnet ou ZEC de testnet pela blockchain, o participante precisa dessas moedas em sua carteira externa e autoriza o pagamento no fluxo próprio. O saldo fictício não financia taxas ou transferências. Uma simulação não recebe TXID nem status de transação confirmada."
+          ]
         }
       ]
     },
@@ -182,7 +204,7 @@
       "title": "Política de Transparência do MVP",
       "summary": "Como consultar o histórico, entender evidências e acompanhar decisões simuladas.",
       "status": "current",
-      "version": "mvp-1.5",
+      "version": "mvp-1.6",
       "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow demonstra prestação de contas por campanha: entradas, saídas, orçamento, evidências e decisões ficam disponíveis para consulta pública, com os limites descritos nesta política.",
@@ -245,6 +267,17 @@
             "A API consulta um RPC Solana ou um servidor lightwalletd Zcash com TLS e confere a rede de teste, o destinatário, o valor e a confirmação. Essas consultas dependem da disponibilidade e da informação fornecida por terceiros. A confirmação em um bloco não elimina o risco de reorganização da rede. O site não é um nó completo independente.",
             "Os recibos confirmados publicam endereço destinatário, valor na moeda, identificador da transação, rede e referência no histórico. Pagamentos Solana também revelam o endereço doador. O fluxo Zcash usa endereços transparentes e não oferece sigilo de transações ou identificação comprovada do doador. Um pedido ZIP 321 sem transação confirmada não é uma contribuição recebida.",
             "Cada pedido conserva seu destinatário original mesmo que a campanha altere suas carteiras. O recibo pendente e seu código de acesso ficam no armazenamento da sessão deste navegador. Não publique o código de acesso. Conserve o TXID e confira a confirmação antes de enviar outro pagamento."
+          ]
+        },
+        {
+          "id": "saldo-virtual",
+          "title": "Saldo virtual e conversão demonstrativa",
+          "paragraphs": [
+            "O simulador permite adicionar reais fictícios sem cobrança, depósito, Pix, cartão ou transferência. A conversão gera somente unidades virtuais de SOL/ZEC no banco da demonstração; não compra ativos nem cria moedas de teste na blockchain.",
+            "O cálculo usa uma referência em reais dos ativos reais fornecida pela CoinGecko, com fonte e horário visíveis. Essa referência não atribui valor econômico a SOL de devnet ou ZEC de testnet. Quando a consulta falhar ou estiver desatualizada, o simulador identifica claramente uma taxa didática fictícia em vez de apresentá-la como preço de mercado. Nenhum câmbio ou preço de execução é garantido.",
+            "O saldo virtual pertence à sessão deste navegador, separado do cadastro e das carteiras externas. Um cookie HttpOnly com validade de oito horas permite acessar o saldo; o banco guarda somente seu hash. Ao apagar cookies ou perder a sessão, o saldo pode deixar de estar acessível. Valores fictícios não são resgatáveis, transferíveis entre pessoas ou conversíveis em dinheiro.",
+            "As operações de crédito e conversão ficam restritas à sessão de demonstração. Ao doar saldo virtual, moeda, quantidade fictícia, data e identificador do recibo ficam públicos no histórico da campanha, claramente identificados como simulação. Isso não aumenta o saldo em reais ou as contribuições confirmadas nas redes de teste.",
+            "Para enviar SOL de devnet ou ZEC de testnet pela blockchain, o participante precisa dessas moedas em sua carteira externa e autoriza o pagamento no fluxo próprio. O saldo fictício não financia taxas ou transferências. Uma simulação não recebe TXID nem status de transação confirmada."
           ]
         }
       ]

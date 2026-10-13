@@ -24,6 +24,9 @@ const schema = [
   'CREATE TABLE IF NOT EXISTS crypto_payments (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), request_key TEXT NOT NULL UNIQUE, network TEXT NOT NULL, receiver TEXT NOT NULL, units TEXT NOT NULL, txid TEXT, payload TEXT NOT NULL, UNIQUE(network, txid))',
   "CREATE UNIQUE INDEX IF NOT EXISTS crypto_zcash_amount ON crypto_payments(network, receiver, units) WHERE network = 'zcash'",
   'CREATE INDEX IF NOT EXISTS crypto_payments_campaign ON crypto_payments(campaign_id)',
+  'CREATE TABLE IF NOT EXISTS demo_wallets (key_hash TEXT PRIMARY KEY, payload TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS demo_operations (request_key TEXT PRIMARY KEY, wallet_hash TEXT NOT NULL REFERENCES demo_wallets(key_hash), kind TEXT NOT NULL, fingerprint TEXT NOT NULL, payload TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS demo_crypto_donations (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), payload TEXT NOT NULL)',
   "CREATE TRIGGER IF NOT EXISTS ledger_no_update BEFORE UPDATE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
   "CREATE TRIGGER IF NOT EXISTS ledger_no_delete BEFORE DELETE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
 ];
@@ -202,7 +205,7 @@ export class Store {
   }
 
   async campaign(id) {
-    const [records, history, requests, anchors, donations] = await this.batch(
+    const [records, history, requests, anchors, donations, payments, simulated] = await this.batch(
       [
         { sql: 'SELECT payload FROM campaigns WHERE id = ?', args: [id] },
         {
@@ -212,6 +215,8 @@ export class Store {
         { sql: 'SELECT payload FROM expenses WHERE campaign_id = ?', args: [id] },
         { sql: 'SELECT payload FROM anchors WHERE campaign_id = ?', args: [id] },
         { sql: 'SELECT payload FROM donations WHERE campaign_id = ?', args: [id] },
+        { sql: 'SELECT payload FROM crypto_payments WHERE campaign_id = ?', args: [id] },
+        { sql: 'SELECT payload FROM demo_crypto_donations WHERE campaign_id = ?', args: [id] },
       ],
       'read',
     );
@@ -226,10 +231,6 @@ export class Store {
     const pending = expenses
       .filter((expense) => expense.status === 'pending')
       .reduce((sum, expense) => sum + expense.amount, 0);
-    const payments = await this.execute({
-      sql: 'SELECT payload FROM crypto_payments WHERE campaign_id = ?',
-      args: [id],
-    });
     const cryptoPayments = payments.rows
       .map((row) => JSON.parse(row.payload))
       .filter((payment) => payment.status === 'confirmed')
@@ -243,6 +244,19 @@ export class Store {
           .toString(),
       ]),
     );
+    const simulatedCryptoDonations = simulated.rows.map((row) => {
+      const { acceptance, ...donation } = JSON.parse(row.payload);
+      return donation;
+    });
+    const simulatedCryptoTotals = Object.fromEntries(
+      ['solana', 'zcash'].map((network) => [
+        network,
+        simulatedCryptoDonations
+          .filter((item) => item.network === network)
+          .reduce((sum, item) => sum + BigInt(item.units), 0n)
+          .toString(),
+      ]),
+    );
     return {
       ...campaign,
       raised,
@@ -252,6 +266,8 @@ export class Store {
       donors: incoming.length,
       cryptoPayments,
       cryptoTotals,
+      simulatedCryptoDonations,
+      simulatedCryptoTotals,
       budget: campaign.budget.map((category) => ({
         ...category,
         spent: outgoing

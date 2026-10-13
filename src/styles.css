@@ -4,6 +4,36 @@
   display: grid;
   gap: 8px;
 }
+.demo-wallet-balances {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: #f0f5fb;
+  border: 1px solid #dce4ed;
+  border-radius: 5px;
+}
+.demo-wallet-balances span {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.demo-wallet-balances strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  color: #0b4a87;
+}
+.demo-exchange > form,
+.demo-exchange > .form-stack {
+  border-top: 1px solid #dce4ed;
+  padding-top: 16px;
+}
+@media (max-width: 600px) {
+  .demo-wallet-balances {
+    grid-template-columns: 1fr;
+  }
+}
 .payment-address {
   display: block;
   overflow-wrap: anywhere;

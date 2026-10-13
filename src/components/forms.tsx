@@ -15,6 +15,7 @@ import type { LegalRole } from '../lib/legal';
 import { Modal, Button } from './ui';
 import type { Campaign, Donor, Expense } from '../types';
 import { CryptoDonation } from './CryptoDonation';
+import { DemoExchange } from './DemoExchange';
 
 export function LegalAcceptance({
   legal,
@@ -101,7 +102,12 @@ export function DonationForm({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [method, setMethod] = useState<'simulation' | 'solana' | 'zcash'>('simulation');
+  const [method, setMethod] = useState<'conversion' | 'simulation' | 'solana' | 'zcash'>(
+    'conversion',
+  );
+  const [transfer, setTransfer] = useState<
+    { network: 'solana' | 'zcash'; amount: string } | undefined
+  >();
   const [amount, setAmount] = useState('50');
   const [donorType, setDonorType] = useState<Donor['type']>('anonymous');
   const [donorName, setDonorName] = useState('');
@@ -161,6 +167,19 @@ export function DonationForm({
     }
   }
 
+  if (method === 'conversion')
+    return (
+      <DemoExchange
+        campaign={campaign}
+        onClose={onClose}
+        onBack={() => setMethod('simulation')}
+        onSaved={onSaved}
+        onTransfer={(network, amount) => {
+          setTransfer({ network, amount });
+          setMethod(network);
+        }}
+      />
+    );
   if (method !== 'simulation')
     return (
       <CryptoDonation
@@ -169,6 +188,7 @@ export function DonationForm({
         onBack={() => setMethod('simulation')}
         onClose={onClose}
         onSaved={onSaved}
+        initialAmount={transfer?.network === method ? transfer.amount : undefined}
       />
     );
   return (
@@ -205,6 +225,13 @@ export function DonationForm({
           <fieldset className="donor-identity">
             <legend>Como você quer contribuir?</legend>
             <div className="payment-methods">
+              <Button
+                type="button"
+                className="button outline"
+                onClick={() => setMethod('conversion')}
+              >
+                Adicionar R$ fictícios e converter para SOL/ZEC
+              </Button>
               <Button
                 type="button"
                 className="button outline selected"

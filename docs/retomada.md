@@ -1,5 +1,7 @@
 # Retomada do projeto
 
+**Simulador de 13/10/2026:** adicionar reais fictícios, calcular SOL/ZEC com referência identificada e doar saldo virtual sem carteira. Os recibos ficam separados dos pagamentos confirmados e do saldo em reais. Leia [saldo virtual](saldo-virtual.md). Cadastro e contribuições de teste foram publicados nos PRs #7 e #8.
+
 **Atualização de 13/10/2026:** cadastro, login e design foram mesclados e publicados pelo PR #7. A evolução seguinte acrescenta escolha SOL/devnet e ZEC/testnet, destinatários por campanha, confirmação pela API e recibos cripto em totais separados. Leia [contribuições cripto](doacoes-cripto.md) para configuração, verificações realizadas e a transferência de teste ainda necessária para o vídeo. Os itens anteriores abaixo preservam o registro da entrega inicial.
 
 Registro de 12/10/2026. O usuário autorizou a continuidade sem novas perguntas; as decisões abaixo foram adotadas para concluir a implementação do MVP.
