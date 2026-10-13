@@ -1,5 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;450;500;550;600;650;700&family=Manrope:wght@400;500;600;650;700;750;800&display=swap');
 
+.payment-methods {
+  display: grid;
+  gap: 8px;
+}
+.payment-address {
+  display: block;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.crypto-summary,
+.campaign-receivers {
+  padding: 20px;
+  border: 1px solid #dce4ed;
+  background: #f0f5fb;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+.crypto-summary p {
+  margin: 8px 0;
+  font-weight: 700;
+  color: #0b4a87;
+}
+.crypto-receipt {
+  border-top: 1px solid #dce4ed;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
 :root {
   font-family: 'DM Sans', sans-serif;
   color: #162e46;

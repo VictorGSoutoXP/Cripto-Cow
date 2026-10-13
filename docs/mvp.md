@@ -43,7 +43,7 @@ O cadastro registra e-mail, nome de exibição, hash scrypt da senha e aceite da
 - Infraestrutura: uma instância de API com SQLite local ou libSQL remoto no Turso. A hospedagem no Render exige banco remoto e senha administrativa. Sessões individuais ficam no banco e expiram após oito horas; sessões da moderação ficam em memória e também terminam ao reiniciar.
 - Campanhas: a meta não encerra automaticamente a arrecadação. O prazo bloqueia novas doações. Encerramento com saldo ou pedidos pendentes é recusado, pois a devolução ainda não está integrada.
 - Solana: ancoragem de hashes por Memo na devnet, sem contrato de custódia ou movimentação de tokens. O administrador paga somente a taxa da rede em SOL de teste.
-- Carteiras: uma por rede no perfil, com prova de posse por assinatura e desafio de cinco minutos. Zcash suporta somente endereços transparentes testnet e pedidos ZIP 321, sem crédito no ledger ou verificação de pagamento. Detalhes em [carteiras e redes](carteiras-redes.md).
+- Carteiras: uma por rede no perfil, com prova de posse por assinatura e desafio de cinco minutos. Campanhas podem receber SOL/devnet e ZEC/testnet transparente, com conferência de transação e recibo no ledger. São totais separados, sem crédito no saldo BRL ou retenção condicionada. O pedido genérico do perfil continua sem conciliação. Detalhes em [carteiras e redes](carteiras-redes.md) e [contribuições cripto](doacoes-cripto.md).
 
 ## Antes de operar com recursos reais
 

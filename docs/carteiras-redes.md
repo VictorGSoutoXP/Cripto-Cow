@@ -1,5 +1,7 @@
 # Carteiras e redes de teste
 
+**Atualização de 13/10/2026:** além dos vínculos descritos abaixo, campanhas podem receber contribuições de teste em SOL e ZEC com confirmação pela API e totais separados. O pedido genérico gerado no perfil continua sem conciliação; o pedido criado em uma campanha usa o fluxo de [contribuições cripto](doacoes-cripto.md). As limitações de pagamento dos parágrafos seguintes referem-se ao pedido genérico do perfil.
+
 O perfil aceita **uma carteira Solana** e **um endereço transparente Zcash testnet**. São carteiras externas: o participante guarda suas chaves e o servidor recebe somente endereço e assinatura de mensagem. A aplicação não cria uma carteira custodial.
 
 ## Prova de posse

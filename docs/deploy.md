@@ -51,6 +51,8 @@ O SQLite em `data/` continua disponível para desenvolvimento local. No Render, 
 
 As tabelas de contas, sessões, recuperação e vínculos de carteiras são criadas automaticamente ao iniciar a versão atual. Não é necessária uma nova variável de ambiente para os vínculos Solana/Zcash: a prova Zcash é verificada localmente e o RPC Solana continua em `SOLANA_RPC_URL`. As chaves privadas dos participantes não ficam no Render ou no Turso. Antes de publicar, confira o registro de [retomada](retomada.md) e preserve as credenciais existentes.
 
+As contribuições cripto usam a nova tabela aditiva `crypto_payments`. A confirmação Zcash consulta `ZCASH_LIGHTWALLETD`, com padrão TLS `testnet.zec.rocks:443`; não é necessário inserir uma credencial. A API exige a identificação de testnet. `npm run verify:payment-networks` confere conectividade e uma transação existente sem movimentar moedas. [Detalhes e limites](doacoes-cripto.md).
+
 - Envie alterações por pull request para `main`. O CI verifica build e testes; o Render acompanha essa branch e publica quando as verificações passam.
 - A senha do painel e as credenciais do banco ficam em **Environment** no Render. Atualize o token nesse painel caso ele seja revogado ou substituído no Turso.
 - `SEED_DEMO=true` preenche somente um banco vazio. Reinícios e novas publicações preservam o histórico existente.

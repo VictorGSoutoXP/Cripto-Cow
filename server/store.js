@@ -21,6 +21,9 @@ const schema = [
   'CREATE TABLE IF NOT EXISTS reports (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), payload TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS donations (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), request_key TEXT UNIQUE NOT NULL, payload TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS anchors (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), payload TEXT NOT NULL)',
+  'CREATE TABLE IF NOT EXISTS crypto_payments (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), request_key TEXT NOT NULL UNIQUE, network TEXT NOT NULL, receiver TEXT NOT NULL, units TEXT NOT NULL, txid TEXT, payload TEXT NOT NULL, UNIQUE(network, txid))',
+  "CREATE UNIQUE INDEX IF NOT EXISTS crypto_zcash_amount ON crypto_payments(network, receiver, units) WHERE network = 'zcash'",
+  'CREATE INDEX IF NOT EXISTS crypto_payments_campaign ON crypto_payments(campaign_id)',
   "CREATE TRIGGER IF NOT EXISTS ledger_no_update BEFORE UPDATE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
   "CREATE TRIGGER IF NOT EXISTS ledger_no_delete BEFORE DELETE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
 ];
@@ -223,6 +226,23 @@ export class Store {
     const pending = expenses
       .filter((expense) => expense.status === 'pending')
       .reduce((sum, expense) => sum + expense.amount, 0);
+    const payments = await this.execute({
+      sql: 'SELECT payload FROM crypto_payments WHERE campaign_id = ?',
+      args: [id],
+    });
+    const cryptoPayments = payments.rows
+      .map((row) => JSON.parse(row.payload))
+      .filter((payment) => payment.status === 'confirmed')
+      .map(({ tokenHash, requestKey, acceptance, ...payment }) => payment);
+    const cryptoTotals = Object.fromEntries(
+      ['solana', 'zcash'].map((network) => [
+        network,
+        cryptoPayments
+          .filter((payment) => payment.network === network)
+          .reduce((sum, payment) => sum + BigInt(payment.units), 0n)
+          .toString(),
+      ]),
+    );
     return {
       ...campaign,
       raised,
@@ -230,6 +250,8 @@ export class Store {
       balance: raised - released,
       pending,
       donors: incoming.length,
+      cryptoPayments,
+      cryptoTotals,
       budget: campaign.budget.map((category) => ({
         ...category,
         spent: outgoing

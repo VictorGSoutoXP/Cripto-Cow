@@ -13,10 +13,13 @@
     "test": "node --test tests/*.test.js",
     "check": "npm run build && npm test",
     "verify:devnet": "node --env-file-if-exists=.env scripts/verify-devnet-anchor.js",
+    "verify:payment-networks": "node --env-file-if-exists=.env scripts/verify-payment-networks.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.14.6",
+    "@grpc/proto-loader": "^0.8.1",
     "@libsql/client": "^0.18.0",
     "@noble/curves": "1.9.7",
     "@radix-ui/react-dialog": "^1.1.15",

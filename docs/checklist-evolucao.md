@@ -68,11 +68,12 @@ Solana e Zcash são integrações independentes. Não foram acrescentados ponte,
 ## 5. Conferência e documentação
 
 - [x] README e documentos de acesso, design, carteiras e hospedagem atualizados.
-- [x] Políticas atuais em `mvp-1.4`, preservando aceites históricos.
+- [x] Políticas atuais em `mvp-1.5`, preservando aceites históricos.
 - [x] Documentar hipóteses adotadas e os limites do MVP.
 - [x] Testes de cadastro, recuperação, permissões, carteira, ledger e libSQL.
 - [x] Build, formatação e auditoria de dependências.
 - [x] Cadastro e geração de pedido Zcash conferidos no navegador com dados locais fictícios.
-- [ ] Revisão e publicação do conjunto no ambiente remoto.
+- [x] Cadastro, login, carteiras e novo lobby publicados pelo PR #7.
+- [x] Evolução do fluxo de contribuições de teste SOL/ZEC com conferência pela API; veja [contribuições cripto](doacoes-cripto.md) para limites e demonstração ainda necessária.
 
 Os pontos restantes estão concentrados em [retomada](retomada.md); não são apresentados como funcionalidades prontas ou provas já obtidas.

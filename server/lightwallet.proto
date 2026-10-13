@@ -1,0 +1,24 @@
+// Minimal wire-compatible subset of zcash/lightwallet-protocol (MIT).
+// https://github.com/zcash/lightwallet-protocol/blob/main/walletrpc/service.proto
+syntax = "proto3";
+package cash.z.wallet.sdk.rpc;
+message Empty {}
+message BlockID { uint64 height = 1; bytes hash = 2; }
+message TxFilter { BlockID block = 1; uint64 index = 2; bytes hash = 3; }
+message RawTransaction { bytes data = 1; uint64 height = 2; }
+message LightdInfo {
+  string version = 1; string vendor = 2; bool taddrSupport = 3;
+  string chainName = 4; uint64 saplingActivationHeight = 5;
+  string consensusBranchId = 6; uint64 blockHeight = 7;
+}
+message TreeState {
+  string network = 1; uint64 height = 2; string hash = 3; uint32 time = 4;
+}
+message CompactTx { uint64 index = 1; bytes txid = 2; }
+message CompactBlock { uint64 height = 2; bytes hash = 3; repeated CompactTx vtx = 7; }
+service CompactTxStreamer {
+  rpc GetLightdInfo(Empty) returns (LightdInfo);
+  rpc GetTransaction(TxFilter) returns (RawTransaction);
+  rpc GetTreeState(BlockID) returns (TreeState);
+  rpc GetBlock(BlockID) returns (CompactBlock);
+}

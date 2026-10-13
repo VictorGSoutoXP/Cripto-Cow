@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { verifyEntries } from '../server/ledger.js';
+import { verifyEntries, verifyPaymentReceipts } from '../server/ledger.js';
 
 const path = process.argv[2];
 if (!path) {
@@ -13,5 +13,8 @@ const anchors = (snapshot.anchors ?? []).map((anchor) => ({
   signature: anchor.signature,
   matchesHistory: verifyEntries(snapshot.entries.slice(0, anchor.count)).root === anchor.root,
 }));
-console.log(JSON.stringify({ ...result, anchors }, null, 2));
-process.exit(result.valid && anchors.every((anchor) => anchor.matchesHistory) ? 0 : 1);
+const cryptoReceiptsValid = verifyPaymentReceipts(snapshot.entries, snapshot.cryptoPayments);
+console.log(JSON.stringify({ ...result, anchors, cryptoReceiptsValid }, null, 2));
+process.exit(
+  result.valid && cryptoReceiptsValid && anchors.every((anchor) => anchor.matchesHistory) ? 0 : 1,
+);

@@ -4,6 +4,8 @@
 
 MVP de doações com orçamento aberto, prestação de contas e ancoragem de hashes na Solana devnet. Campanhas, doações e liberações são demonstrativas; nenhum dinheiro real é movimentado.
 
+**Contribuições em cripto de teste:** em “Apoiar esta causa”, escolha simulação em reais, SOL/devnet ou ZEC/testnet. A API confirma destinatário, valor e transação antes de registrar o recibo. SOL e ZEC têm totais próprios, sem conversão ou crédito no saldo demonstrativo em reais. São transferências diretas, sem retenção para revisão de despesas. [Como usar e conferir](docs/doacoes-cripto.md).
+
 React, TypeScript e Vite cuidam da interface. A API usa Node.js 24 e Express, com SQLite local ou Turso/libSQL. Os valores ficam em centavos e cada evento financeiro recebe um hash SHA-256 encadeado ao anterior.
 
 ## Rodar
@@ -67,7 +69,7 @@ Se a conexão cair ou a confirmação demorar, clique novamente para retomar a m
 
 ## Zcash e recuperação de acesso
 
-O perfil verifica a posse de um endereço transparente Zcash testnet `tm…` mediante assinatura de mensagem e gera pedidos de teste [ZIP 321](https://zips.z.cash/zip-0321). O fluxo não usa endereços protegidos, não oferece conciliação de pagamentos e não altera o saldo demonstrativo. Veja [carteiras e redes](docs/carteiras-redes.md).
+O perfil verifica a posse de um endereço transparente Zcash testnet `tm…` mediante assinatura de mensagem. A campanha gera pedidos [ZIP 321](https://zips.z.cash/zip-0321) e confere o TXID via lightwalletd antes de registrar uma contribuição confirmada. O fluxo não usa destinatários protegidos e não altera o saldo demonstrativo em reais. Veja [carteiras e redes](docs/carteiras-redes.md) e [contribuições cripto](docs/doacoes-cripto.md).
 
 Guarde o código privado exibido no cadastro: ele permite recuperar sua conta em **Esqueci minha senha**. O perfil permite gerar outro código, alterar a senha e encerrar a conta. Não há envio de códigos nem verificação de e-mail por mensagem. Detalhes em [contas e permissões](docs/contas.md).
 

@@ -8,6 +8,7 @@ import { donorSchema } from './donors.js';
 import { Accounts, sessionDuration, sessionToken } from './accounts.js';
 import { ProfileWallets } from './profile-wallets.js';
 import { zcashPaymentRequest } from './zcash.js';
+import { Payments, cryptoPaymentSchema, publicPayment } from './payments.js';
 import {
   anchorMemo,
   confirmAnchor,
@@ -67,6 +68,7 @@ export function createApp(store, options = {}) {
   const sessions = new Map();
   const accounts = new Accounts(store);
   const wallets = new ProfileWallets(store);
+  const payments = new Payments(store, { ...options, rpcUrl });
   const rate = new Map();
   const authRate = new Map();
   app.disable('x-powered-by');
@@ -225,6 +227,7 @@ export function createApp(store, options = {}) {
       algorithm: 'SHA-256',
       campaignId: campaign.id,
       entries: campaign.ledger,
+      cryptoPayments: campaign.cryptoPayments,
       anchors: campaign.anchors.map(({ wallet, ...anchor }) => anchor),
     });
   });
@@ -260,6 +263,67 @@ export function createApp(store, options = {}) {
           input.donor,
         ),
       );
+  });
+  app.get('/api/campaigns/:id/payment-methods', async (req, res) => {
+    const campaign = await requireCampaign(req.params.id);
+    if (campaign.status === 'draft')
+      return res.status(404).json({ error: 'Campanha não publicada.' });
+    res.json(await payments.methods(campaign));
+  });
+  app.post('/api/campaigns/:id/crypto-payments', demoOnly, async (req, res) => {
+    const input = cryptoPaymentSchema.parse(req.body);
+    const acceptance = requireAcceptance(input, 'donor');
+    res.status(201).json(await payments.create(req.params.id, input, acceptance));
+  });
+  app.post('/api/crypto-payments/:id/status', demoOnly, async (req, res) => {
+    const { token } = z.strictObject({ token: text(20, 100) }).parse(req.body);
+    res.json(publicPayment(await payments.get(req.params.id, token)));
+  });
+  app.post('/api/crypto-payments/:id/submit', demoOnly, async (req, res) => {
+    const { token, transaction } = z
+      .strictObject({ token: text(20, 100), transaction: text(1, 4000) })
+      .parse(req.body);
+    res.json(await payments.submit(req.params.id, token, transaction));
+  });
+  app.post('/api/crypto-payments/:id/confirm', demoOnly, async (req, res) => {
+    const { token, txid } = z
+      .strictObject({ token: text(20, 100), txid: text(64, 90) })
+      .parse(req.body);
+    const intent = await payments.get(req.params.id, token);
+    if (
+      !(intent.network === 'zcash' ? /^[a-f0-9]{64}$/i : /^[1-9A-HJ-NP-Za-km-z]{80,90}$/).test(txid)
+    )
+      return res.status(400).json({ error: 'Informe o identificador válido da transação.' });
+    res.json(
+      await payments.confirm(
+        req.params.id,
+        token,
+        intent.network === 'zcash' ? txid.toLowerCase() : txid,
+      ),
+    );
+  });
+  app.put('/api/campaigns/:id/payment-receivers', ...individual, async (req, res) => {
+    const campaign = await requireOwnedCampaign(req, req.params.id);
+    const input = z
+      .strictObject({ networks: z.array(z.enum(['solana', 'zcash'])).max(2) })
+      .parse(req.body);
+    const linked = await wallets.list(req.account.id);
+    const receivers = Object.fromEntries(
+      input.networks.map((network) => {
+        const wallet = linked.find((item) => item.network === network);
+        if (!wallet)
+          throw Object.assign(
+            new Error('Vincule e verifique sua carteira em Perfil e carteiras primeiro.'),
+            { status: 409 },
+          );
+        return [network, wallet.address];
+      }),
+    );
+    await store.transaction(async () => {
+      const current = await store.get('campaigns', campaign.id);
+      await store.save('campaigns', { ...current, cryptoReceivers: receivers });
+    });
+    res.json({ receivers });
   });
   app.post('/api/campaigns/:id/reports', demoOnly, async (req, res) => {
     const input = z
