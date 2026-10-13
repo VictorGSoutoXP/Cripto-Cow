@@ -189,6 +189,9 @@ export function CryptoDonation({
       description="Somente Solana devnet e Zcash testnet. Nunca envie moedas de mainnet."
       onClose={onClose}
     >
+      <p className="muted">
+        Entre na conta antes de preparar o pagamento para acompanhar a contribuição no seu perfil.
+      </p>
       {intent ? (
         <div className="form-stack">
           <strong>

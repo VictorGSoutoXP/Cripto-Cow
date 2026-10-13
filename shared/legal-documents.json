@@ -5,11 +5,11 @@
     "description": "Versão de trabalho para discussão do grupo, fornecida pelo time em 02/10/2026. Rascunho de hackathon; não constitui parecer jurídico. As minutas seguem a estrutura das seções 7, 8 e 9, com os prazos e percentuais propostos pelo time na revisão de 09/10/2026; as políticas atuais descrevem o MVP publicado."
   },
   "acceptance": {
-    "version": "mvp-1.6",
+    "version": "mvp-1.7",
     "documents": ["uso-demonstrativo", "privacidade", "transparencia"],
-    "donorText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Usarei dados fictícios. Entendo que a simulação em reais e as regras de liberação/sobra são demonstrativas. SOL de devnet e ZEC de testnet vão diretamente ao destinatário indicado, sem valor real, custódia ou devolução automática. Nome fictício escolhido, endereços e transações aplicáveis ficam públicos. Não há retorno financeiro. O simulador permite adicionar reais fictícios, calcular SOL/ZEC fictícios e doar esse saldo sem criar moedas ou transações na blockchain.",
+    "donorText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Usarei dados fictícios. Entendo que a simulação em reais e as regras de liberação/sobra são demonstrativas. SOL de devnet e ZEC de testnet vão diretamente ao destinatário indicado, sem valor real, custódia ou devolução automática. Nome fictício escolhido, endereços e transações aplicáveis ficam públicos. Não há retorno financeiro. O simulador permite adicionar reais fictícios, calcular SOL/ZEC fictícios e doar esse saldo sem criar moedas ou transações na blockchain. Quando contribuo com a conta conectada, o site guarda um vínculo privado para mostrar meus totais e recibos no perfil, inclusive em doações anônimas publicamente.",
     "organizerText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. A campanha, suas evidências e justificativas usarão apenas dados fictícios. Entendo que as regras de liberação e sobra são demonstrativas, sem pagamento real ou retorno financeiro.",
-    "accountText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Entendo que meu e-mail, nome de exibição e dados de autenticação serão usados para manter minha conta e meu painel. Usarei dados fictícios nas campanhas e evidências. As doações e liberações são simuladas."
+    "accountText": "Tenho 18 anos ou mais, li e aceito os Termos de uso, a Política de Privacidade e a Política de Transparência do MVP. Entendo que meu e-mail, nome de exibição e dados de autenticação serão usados para manter minha conta e meu painel. Usarei dados fictícios nas campanhas e evidências. As doações e liberações são simuladas. Contribuições realizadas com a conta conectada ficam vinculadas privadamente ao meu perfil, sem publicar esse vínculo."
   },
   "documents": [
     {
@@ -17,7 +17,7 @@
       "title": "Termos de uso do MVP",
       "summary": "Regras válidas para participar da demonstração da Cripto Cow.",
       "status": "current",
-      "version": "mvp-1.6",
+      "version": "mvp-1.7",
       "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow é um protótipo de doações transparentes criado para o hackathon. Campanhas, valores, comprovantes e decisões da demonstração devem usar dados fictícios. Uma doação no site é uma simulação e não movimenta dinheiro.",
@@ -112,7 +112,7 @@
       "title": "Política de Privacidade do MVP",
       "summary": "Quais informações o protótipo utiliza, publica e mantém restritas.",
       "status": "current",
-      "version": "mvp-1.6",
+      "version": "mvp-1.7",
       "updatedAt": "2026-10-13",
       "intro": [
         "Esta política descreve o funcionamento atual da Cripto Cow. O cadastro utiliza e-mail, nome de exibição e senha para autenticar uma conta individual. Campanhas, doações, evidências e justificativas continuam demonstrativas e devem receber somente dados fictícios. Não há KYC, biometria ou envio de documentos originais.",
@@ -127,7 +127,8 @@
             "A doação demonstrativa aparece como anônima por padrão. A identificação é opcional: você pode escolher pessoa ou empresa e preencher um nome fictício de 2 a 60 caracteres para exibição pública. O MVP não verifica essa identidade e não solicita CPF, CNPJ, cartão, conta bancária ou chave Pix do doador. O participante entra no próprio painel com e-mail e senha. A moderação utiliza um acesso administrativo separado.",
             "A preparação e confirmação de ancoragens também registram o endereço público da carteira, assinatura e dados técnicos da transação. Uma assinatura de transação não dá ao site acesso à chave privada.",
             "O cadastro registra identificador da conta, e-mail normalizado, nome de exibição, data de criação e aceite versionado das políticas. A senha é armazenada como hash scrypt com salt aleatório, sem guardar seu texto original. As sessões individuais guardam o hash de um token aleatório e o prazo de validade. Campanhas novas são vinculadas ao identificador da conta responsável. O e-mail e o nome de perfil não são incluídos no histórico público ou na blockchain pelo cadastro.",
-            "Os vínculos de carteira guardam rede, endereço público, identificador da conta e data da verificação. Desafios temporários de assinatura guardam a mensagem, um nonce aleatório, a conta, o endereço e a validade; são descartados quando usados ou substituídos. Os códigos de recuperação são armazenados somente como hashes; o código completo é entregue ao participante uma vez no cadastro ou ao gerar seu substituto. Ele não é enviado por e-mail."
+            "Os vínculos de carteira guardam rede, endereço público, identificador da conta e data da verificação. Desafios temporários de assinatura guardam a mensagem, um nonce aleatório, a conta, o endereço e a validade; são descartados quando usados ou substituídos. Os códigos de recuperação são armazenados somente como hashes; o código completo é entregue ao participante uma vez no cadastro ou ao gerar seu substituto. Ele não é enviado por e-mail.",
+            "Contribuições realizadas com a conta autenticada registram um vínculo privado entre o identificador da conta, o recibo e a modalidade: reais fictícios, SOL/ZEC virtuais ou pagamento nas redes de teste. Esse vínculo permite mostrar totais e histórico no perfil e é criado junto com a doação ou preparação do pagamento. Adicionar saldo e converter moedas não são contribuições. Registros antigos ou criados sem login não são atribuídos automaticamente por nome ou endereço público."
           ]
         },
         {
@@ -138,7 +139,8 @@
             "Quando a opção pessoa ou empresa é escolhida, o nome fictício e o tipo informado aparecem publicamente com o valor e a data da doação simulada. Esses campos ficam no banco de dados fora do ledger financeiro imutável e não integram seus hashes. A opção anônima descreve a exibição pública e não elimina os dados técnicos de conexão tratados pela infraestrutura.",
             "Denúncias, seus motivos e a decisão de revisão ficam restritos à moderação. Cada participante consulta no painel somente suas próprias campanhas e solicitações. Não recebe acesso às denúncias nem pode aprovar despesas. O formulário de denúncia não solicita a identidade do denunciante. Não inclua dados que identifiquem quem denuncia.",
             "Não existe, neste MVP, mecanismo para ocultar automaticamente dados pessoais, tarjar documentos ou remover metadados. Os formulários recebem textos demonstrativos, não documentos originais. Não copie informações reais para esses textos.",
-            "A lista de carteiras vinculadas ao perfil fica restrita ao participante. Um endereço usado para ancorar uma campanha na Solana passa a integrar os dados públicos dessa ancoragem. Um pedido Zcash de teste gerado no perfil pode revelar seu endereço a quem receber o link; o site não publica esses pedidos na lista de campanhas nem registra uma doação a partir deles."
+            "A lista de carteiras vinculadas ao perfil fica restrita ao participante. Um endereço usado para ancorar uma campanha na Solana passa a integrar os dados públicos dessa ancoragem. Um pedido Zcash de teste gerado no perfil pode revelar seu endereço a quem receber o link; o site não publica esses pedidos na lista de campanhas nem registra uma doação a partir deles.",
+            "O vínculo entre conta e contribuição e o histórico pessoal ficam restritos à conta autenticada; o identificador da conta não integra o recibo público nem o ledger ou a blockchain. A opção anônima mantém essa relação privada no perfil. Totais em reais fictícios, SOL/ZEC virtuais e SOL/ZEC de teste confirmados são separados; pedidos pendentes não entram nos totais. Ao encerrar a conta, os vínculos privados de contribuições são apagados e os registros públicos permanecem."
           ]
         },
         {
@@ -204,7 +206,7 @@
       "title": "Política de Transparência do MVP",
       "summary": "Como consultar o histórico, entender evidências e acompanhar decisões simuladas.",
       "status": "current",
-      "version": "mvp-1.6",
+      "version": "mvp-1.7",
       "updatedAt": "2026-10-13",
       "intro": [
         "A Cripto Cow demonstra prestação de contas por campanha: entradas, saídas, orçamento, evidências e decisões ficam disponíveis para consulta pública, com os limites descritos nesta política.",

@@ -11,6 +11,7 @@ import {
 import { api } from '../lib/api';
 import { linkSolanaWallet, solanaProvider } from '../lib/wallet';
 import { Button } from '../components/ui';
+import { Contributions } from '../components/Contributions';
 import type { Overlay, ProfileWallet, WalletChallenge } from '../types';
 
 type User = { id: string | null; name: string; email?: string };
@@ -116,6 +117,7 @@ export default function Profile({
   }
   return (
     <div className="profile-layout">
+      <Contributions key={user.id} />
       <section className="profile-card">
         <span className="eyebrow small">SEU PERFIL</span>
         <h2>Uma conta, suas causas.</h2>

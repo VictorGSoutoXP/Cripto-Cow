@@ -3599,6 +3599,101 @@ select {
 .profile-security {
   grid-column: 1 / -1;
 }
+.profile-contributions {
+  grid-column: 1 / -1;
+}
+.contribution-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.contribution-heading .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.contribution-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+.contribution-totals article {
+  padding: 20px;
+  background: var(--surface, #f6f9fc);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.contribution-totals h3 {
+  font-size: 14px;
+  margin: 0 0 16px;
+}
+.contribution-totals strong {
+  display: block;
+  color: var(--brand);
+  font-size: 23px;
+  overflow-wrap: anywhere;
+}
+.contribution-totals small,
+.contribution-history small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 5px;
+}
+.contribution-coin + .contribution-coin {
+  margin: 14px 0;
+}
+.contribution-history {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+}
+.contribution-history li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.contribution-history li > div {
+  min-width: 0;
+  flex: 1 1 250px;
+}
+.contribution-history a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--brand);
+  font-weight: 600;
+}
+.contribution-reference {
+  overflow-wrap: anywhere;
+}
+.contribution-value {
+  text-align: right;
+}
+.contribution-state {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.contribution-state.confirmed {
+  color: #186344;
+}
+.profile-card .contribution-note {
+  font-size: 12px;
+  margin-top: 22px;
+}
+@media (max-width: 600px) {
+  .contribution-value {
+    text-align: left;
+  }
+}
 .profile-actions {
   display: flex;
   flex-wrap: wrap;

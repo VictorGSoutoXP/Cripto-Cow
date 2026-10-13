@@ -27,6 +27,8 @@ const schema = [
   'CREATE TABLE IF NOT EXISTS demo_wallets (key_hash TEXT PRIMARY KEY, payload TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS demo_operations (request_key TEXT PRIMARY KEY, wallet_hash TEXT NOT NULL REFERENCES demo_wallets(key_hash), kind TEXT NOT NULL, fingerprint TEXT NOT NULL, payload TEXT NOT NULL)',
   'CREATE TABLE IF NOT EXISTS demo_crypto_donations (id TEXT PRIMARY KEY, campaign_id TEXT NOT NULL REFERENCES campaigns(id), payload TEXT NOT NULL)',
+  "CREATE TABLE IF NOT EXISTS contribution_owners (kind TEXT NOT NULL CHECK(kind IN ('brl', 'virtual', 'testnet')), reference_id TEXT NOT NULL, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, PRIMARY KEY(kind, reference_id))",
+  'CREATE INDEX IF NOT EXISTS contribution_owners_user ON contribution_owners(user_id)',
   "CREATE TRIGGER IF NOT EXISTS ledger_no_update BEFORE UPDATE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
   "CREATE TRIGGER IF NOT EXISTS ledger_no_delete BEFORE DELETE ON ledger BEGIN SELECT RAISE(ABORT, 'Ledger is append-only'); END",
 ];
@@ -289,7 +291,15 @@ export class Store {
     };
   }
 
-  async donate(campaignId, amount, requestKey, accepted, donor) {
+  async linkContribution(kind, referenceId, userId) {
+    if (!userId) return;
+    await this.execute({
+      sql: 'INSERT INTO contribution_owners (kind, reference_id, user_id) VALUES (?, ?, ?)',
+      args: [kind, referenceId, userId],
+    });
+  }
+
+  async donate(campaignId, amount, requestKey, accepted, donor, userId = null) {
     const profile = donorSchema.parse(donor);
     return this.transaction(async () => {
       const { rows } = await this.execute({
@@ -317,7 +327,7 @@ export class Store {
       const id = randomUUID();
       const acceptance = getAcceptance('donor');
       const entry = await this.append(campaignId, { type: 'donation', amount, referenceId: id });
-      return this.save('donations', {
+      const donation = await this.save('donations', {
         id,
         campaignId,
         amount,
@@ -333,6 +343,8 @@ export class Store {
         ledgerId: entry.id,
         simulated: true,
       });
+      await this.linkContribution('brl', id, userId);
+      return donation;
     });
   }
 

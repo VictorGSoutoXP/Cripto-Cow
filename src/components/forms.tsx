@@ -222,6 +222,10 @@ export function DonationForm({
         </div>
       ) : (
         <form onSubmit={submit} className="form-stack">
+          <p className="muted">
+            Entre na conta antes de doar para acompanhar suas contribuições no perfil. Você pode
+            continuar anônimo no histórico público.
+          </p>
           <fieldset className="donor-identity">
             <legend>Como você quer contribuir?</legend>
             <div className="payment-methods">

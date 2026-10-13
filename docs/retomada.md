@@ -1,5 +1,7 @@
 # Retomada do projeto
 
+**Contribuições por perfil — 13/10/2026:** vínculo privado das novas doações com a conta autenticada, totais separados em reais fictícios, SOL/ZEC virtuais e SOL/ZEC confirmados nas redes de teste, histórico paginado e indicação dos pedidos pendentes. Registros antigos sem vínculo não são atribuídos automaticamente. [Contas](contas.md) detalha o comportamento. Políticas atuais `mvp-1.7`; 110 testes aprovados. O simulador foi publicado pelo PR #9. Os registros de entregas anteriores abaixo preservam seus números e pendências históricas.
+
 **Simulador de 13/10/2026:** adicionar reais fictícios, calcular SOL/ZEC com referência identificada e doar saldo virtual sem carteira. Os recibos ficam separados dos pagamentos confirmados e do saldo em reais. Leia [saldo virtual](saldo-virtual.md). Cadastro e contribuições de teste foram publicados nos PRs #7 e #8.
 
 **Atualização de 13/10/2026:** cadastro, login e design foram mesclados e publicados pelo PR #7. A evolução seguinte acrescenta escolha SOL/devnet e ZEC/testnet, destinatários por campanha, confirmação pela API e recibos cripto em totais separados. Leia [contribuições cripto](doacoes-cripto.md) para configuração, verificações realizadas e a transferência de teste ainda necessária para o vídeo. Os itens anteriores abaixo preservam o registro da entrega inicial.
